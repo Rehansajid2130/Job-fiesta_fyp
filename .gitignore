@@ -7,6 +7,8 @@ dist/
 dist-ssr/
 */dist/
 build/
+.vite/
+*/.vite/
 
 # Local environment and secret files
 .env
