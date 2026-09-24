@@ -12,12 +12,12 @@ const { protect, authorize } = require('../middleware/auth');
 
 router.route('/')
   .get(getJobs)
-  .post(protect, authorize('employer', 'admin'), createJob);
+  .post(protect, authorize('employer', 'recruiter', 'admin'), createJob);
 
 router.route('/:id')
   .get(getJobById)
-  .put(protect, authorize('employer', 'admin'), updateJob)
-  .delete(protect, authorize('employer', 'admin'), deleteJob);
+  .put(protect, authorize('employer', 'recruiter', 'admin'), updateJob)
+  .delete(protect, authorize('employer', 'recruiter', 'admin'), deleteJob);
 
 router.post('/:id/save', protect, toggleSaveJob);
 

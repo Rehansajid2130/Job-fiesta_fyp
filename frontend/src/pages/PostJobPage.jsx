@@ -5,7 +5,7 @@ import Footer from '../components/common/Footer';
 import { useJobs } from '../context/JobContext';
 import { useAuth } from '../context/AuthContext';
 import { categories } from '../data/mockData';
-import { Briefcase, Building, MapPin, DollarSign, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Briefcase, Building, MapPin, DollarSign, CheckCircle2, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
 
 const PostJobPage = () => {
   const navigate = useNavigate();
@@ -28,23 +28,41 @@ const PostJobPage = () => {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
+
     if (!formData.title.trim()) {
-      alert('Please provide a job title.');
+      setErrorMsg('Please provide a job title.');
+      return;
+    }
+    if (!formData.company.trim()) {
+      setErrorMsg('Please provide a company name.');
+      return;
+    }
+    if (!formData.description.trim()) {
+      setErrorMsg('Please provide a job description.');
       return;
     }
 
-    postNewJob({
-      ...formData,
-      salary: `$${formData.salaryMin}k - $${formData.salaryMax}k`
-    });
-
-    setSubmitted(true);
-    setTimeout(() => {
-      navigate('/recruiter-dashboard');
-    }, 1500);
+    setSubmitting(true);
+    try {
+      await postNewJob({
+        ...formData,
+        salary: `$${formData.salaryMin}k - $${formData.salaryMax}k`
+      });
+      setSubmitting(false);
+      setSubmitted(true);
+      setTimeout(() => {
+        navigate('/recruiter-dashboard');
+      }, 1500);
+    } catch (err) {
+      setSubmitting(false);
+      setErrorMsg(err.message || 'Failed to publish job.');
+    }
   };
 
   return (
@@ -86,6 +104,22 @@ const PostJobPage = () => {
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+              {errorMsg && (
+                <div style={{
+                  backgroundColor: '#FEF2F2',
+                  border: '1px solid #FCA5A5',
+                  borderRadius: '8px',
+                  padding: '10px 14px',
+                  color: '#B91C1C',
+                  fontSize: '13.5px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <AlertCircle size={16} />
+                  <span>{errorMsg}</span>
+                </div>
+              )}
               <div>
                 <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: '600', color: '#334155', marginBottom: '6px' }}>
                   Position Title *
@@ -344,21 +378,33 @@ const PostJobPage = () => {
                 </button>
                 <button
                   type="submit"
+                  disabled={submitting}
                   style={{
                     padding: '12px 28px',
                     borderRadius: '8px',
-                    backgroundColor: '#0C463B',
+                    backgroundColor: submitting ? '#092F27' : '#0C463B',
                     color: '#FFFFFF',
                     fontWeight: '700',
                     fontSize: '0.98rem',
                     boxShadow: 'var(--shadow-md)',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8px'
+                    gap: '8px',
+                    cursor: submitting ? 'not-allowed' : 'pointer',
+                    opacity: submitting ? 0.8 : 1
                   }}
                 >
-                  <span>Publish Job</span>
-                  <ArrowRight size={18} />
+                  {submitting ? (
+                    <>
+                      <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />
+                      <span>Publishing Job...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Publish Job</span>
+                      <ArrowRight size={18} />
+                    </>
+                  )}
                 </button>
               </div>
             </form>

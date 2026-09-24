@@ -141,23 +141,60 @@ export const JobProvider = ({ children }) => {
     return { success: true, message: `Application submitted successfully for ${job.title || 'position'}!` };
   };
 
-  const postNewJob = (newJobData) => {
+  const postNewJob = async (newJobData) => {
+    const token = localStorage.getItem('token');
+    let backendJob = null;
+
+    const payload = {
+      title: newJobData.title,
+      company: newJobData.company || 'Nexus Innovations',
+      companyLogo: newJobData.logo || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=100&h=100&fit=crop&crop=faces',
+      location: newJobData.location || 'Remote',
+      workplaceType: newJobData.location?.toLowerCase().includes('remote') ? 'Remote' : (newJobData.location?.toLowerCase().includes('hybrid') ? 'Hybrid' : 'On-site'),
+      jobType: newJobData.type || 'Full-time',
+      experienceLevel: newJobData.experience || 'Mid-level',
+      category: newJobData.category || 'Development',
+      salaryMin: Number(newJobData.salaryMin) > 1000 ? Number(newJobData.salaryMin) : (Number(newJobData.salaryMin) * 1000 || 100000),
+      salaryMax: Number(newJobData.salaryMax) > 1000 ? Number(newJobData.salaryMax) : (Number(newJobData.salaryMax) * 1000 || 140000),
+      salaryPeriod: 'year',
+      currency: 'USD',
+      description: newJobData.description || 'Join our team to build state-of-the-art products.',
+      requirements: typeof newJobData.requirements === 'string' ? newJobData.requirements.split('\n').filter(Boolean) : (newJobData.requirements || []),
+      benefits: typeof newJobData.benefits === 'string' ? newJobData.benefits.split('\n').filter(Boolean) : (newJobData.benefits || ['Health insurance', 'Flexible PTO']),
+      skills: typeof newJobData.tags === 'string' ? newJobData.tags.split(',').map(t => t.trim()).filter(Boolean) : (newJobData.tags || []),
+    };
+
+    if (token && !token.startsWith('demo-token')) {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+        const res = await axios.post(`${apiUrl}/api/jobs`, payload, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.data?.job) {
+          backendJob = res.data.job;
+        }
+      } catch (err) {
+        console.warn('Backend post job error:', err.response?.data?.message || err.message);
+      }
+    }
+
     const newJob = {
-      id: `job-${Date.now()}`,
+      id: backendJob ? backendJob._id : `job-${Date.now()}`,
       postedDate: 'Just now',
       featured: false,
-      salaryMin: Number(newJobData.salaryMin) || 100000,
-      salaryMax: Number(newJobData.salaryMax) || 140000,
-      salary: `$${newJobData.salaryMin || '100'}k - $${newJobData.salaryMax || '140'}k`,
-      logo: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=100&h=100&fit=crop&crop=faces',
-      tags: newJobData.tags ? newJobData.tags.split(',').map(t => t.trim()) : ['Full-Time'],
-      requirements: typeof newJobData.requirements === 'string' ? newJobData.requirements.split('\n').filter(Boolean) : newJobData.requirements,
-      benefits: typeof newJobData.benefits === 'string' ? newJobData.benefits.split('\n').filter(Boolean) : (newJobData.benefits || ['Health insurance', '401k match', 'Flexible PTO']),
-      ...newJobData
+      salaryMin: payload.salaryMin,
+      salaryMax: payload.salaryMax,
+      salary: `$${Math.round(payload.salaryMin / 1000)}k - $${Math.round(payload.salaryMax / 1000)}k`,
+      logo: payload.companyLogo,
+      tags: payload.skills,
+      requirements: payload.requirements,
+      benefits: payload.benefits,
+      ...newJobData,
+      _id: backendJob ? backendJob._id : undefined
     };
 
     setJobs(prev => [newJob, ...prev]);
-    return newJob;
+    return { success: true, job: newJob };
   };
 
   const updateApplicationStatus = (appId, newStatus) => {

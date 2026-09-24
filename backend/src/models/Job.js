@@ -23,17 +23,17 @@ const jobSchema = new mongoose.Schema(
     },
     workplaceType: {
       type: String,
-      enum: ['Remote', 'On-site', 'Hybrid'],
+      enum: ['Remote', 'On-site', 'Hybrid', 'Onsite'],
       default: 'On-site',
     },
     jobType: {
       type: String,
-      enum: ['Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance'],
+      enum: ['Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance', 'Full-Time', 'Part-Time'],
       default: 'Full-time',
     },
     experienceLevel: {
       type: String,
-      enum: ['Fresher', 'Junior', 'Mid-level', 'Senior', 'Director / Executive'],
+      enum: ['Fresher', 'Junior', 'Mid-level', 'Mid-Senior', 'Senior', 'Director / Executive', 'Senior Level'],
       default: 'Mid-level',
     },
     category: {
