@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import axios from 'axios';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import JobFilterSidebar from '../components/jobs/JobFilterSidebar';
@@ -14,7 +15,8 @@ import {
   X, 
   Send, 
   Briefcase,
-  ChevronDown
+  ChevronDown,
+  Loader2
 } from 'lucide-react';
 
 const figmaMockJobs = [
@@ -124,7 +126,7 @@ const figmaMockJobs = [
 ];
 
 const SearchPage = () => {
-  const { jobs: contextJobs, applyToJob } = useJobs();
+  const { jobs: contextJobs, applyToJob, toggleSaveJob, savedJobIds } = useJobs();
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -132,17 +134,23 @@ const SearchPage = () => {
   const [keywordInput, setKeywordInput] = useState(searchParams.get('keyword') || '');
   const [locationInput, setLocationInput] = useState(searchParams.get('location') || '');
 
-  // Filter state for Figma 1 Job Search
+  // Filter state aligned with JobFilterSidebar
   const [filters, setFilters] = useState({
     minSalary: '',
     maxSalary: '',
-    jobTypes: [],
-    workModes: [],
-    experienceLevels: [],
+    type: 'all',
+    workMode: 'all',
+    experience: 'all',
     category: searchParams.get('category') || 'all'
   });
 
-  // ponytail: Modal state for applying; selectedJob details modal was dead code (cards navigate to /job/:id directly)
+  const [selectedSort, setSelectedSort] = useState('popular');
+  const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
+  const [liveJobs, setLiveJobs] = useState([]);
+  const [isLiveLoading, setIsLiveLoading] = useState(false);
+  const [usingLiveApi, setUsingLiveApi] = useState(false);
+
+  // Modal state for applying
   const [applyModalJob, setApplyModalJob] = useState(null);
   const [applySuccess, setApplySuccess] = useState(false);
   const [coverNote, setCoverNote] = useState('');
@@ -175,7 +183,82 @@ const SearchPage = () => {
     setSearchParams(newParams);
   };
 
-  // Combine mock Figma jobs with any user-posted context jobs
+  const handleResetFilters = () => {
+    setFilters({
+      minSalary: '',
+      maxSalary: '',
+      type: 'all',
+      workMode: 'all',
+      experience: 'all',
+      category: 'all'
+    });
+    setKeywordInput('');
+    setLocationInput('');
+    setSelectedSort('popular');
+    setSearchParams(new URLSearchParams());
+  };
+
+  // Fetch live jobs from backend API whenever search/filter criteria change
+  useEffect(() => {
+    let isCancelled = false;
+    const fetchLiveJobs = async () => {
+      setIsLiveLoading(true);
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+        const params = {};
+        if (keywordInput.trim()) params.keyword = keywordInput.trim();
+        if (locationInput.trim()) params.location = locationInput.trim();
+        if (filters.category && filters.category !== 'all') params.category = filters.category;
+        if (filters.type && filters.type !== 'all') params.jobType = filters.type;
+        if (filters.workMode && filters.workMode !== 'all') params.workplaceType = filters.workMode;
+        if (filters.experience && filters.experience !== 'all') {
+          params.experienceLevel = filters.experience.replace(' Level', '').replace(' level', '');
+        }
+        if (filters.minSalary) params.minSalary = filters.minSalary;
+        if (filters.maxSalary) params.maxSalary = filters.maxSalary;
+        if (selectedSort) params.sort = selectedSort;
+
+        const res = await axios.get(`${apiUrl}/api/jobs`, { params, timeout: 3500 });
+        if (!isCancelled && res.data?.jobs) {
+          const mapped = res.data.jobs.map((job) => ({
+            id: job._id,
+            title: job.title,
+            company: job.company,
+            logo: job.companyLogo || '/assets/images/google_logo.png',
+            location: job.location,
+            type: (job.jobType || 'Full-time').toUpperCase(),
+            category: job.category?.toLowerCase() || 'tech',
+            workMode: job.workplaceType || 'On-site',
+            experience: job.experienceLevel || 'Mid-Level',
+            salary: job.currency === 'INR'
+              ? `${Number(job.salaryMin).toLocaleString()} INR - ${Number(job.salaryMax).toLocaleString()} INR`
+              : `$${Number(job.salaryMin).toLocaleString()} - $${Number(job.salaryMax).toLocaleString()}`,
+            salaryMin: job.salaryMin,
+            salaryMax: job.salaryMax,
+            postedDate: 'Recently',
+            applicantsCount: job.applicantsCount || 0,
+            description: job.description,
+            isBookmarked: savedJobIds?.includes(job._id) || false,
+          }));
+          setLiveJobs(mapped);
+          setUsingLiveApi(true);
+        }
+      } catch (err) {
+        console.info('Backend live API unavailable, using local jobs data:', err.message);
+        setUsingLiveApi(false);
+      } finally {
+        if (!isCancelled) setIsLiveLoading(false);
+      }
+    };
+
+    fetchLiveJobs();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [keywordInput, locationInput, filters, selectedSort, savedJobIds]);
+
+  // Combine mock Figma jobs with any user-posted context jobs (used as robust fallback)
   const combinedJobs = [
     ...figmaMockJobs,
     ...(contextJobs || []).map(j => ({
@@ -193,55 +276,69 @@ const SearchPage = () => {
       salaryMax: j.salaryMax || 150000,
       postedDate: j.postedDate || 'Recent',
       applicantsCount: j.applicantsCount || 28,
-      description: j.description || 'Join our innovative engineering team.'
+      description: j.description || 'Join our innovative engineering team.',
+      isBookmarked: savedJobIds?.includes(j.id) || false
     }))
   ];
 
-  // Filtering logic
-  const filteredJobs = combinedJobs.filter(job => {
-    if (keywordInput.trim()) {
-      const q = keywordInput.toLowerCase();
-      const matchTitle = job.title.toLowerCase().includes(q);
-      const matchCompany = job.company.toLowerCase().includes(q);
-      if (!matchTitle && !matchCompany) return false;
-    }
+  // Client-side filtering logic for fallback
+  const filteredJobs = combinedJobs
+    .filter(job => {
+      if (keywordInput.trim()) {
+        const q = keywordInput.toLowerCase();
+        const matchTitle = job.title.toLowerCase().includes(q);
+        const matchCompany = job.company.toLowerCase().includes(q);
+        if (!matchTitle && !matchCompany) return false;
+      }
 
-    if (locationInput.trim()) {
-      const locQ = locationInput.toLowerCase();
-      if (!job.location.toLowerCase().includes(locQ)) return false;
-    }
+      if (locationInput.trim()) {
+        const locQ = locationInput.toLowerCase();
+        if (!job.location.toLowerCase().includes(locQ)) return false;
+      }
 
-    if (filters.category && filters.category !== 'all') {
-      if (job.category !== filters.category) return false;
-    }
+      if (filters.category && filters.category !== 'all') {
+        if (job.category !== filters.category) return false;
+      }
 
-    if (filters.jobTypes.length > 0) {
-      const matchesType = filters.jobTypes.some(t => job.type.toLowerCase().includes(t.toLowerCase()));
-      if (!matchesType) return false;
-    }
+      if (filters.type && filters.type !== 'all') {
+        const matchesType = job.type.toLowerCase().includes(filters.type.toLowerCase());
+        if (!matchesType) return false;
+      }
 
-    if (filters.workModes.length > 0) {
-      const matchesMode = filters.workModes.some(m => job.workMode.toLowerCase().includes(m.toLowerCase()));
-      if (!matchesMode) return false;
-    }
+      if (filters.workMode && filters.workMode !== 'all') {
+        const matchesMode = job.workMode.toLowerCase().includes(filters.workMode.toLowerCase());
+        if (!matchesMode) return false;
+      }
 
-    if (filters.experienceLevels.length > 0) {
-      const matchesExp = filters.experienceLevels.some(exp => job.experience.toLowerCase().includes(exp.toLowerCase()));
-      if (!matchesExp) return false;
-    }
+      if (filters.experience && filters.experience !== 'all') {
+        const matchesExp = job.experience.toLowerCase().includes(filters.experience.toLowerCase());
+        if (!matchesExp) return false;
+      }
 
-    if (filters.minSalary) {
-      const min = parseInt(filters.minSalary, 10);
-      if (!isNaN(min) && (job.salaryMin || 0) < min) return false;
-    }
+      if (filters.minSalary) {
+        const min = parseInt(filters.minSalary, 10);
+        if (!isNaN(min) && (job.salaryMin || 0) < min) return false;
+      }
 
-    if (filters.maxSalary) {
-      const max = parseInt(filters.maxSalary, 10);
-      if (!isNaN(max) && (job.salaryMax || 999999) > max) return false;
-    }
+      if (filters.maxSalary) {
+        const max = parseInt(filters.maxSalary, 10);
+        if (!isNaN(max) && (job.salaryMax || 999999) > max) return false;
+      }
 
-    return true;
-  });
+      return true;
+    })
+    .sort((a, b) => {
+      if (selectedSort === 'popular') {
+        return (b.applicantsCount || 0) - (a.applicantsCount || 0);
+      } else if (selectedSort === 'salary_high') {
+        return (b.salaryMax || 0) - (a.salaryMax || 0);
+      } else if (selectedSort === 'salary_low') {
+        return (a.salaryMin || 0) - (b.salaryMin || 0);
+      }
+      return 0;
+    });
+
+  const displayedJobs = usingLiveApi ? liveJobs : filteredJobs;
 
 
   const handleApplySubmit = (e) => {
@@ -406,7 +503,8 @@ const SearchPage = () => {
                 <JobFilterSidebar 
                   filters={filters} 
                   setFilters={setFilters} 
-                  totalJobsCount={combinedJobs.length} 
+                  totalJobsCount={displayedJobs.length} 
+                  onReset={handleResetFilters}
                 />
               </div>
             )}
@@ -419,7 +517,8 @@ const SearchPage = () => {
               <JobFilterSidebar 
                 filters={filters} 
                 setFilters={setFilters} 
-                totalJobsCount={combinedJobs.length} 
+                totalJobsCount={displayedJobs.length} 
+                onReset={handleResetFilters}
               />
             </aside>
 
@@ -433,13 +532,14 @@ const SearchPage = () => {
                   margin: 0,
                   letterSpacing: '-0.01em'
                 }}>
-                  All Jobs <span style={{ color: '#0D473B', fontWeight: '700', fontSize: '18px' }}>({filteredJobs.length || '2310'})</span>
+                  All Jobs <span style={{ color: '#0D473B', fontWeight: '700', fontSize: '18px' }}>({displayedJobs.length})</span>
                 </h2>
 
-                {/* Popular Sort Dropdown Pill */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                {/* Interactive Sort Dropdown Pill */}
+                <div style={{ position: 'relative' }}>
                   <button
                     type="button"
+                    onClick={() => setSortDropdownOpen(!sortDropdownOpen)}
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
@@ -454,13 +554,82 @@ const SearchPage = () => {
                       cursor: 'pointer'
                     }}
                   >
-                    <span>Popular</span>
+                    <span>
+                      {selectedSort === 'popular'
+                        ? 'Popular'
+                        : selectedSort === 'salary_high'
+                        ? 'Salary: High to Low'
+                        : selectedSort === 'salary_low'
+                        ? 'Salary: Low to High'
+                        : 'Newest'}
+                    </span>
                     <ChevronDown size={14} color="#6B7280" />
                   </button>
+
+                  {sortDropdownOpen && (
+                    <div style={{
+                      position: 'absolute',
+                      right: 0,
+                      top: 'calc(100% + 6px)',
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '12px',
+                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+                      border: '1px solid #E5E7EB',
+                      padding: '6px',
+                      zIndex: 50,
+                      minWidth: '180px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '2px'
+                    }}>
+                      {[
+                        { id: 'popular', label: 'Popular' },
+                        { id: 'newest', label: 'Newest' },
+                        { id: 'salary_high', label: 'Salary: High to Low' },
+                        { id: 'salary_low', label: 'Salary: Low to High' }
+                      ].map((opt) => (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedSort(opt.id);
+                            setSortDropdownOpen(false);
+                          }}
+                          style={{
+                            textAlign: 'left',
+                            padding: '8px 12px',
+                            fontSize: '13px',
+                            borderRadius: '8px',
+                            border: 'none',
+                            backgroundColor: selectedSort === opt.id ? '#F2FFF2' : 'transparent',
+                            color: selectedSort === opt.id ? '#0D473B' : '#374151',
+                            fontWeight: selectedSort === opt.id ? '600' : '400',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {filteredJobs.length === 0 ? (
+              {isLiveLoading && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '24px 0',
+                  gap: '8px',
+                  color: '#0D473B'
+                }}>
+                  <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />
+                  <span style={{ fontSize: '13.5px', fontWeight: '500' }}>Updating jobs...</span>
+                </div>
+              )}
+
+              {displayedJobs.length === 0 && !isLiveLoading ? (
                 <div style={{
                   backgroundColor: '#FFFFFF',
                   borderRadius: '16px',
@@ -477,7 +646,7 @@ const SearchPage = () => {
                   </p>
                   <button
                     type="button"
-                    onClick={() => setFilters({ minSalary: '', maxSalary: '', jobTypes: [], workModes: [], experienceLevels: [], category: 'all' })}
+                    onClick={handleResetFilters}
                     style={{
                       padding: '10px 24px',
                       backgroundColor: '#0D473B',
@@ -495,11 +664,12 @@ const SearchPage = () => {
               ) : (
                 <>
                   <div className="search-jobs-grid">
-                    {filteredJobs.map((job) => (
+                    {displayedJobs.map((job) => (
                       <FigmaJobCard
                         key={job.id}
                         job={job}
-                        isBookmarked={job.isBookmarked}
+                        isBookmarked={savedJobIds?.includes(job.id)}
+                        onToggleBookmark={(id) => toggleSaveJob(id)}
                         onApply={(j) => setApplyModalJob(j)}
                       />
                     ))}

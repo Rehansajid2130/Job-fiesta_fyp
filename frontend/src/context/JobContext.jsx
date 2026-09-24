@@ -87,26 +87,50 @@ export const JobProvider = ({ children }) => {
     fetchLiveJobs();
   }, []);
 
-  const toggleSaveJob = (jobId) => {
+  const toggleSaveJob = async (jobId) => {
     setSavedJobIds(prev => 
       prev.includes(jobId) ? prev.filter(id => id !== jobId) : [...prev, jobId]
     );
+
+    const token = localStorage.getItem('token');
+    if (token && !token.startsWith('demo-token') && typeof jobId === 'string' && jobId.length === 24) {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+        await axios.post(`${apiUrl}/api/jobs/${jobId}/save`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (err) {
+        console.warn('Backend toggle save job sync:', err.response?.data?.message || err.message);
+      }
+    }
   };
 
-  const applyToJob = (jobId, customCoverNote = '') => {
-    const job = jobs.find(j => j.id === jobId);
-    if (!job) return { success: false, message: 'Job not found' };
-
+  const applyToJob = async (jobId, customCoverNote = '') => {
+    const job = jobs.find(j => j.id === jobId) || {};
     const alreadyApplied = applications.some(a => a.jobId === jobId);
     if (alreadyApplied) {
       return { success: false, message: 'You have already applied to this position.' };
     }
 
+    const token = localStorage.getItem('token');
+    if (token && !token.startsWith('demo-token') && typeof jobId === 'string' && jobId.length === 24) {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+        await axios.post(`${apiUrl}/api/applications/${jobId}`, {
+          coverLetter: customCoverNote
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (err) {
+        console.warn('Backend application submission:', err.response?.data?.message || err.message);
+      }
+    }
+
     const newApplication = {
       id: `app-${Date.now()}`,
       jobId,
-      jobTitle: job.title,
-      company: job.company,
+      jobTitle: job.title || 'Position',
+      company: job.company || 'Company',
       appliedDate: new Date().toISOString().split('T')[0],
       status: 'Under Review',
       matchScore: Math.floor(Math.random() * 15) + 85,
@@ -114,7 +138,7 @@ export const JobProvider = ({ children }) => {
     };
 
     setApplications(prev => [newApplication, ...prev]);
-    return { success: true, message: `Application submitted successfully for ${job.title}!` };
+    return { success: true, message: `Application submitted successfully for ${job.title || 'position'}!` };
   };
 
   const postNewJob = (newJobData) => {
