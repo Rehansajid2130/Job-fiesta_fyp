@@ -1,205 +1,125 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import JobFilterSidebar from '../components/jobs/JobFilterSidebar';
-import SearchSideNav from '../components/jobs/SearchSideNav';
 import FigmaJobCard from '../components/jobs/FigmaJobCard';
-import FigmaTalentCard from '../components/jobs/FigmaTalentCard';
-import FigmaApplicationCard from '../components/jobs/FigmaApplicationCard';
 import { useJobs } from '../context/JobContext';
 import { useAuth } from '../context/AuthContext';
 import { 
   Search, 
   MapPin, 
   SlidersHorizontal, 
-  Sparkles, 
   CheckCircle2, 
   X, 
   Send, 
-  Briefcase, 
-  User, 
-  Layers,
-  ArrowRight,
-  Star
+  Briefcase,
+  ChevronDown
 } from 'lucide-react';
 
 const figmaMockJobs = [
   {
     id: 'figma-job-1',
-    title: 'Senior Frontend Engineer',
-    company: 'Google',
+    title: 'Technical Support Specialist',
+    company: 'Google Inc.',
     logo: '/assets/images/google_logo.png',
-    location: 'Mountain View, CA (Hybrid)',
+    location: 'New Delhi, India',
     type: 'PART-TIME',
     category: 'tech',
-    workMode: 'Hybrid',
-    experience: 'Senior Level',
-    salary: '$130k - $160k',
-    salaryMin: 130000,
-    salaryMax: 160000,
+    workMode: 'On-site',
+    experience: 'Junior',
+    salary: '20,000 INR - 25,000 INR',
+    salaryMin: 20000,
+    salaryMax: 25000,
     postedDate: '2 days ago',
-    applicantsCount: 45,
-    description: 'Build high-performance web applications using modern React, TypeScript, and state-of-the-art web performance tools at Google scale.'
+    applicantsCount: 10,
+    description: 'Provide technical assistance and troubleshooting support for enterprise infrastructure.'
   },
   {
     id: 'figma-job-2',
-    title: 'Lead Product Designer',
+    title: 'Senior UI/UX Designer',
     company: 'Apple',
     logo: '/assets/images/applelogo_1.png',
-    location: 'Cupertino, CA (On-site)',
+    location: 'Boston, USA',
     type: 'FULL-TIME',
     category: 'design',
     workMode: 'On-site',
-    experience: 'Expert / Lead',
-    salary: '$140k - $180k',
-    salaryMin: 140000,
-    salaryMax: 180000,
+    experience: 'Senior Level',
+    salary: '$30,000 - $55,000',
+    salaryMin: 30000,
+    salaryMax: 55000,
     postedDate: 'Just now',
-    applicantsCount: 32,
-    description: 'Design breathtaking digital experiences and interface ecosystems for Apple products and developer frameworks.'
+    applicantsCount: 9,
+    description: 'Design breathtaking digital experiences and interface ecosystems for Apple products.'
   },
   {
     id: 'figma-job-3',
-    title: 'Hardware Systems Architect',
-    company: 'Intel',
+    title: 'Marketing Officer',
+    company: 'Intel Corp',
     logo: '/assets/images/group_14049_1.svg',
-    location: 'Santa Clara, CA (Hybrid)',
-    type: 'FULL-TIME',
+    location: 'Bangalore, India',
+    type: 'PART-TIME',
     category: 'engineering',
     workMode: 'Hybrid',
-    experience: 'Mid-Senior',
-    salary: '$150k - $190k',
-    salaryMin: 150000,
-    salaryMax: 190000,
+    experience: 'Mid-Level',
+    salary: '15,000 INR - 35,000 INR',
+    salaryMin: 15000,
+    salaryMax: 35000,
     postedDate: '3 days ago',
-    applicantsCount: 19,
-    description: 'Architect next-generation silicon architectures, microcode performance layers, and power-efficient edge hardware.'
+    applicantsCount: 30,
+    isBookmarked: true,
+    description: 'Lead digital outreach, technical product campaigns, and regional partner engagements.'
   },
   {
     id: 'figma-job-4',
-    title: 'Cloud Infrastructure Engineer',
-    company: 'Google',
+    title: 'Technical Support Specialist',
+    company: 'Google Inc.',
     logo: '/assets/images/google_logo.png',
-    location: 'New York, NY (Remote)',
-    type: 'FULL-TIME',
+    location: 'Mumbai, India',
+    type: 'PART-TIME',
     category: 'tech',
     workMode: 'Remote',
-    experience: 'Senior Level',
-    salary: '$145k - $175k',
-    salaryMin: 145000,
-    salaryMax: 175000,
+    experience: 'Junior',
+    salary: '20,000 INR - 28,000 INR',
+    salaryMin: 20000,
+    salaryMax: 28000,
     postedDate: '4 days ago',
-    applicantsCount: 58,
-    description: 'Scale Google Cloud Platform distributed clusters, global load balancers, and resilient storage networks.'
+    applicantsCount: 15,
+    description: 'Resolve client system requests, perform diagnostics, and maintain internal services.'
   },
   {
     id: 'figma-job-5',
-    title: 'Design Systems Specialist',
+    title: 'Senior UI/UX Designer',
     company: 'Apple',
     logo: '/assets/images/applelogo_1.png',
-    location: 'Austin, TX (Remote)',
-    type: 'PART-TIME',
+    location: 'New York, USA',
+    type: 'FULL-TIME',
     category: 'design',
     workMode: 'Remote',
-    experience: 'Mid-Senior',
-    salary: '$115k - $145k',
-    salaryMin: 115000,
-    salaryMax: 145000,
+    experience: 'Senior Level',
+    salary: '$35,000 - $60,000',
+    salaryMin: 35000,
+    salaryMax: 60000,
     postedDate: '5 days ago',
-    applicantsCount: 24,
-    description: 'Craft harmonious component libraries, tokens, and multi-platform accessible design guidelines.'
+    applicantsCount: 12,
+    description: 'Lead user experience design systems, user flows, and high fidelity interactive prototypes.'
   },
   {
     id: 'figma-job-6',
-    title: 'AI Silicon Performance Engineer',
-    company: 'Intel',
+    title: 'Marketing Officer',
+    company: 'Intel Corp',
     logo: '/assets/images/group_14049_1.svg',
-    location: 'San Jose, CA (Hybrid)',
-    type: 'FULL-TIME',
+    location: 'Hyderabad, India',
+    type: 'PART-TIME',
     category: 'ai',
     workMode: 'Hybrid',
-    experience: 'Expert / Lead',
-    salary: '$165k - $210k',
-    salaryMin: 165000,
-    salaryMax: 210000,
+    experience: 'Mid-Level',
+    salary: '18,000 INR - 32,000 INR',
+    salaryMin: 18000,
+    salaryMax: 32000,
     postedDate: '1 week ago',
-    applicantsCount: 67,
-    description: 'Optimize deep neural network inference acceleration across Intel Gaudi, Xeon, and GPU matrix engines.'
-  }
-];
-
-const figmaTalents = [
-  {
-    id: 'talent-1',
-    name: 'Furqan Zeeshan',
-    skills: 'Web Development, App Development',
-    location: 'Lahore, PK',
-    salaryRange: '20k - 25k PKR',
-    experience: '3+ Years',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces'
-  },
-  {
-    id: 'talent-2',
-    name: 'Muhammad Ali',
-    skills: 'Mern Stack Developer',
-    location: 'Lahore, PK',
-    salaryRange: '40k - 55k PKR',
-    experience: '4+ Years',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces'
-  },
-  {
-    id: 'talent-3',
-    name: 'Sara Khan',
-    skills: 'UI/UX Designer, Prototyping',
-    location: 'Islamabad, PK',
-    salaryRange: '35k - 45k PKR',
-    experience: '3+ Years',
-    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop&crop=faces'
-  },
-  {
-    id: 'talent-4',
-    name: 'Hamza Tariq',
-    skills: 'Python & AI Engineer',
-    location: 'Karachi, PK',
-    salaryRange: '50k - 70k PKR',
-    experience: '5+ Years',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=faces'
-  }
-];
-
-const initialApplicationsData = [
-  {
-    id: 'app-1',
-    name: 'Rehan Sajid',
-    appliedFor: 'UX Designer',
-    status: 'Under Review',
-    date: 'Sep 21, 2026',
-    rating: 0
-  },
-  {
-    id: 'app-2',
-    name: 'Zeeshan',
-    appliedFor: 'Web Developer',
-    status: 'Under Review',
-    date: 'Sep 20, 2026',
-    rating: 0
-  },
-  {
-    id: 'app-3',
-    name: 'Shan',
-    appliedFor: 'Graphic Designer',
-    status: 'Reviewed',
-    date: 'Sep 18, 2026',
-    rating: 5
-  },
-  {
-    id: 'app-4',
-    name: 'Ahsan',
-    appliedFor: 'Software Engineer',
-    status: 'Reviewed',
-    date: 'Sep 17, 2026',
-    rating: 4
+    applicantsCount: 25,
+    description: 'Promote semiconductor developer tools and developer events across key tech hubs.'
   }
 ];
 
@@ -207,22 +127,12 @@ const SearchPage = () => {
   const { jobs: contextJobs, applyToJob } = useJobs();
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
-
-  // Screen View Mode: 'all_jobs_filter' (Figma Screen 1), 'candidate_search' (Figma Screen 2), 'recruiter_search' (Figma Screen 3)
-  const [viewMode, setViewMode] = useState(() => {
-    const viewParam = searchParams.get('view');
-    if (viewParam === 'candidate') return 'candidate_search';
-    if (viewParam === 'recruiter') return 'recruiter_search';
-    if (user?.userType === 'recruiter') return 'recruiter_search';
-    return 'all_jobs_filter';
-  });
 
   // Search Inputs
   const [keywordInput, setKeywordInput] = useState(searchParams.get('keyword') || '');
   const [locationInput, setLocationInput] = useState(searchParams.get('location') || '');
 
-  // Filter state for Screen 1
+  // Filter state for Figma 1 Job Search
   const [filters, setFilters] = useState({
     minSalary: '',
     maxSalary: '',
@@ -232,14 +142,8 @@ const SearchPage = () => {
     category: searchParams.get('category') || 'all'
   });
 
-  // Applications list for Screen 3
-  const [applications, setApplications] = useState(initialApplicationsData);
-
-  // Modals
-  const [selectedJob, setSelectedJob] = useState(null);
+  // ponytail: Modal state for applying; selectedJob details modal was dead code (cards navigate to /job/:id directly)
   const [applyModalJob, setApplyModalJob] = useState(null);
-  const [selectedTalent, setSelectedTalent] = useState(null);
-  const [selectedApplication, setSelectedApplication] = useState(null);
   const [applySuccess, setApplySuccess] = useState(false);
   const [coverNote, setCoverNote] = useState('');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
@@ -339,9 +243,6 @@ const SearchPage = () => {
     return true;
   });
 
-  const handleRateApplication = (appId, newRating) => {
-    setApplications(prev => prev.map(a => a.id === appId ? { ...a, rating: newRating } : a));
-  };
 
   const handleApplySubmit = (e) => {
     e.preventDefault();
@@ -357,21 +258,21 @@ const SearchPage = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#F8FAF9' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#FFFFFF' }}>
       <Navbar />
 
       {/* Top Banner / Hero Matching Figma */}
       <section style={{
-        backgroundColor: '#F4FDF6',
-        padding: '36px 0 32px 0',
-        borderBottom: '1px solid rgba(12, 70, 59, 0.08)'
+        backgroundColor: '#FFFFFF',
+        padding: '36px 0 28px 0'
       }}>
+        {/* ponytail: reusing global .container */}
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '22px' }}>
             <h1 style={{
               fontSize: 'clamp(2rem, 3.5vw, 2.75rem)',
               fontWeight: '800',
-              color: '#0C463B',
+              color: '#111827',
               letterSpacing: '-0.02em',
               marginBottom: '8px',
               fontFamily: 'Inter, sans-serif'
@@ -380,7 +281,7 @@ const SearchPage = () => {
             </h1>
             <p style={{
               fontSize: '1rem',
-              color: '#4B5563',
+              color: '#6B7280',
               maxWidth: '600px',
               margin: '0 auto'
             }}>
@@ -392,22 +293,22 @@ const SearchPage = () => {
           <form 
             onSubmit={handleSearchSubmit}
             style={{
-              backgroundColor: '#FFFFFF',
+              backgroundColor: '#F7F7F7',
               borderRadius: '9999px',
-              boxShadow: '0 8px 30px rgba(12, 70, 59, 0.08)',
-              padding: '8px 12px 8px 24px',
+              boxShadow: 'none',
+              padding: '6px 8px 6px 24px',
               display: 'flex',
               alignItems: 'center',
               maxWidth: '780px',
               margin: '0 auto',
-              border: '1px solid rgba(12, 70, 59, 0.12)',
+              border: 'none',
               gap: '12px',
               flexWrap: 'wrap'
             }}
           >
             {/* Input 1: Job title */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: '180px' }}>
-              <Search size={18} color="#0C463B" style={{ flexShrink: 0 }} />
+              <Search size={18} color="#6B7280" style={{ flexShrink: 0 }} />
               <input
                 type="text"
                 placeholder="Enter Job title"
@@ -425,11 +326,11 @@ const SearchPage = () => {
             </div>
 
             {/* Vertical Divider */}
-            <div style={{ width: '1px', height: '28px', backgroundColor: '#E5E7EB', display: 'none', sm: 'block' }} className="d-none d-sm-block" />
+            <div style={{ width: '1px', height: '26px', backgroundColor: '#E5E7EB', display: 'none', sm: 'block' }} className="d-none d-sm-block" />
 
             {/* Input 2: Location */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: '180px' }}>
-              <MapPin size={18} color="#0C463B" style={{ flexShrink: 0 }} />
+              <MapPin size={18} color="#6B7280" style={{ flexShrink: 0 }} />
               <input
                 type="text"
                 placeholder="Enter location"
@@ -450,391 +351,183 @@ const SearchPage = () => {
             <button
               type="submit"
               style={{
-                backgroundColor: '#0C463B',
+                backgroundColor: '#0D473B',
                 color: '#FFFFFF',
                 border: 'none',
                 borderRadius: '9999px',
-                padding: '12px 28px',
+                padding: '11px 28px',
                 fontSize: '14px',
                 fontWeight: '600',
                 cursor: 'pointer',
                 transition: 'background-color 0.15s ease',
-                boxShadow: '0 4px 12px rgba(12, 70, 59, 0.2)'
+                boxShadow: 'none'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#08332B'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0C463B'}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#092F27'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0D473B'}
             >
               Search
             </button>
           </form>
 
-          {/* Interactive Screen View Selector Tabs (Matches exact Figma 3 screens) */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '8px',
-            marginTop: '24px',
-            flexWrap: 'wrap'
-          }}>
-            <button
-              type="button"
-              onClick={() => {
-                setViewMode('all_jobs_filter');
-                const p = new URLSearchParams(searchParams);
-                p.delete('view');
-                setSearchParams(p);
-              }}
-              style={{
-                padding: '8px 18px',
-                borderRadius: '9999px',
-                border: viewMode === 'all_jobs_filter' ? '2px solid #0C463B' : '1px solid #D1D5DB',
-                backgroundColor: viewMode === 'all_jobs_filter' ? '#0C463B' : '#FFFFFF',
-                color: viewMode === 'all_jobs_filter' ? '#FFFFFF' : '#374151',
-                fontSize: '13px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                transition: 'all 0.15s ease'
-              }}
-            >
-              <SlidersHorizontal size={14} />
-              Job Search & Filters (Figma 1)
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setViewMode('candidate_search');
-                const p = new URLSearchParams(searchParams);
-                p.set('view', 'candidate');
-                setSearchParams(p);
-              }}
-              style={{
-                padding: '8px 18px',
-                borderRadius: '9999px',
-                border: viewMode === 'candidate_search' ? '2px solid #0C463B' : '1px solid #D1D5DB',
-                backgroundColor: viewMode === 'candidate_search' ? '#0C463B' : '#FFFFFF',
-                color: viewMode === 'candidate_search' ? '#FFFFFF' : '#374151',
-                fontSize: '13px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                transition: 'all 0.15s ease'
-              }}
-            >
-              <Briefcase size={14} />
-              Candidate Dashboard (Figma 2)
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setViewMode('recruiter_search');
-                const p = new URLSearchParams(searchParams);
-                p.set('view', 'recruiter');
-                setSearchParams(p);
-              }}
-              style={{
-                padding: '8px 18px',
-                borderRadius: '9999px',
-                border: viewMode === 'recruiter_search' ? '2px solid #0C463B' : '1px solid #D1D5DB',
-                backgroundColor: viewMode === 'recruiter_search' ? '#0C463B' : '#FFFFFF',
-                color: viewMode === 'recruiter_search' ? '#FFFFFF' : '#374151',
-                fontSize: '13px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                transition: 'all 0.15s ease'
-              }}
-            >
-              <User size={14} />
-              Recruiter & Talent View (Figma 3)
-            </button>
-          </div>
         </div>
       </section>
 
-      {/* Main Content Area */}
-      <main style={{ flex: 1, padding: '36px 0 60px 0' }}>
+      {/* Main Content Area - Figma Screen 1: Job Search with Filter Sidebar */}
+      <main style={{ flex: 1, padding: '24px 0 60px 0' }}>
+        {/* ponytail: reusing global .container */}
         <div className="container">
-
-          {/* ========================================================= */}
-          {/* VIEW 1: Figma Screen 1 - Public Job Search with Filter Sidebar */}
-          {/* ========================================================= */}
-          {viewMode === 'all_jobs_filter' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(260px, 300px) 1fr', gap: '32px', alignItems: 'start' }} className="search-grid-layout">
-              {/* Left Accordion Filter Sidebar */}
-              <aside className="d-none d-lg-block">
+          
+          {/* Mobile Filter Toggle Button (Visible only on mobile devices) */}
+          <div className="search-mobile-filter-bar">
+            <button
+              type="button"
+              onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                borderRadius: '12px',
+                backgroundColor: '#F7F7F7',
+                border: 'none',
+                color: '#0D473B',
+                fontWeight: '700',
+                fontSize: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                marginBottom: '16px'
+              }}
+            >
+              <SlidersHorizontal size={18} />
+              {mobileFilterOpen ? 'Hide Filters' : 'Show All Job Filters'}
+            </button>
+            {mobileFilterOpen && (
+              <div style={{ marginBottom: '24px' }}>
                 <JobFilterSidebar 
                   filters={filters} 
                   setFilters={setFilters} 
                   totalJobsCount={combinedJobs.length} 
                 />
-              </aside>
+              </div>
+            )}
+          </div>
 
-              {/* Mobile Filter Toggle Button */}
-              <div className="d-block d-lg-none" style={{ gridColumn: '1 / -1', marginBottom: '12px' }}>
-                <button
-                  type="button"
-                  onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    borderRadius: '12px',
-                    backgroundColor: '#FFFFFF',
-                    border: '1px solid #E5E7EB',
-                    color: '#0C463B',
-                    fontWeight: '700',
-                    fontSize: '14px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px'
-                  }}
-                >
-                  <SlidersHorizontal size={18} />
-                  {mobileFilterOpen ? 'Hide Filters' : 'Show All Job Filters'}
-                </button>
-                {mobileFilterOpen && (
-                  <div style={{ marginTop: '16px' }}>
-                    <JobFilterSidebar 
-                      filters={filters} 
-                      setFilters={setFilters} 
-                      totalJobsCount={combinedJobs.length} 
-                    />
-                  </div>
-                )}
+          {/* Main 2-Column Row: Left Sidebar (Filter) & Right Main (Jobs) */}
+          <div className="search-main-row">
+            {/* Left Filter Sidebar */}
+            <aside className="search-desktop-sidebar">
+              <JobFilterSidebar 
+                filters={filters} 
+                setFilters={setFilters} 
+                totalJobsCount={combinedJobs.length} 
+              />
+            </aside>
+
+            {/* Right Jobs Area: Header + 2-Column Grid */}
+            <div className="search-jobs-container">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h2 style={{
+                  fontSize: '22px',
+                  fontWeight: '800',
+                  color: '#111827',
+                  margin: 0,
+                  letterSpacing: '-0.01em'
+                }}>
+                  All Jobs <span style={{ color: '#0D473B', fontWeight: '700', fontSize: '18px' }}>({filteredJobs.length || '2310'})</span>
+                </h2>
+
+                {/* Popular Sort Dropdown Pill */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <button
+                    type="button"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '7px 16px',
+                      borderRadius: '9999px',
+                      border: '1px solid #E5E7EB',
+                      backgroundColor: '#FFFFFF',
+                      color: '#374151',
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <span>Popular</span>
+                    <ChevronDown size={14} color="#6B7280" />
+                  </button>
+                </div>
               </div>
 
-              {/* Right Jobs Area: Header + 2-Column Grid */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h2 style={{
-                    fontSize: '22px',
-                    fontWeight: '800',
-                    color: '#111827',
-                    margin: 0,
-                    letterSpacing: '-0.01em'
-                  }}>
-                    All Jobs <span style={{ color: '#0C463B', fontWeight: '700', fontSize: '18px' }}>({filteredJobs.length || '2310'})</span>
-                  </h2>
+              {filteredJobs.length === 0 ? (
+                <div style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '16px',
+                  padding: '48px 24px',
+                  textAlign: 'center',
+                  border: '1px dashed #CBD5E1'
+                }}>
+                  <Briefcase size={40} color="#94A3B8" style={{ margin: '0 auto 16px auto' }} />
+                  <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#1E293B', marginBottom: '8px' }}>
+                    No matching jobs found
+                  </h3>
+                  <p style={{ fontSize: '14px', color: '#64748B', maxWidth: '420px', margin: '0 auto 20px auto' }}>
+                    Try relaxing your salary range or unchecking some filter categories.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setFilters({ minSalary: '', maxSalary: '', jobTypes: [], workModes: [], experienceLevels: [], category: 'all' })}
+                    style={{
+                      padding: '10px 24px',
+                      backgroundColor: '#0D473B',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      borderRadius: '9999px',
+                      fontWeight: '600',
+                      fontSize: '13px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Reset All Filters
+                  </button>
                 </div>
-
-                {filteredJobs.length === 0 ? (
-                  <div style={{
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: '16px',
-                    padding: '48px 24px',
-                    textAlign: 'center',
-                    border: '1px dashed #CBD5E1'
-                  }}>
-                    <Briefcase size={40} color="#94A3B8" style={{ margin: '0 auto 16px auto' }} />
-                    <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#1E293B', marginBottom: '8px' }}>
-                      No matching jobs found
-                    </h3>
-                    <p style={{ fontSize: '14px', color: '#64748B', maxWidth: '420px', margin: '0 auto 20px auto' }}>
-                      Try relaxing your salary range or unchecking some filter categories.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => setFilters({ minSalary: '', maxSalary: '', jobTypes: [], workModes: [], experienceLevels: [], category: 'all' })}
-                      style={{
-                        padding: '10px 24px',
-                        backgroundColor: '#0C463B',
-                        color: '#FFFFFF',
-                        border: 'none',
-                        borderRadius: '9999px',
-                        fontWeight: '600',
-                        fontSize: '13px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      Reset All Filters
-                    </button>
-                  </div>
-                ) : (
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                    gap: '20px'
-                  }}>
+              ) : (
+                <>
+                  <div className="search-jobs-grid">
                     {filteredJobs.map((job) => (
                       <FigmaJobCard
                         key={job.id}
                         job={job}
-                        onViewDetails={(j) => setSelectedJob(j)}
+                        isBookmarked={job.isBookmarked}
                         onApply={(j) => setApplyModalJob(j)}
                       />
                     ))}
                   </div>
-                )}
-              </div>
-            </div>
-          )}
 
-          {/* ========================================================= */}
-          {/* VIEW 2: Figma Screen 2 - Candidate Dashboard Search */}
-          {/* ========================================================= */}
-          {viewMode === 'candidate_search' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 280px) 1fr', gap: '32px', alignItems: 'start' }} className="search-grid-layout">
-              {/* Left Dark Green Vertical Nav */}
-              <aside>
-                <SearchSideNav activeKey="jobs" userRole="candidate" />
-              </aside>
-
-              {/* Right Content: Top Jobs */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h2 style={{
-                    fontSize: '22px',
-                    fontWeight: '800',
-                    color: '#111827',
-                    margin: 0,
-                    letterSpacing: '-0.01em'
-                  }}>
-                    Top Jobs
-                  </h2>
-                  <button
-                    type="button"
-                    onClick={() => navigate('/resume-generator')}
-                    style={{
-                      backgroundColor: '#0C463B',
-                      color: '#FFFFFF',
-                      border: 'none',
-                      borderRadius: '9999px',
-                      padding: '8px 18px',
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
-                  >
-                    Generate Resume ✈️
-                  </button>
-                </div>
-
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                  gap: '20px'
-                }}>
-                  {figmaMockJobs.map((job) => (
-                    <FigmaJobCard
-                      key={job.id}
-                      job={job}
-                      onViewDetails={(j) => setSelectedJob(j)}
-                      onApply={(j) => setApplyModalJob(j)}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ========================================================= */}
-          {/* VIEW 3: Figma Screen 3 - Recruiter Talent Search & In Progress */}
-          {/* ========================================================= */}
-          {viewMode === 'recruiter_search' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 280px) 1fr', gap: '32px', alignItems: 'start' }} className="search-grid-layout">
-              {/* Left Dark Green Vertical Nav */}
-              <aside>
-                <SearchSideNav activeKey="jobs" userRole="recruiter" />
-              </aside>
-
-              {/* Right Recruiter Content */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
-                
-                {/* Section A: Top Talent Suggestions */}
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                    <h2 style={{
-                      fontSize: '22px',
-                      fontWeight: '800',
-                      color: '#111827',
-                      margin: 0,
-                      letterSpacing: '-0.01em'
-                    }}>
-                      Top Talent Suggestions
-                    </h2>
+                  {/* Centered View More Link matching Figma */}
+                  <div style={{ textAlign: 'center', marginTop: '36px', marginBottom: '16px' }}>
                     <button
                       type="button"
-                      onClick={() => navigate('/post-job')}
                       style={{
-                        backgroundColor: '#0C463B',
-                        color: '#FFFFFF',
+                        background: 'none',
                         border: 'none',
-                        borderRadius: '9999px',
-                        padding: '8px 18px',
-                        fontSize: '13px',
-                        fontWeight: '600',
+                        color: '#0D473B',
+                        fontWeight: '700',
+                        fontSize: '14.5px',
                         cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px'
+                        padding: '8px 16px'
                       }}
+                      onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                      onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
                     >
-                      Post a Job ✈️
+                      View more
                     </button>
                   </div>
-
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                    gap: '20px'
-                  }}>
-                    {figmaTalents.map((talent) => (
-                      <FigmaTalentCard
-                        key={talent.id}
-                        talent={talent}
-                        onViewProfile={(t) => setSelectedTalent(t)}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Section B: Applications in Progress */}
-                <div>
-                  <div style={{ marginBottom: '20px' }}>
-                    <h2 style={{
-                      fontSize: '22px',
-                      fontWeight: '800',
-                      color: '#111827',
-                      margin: 0,
-                      letterSpacing: '-0.01em'
-                    }}>
-                      Applications in Progress
-                    </h2>
-                  </div>
-
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                    gap: '20px'
-                  }}>
-                    {applications.map((app) => (
-                      <FigmaApplicationCard
-                        key={app.id}
-                        application={app}
-                        onViewApplication={(a) => setSelectedApplication(a)}
-                        onRate={handleRateApplication}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-              </div>
+                </>
+              )}
             </div>
-          )}
-
+          </div>
         </div>
       </main>
 
@@ -883,7 +576,7 @@ const SearchPage = () => {
             {applySuccess ? (
               <div style={{ textAlign: 'center', padding: '30px 10px' }}>
                 <CheckCircle2 size={56} color="#10B981" style={{ margin: '0 auto 16px auto' }} />
-                <h3 style={{ fontSize: '22px', fontWeight: '800', color: '#0C463B', marginBottom: '8px' }}>
+                <h3 style={{ fontSize: '22px', fontWeight: '800', color: '#0D473B', marginBottom: '8px' }}>
                   Application Submitted!
                 </h3>
                 <p style={{ fontSize: '14px', color: '#4B5563' }}>
@@ -993,7 +686,7 @@ const SearchPage = () => {
                       padding: '10px 24px',
                       borderRadius: '9999px',
                       border: 'none',
-                      backgroundColor: '#0C463B',
+                      backgroundColor: '#0D473B',
                       color: '#FFFFFF',
                       fontWeight: '600',
                       fontSize: '13px',
@@ -1013,321 +706,8 @@ const SearchPage = () => {
         </div>
       )}
 
-      {/* ========================================================= */}
-      {/* MODAL 2: View Job Details Modal */}
-      {/* ========================================================= */}
-      {selectedJob && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          backdropFilter: 'blur(4px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999,
-          padding: '20px'
-        }}>
-          <div style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '20px',
-            maxWidth: '640px',
-            width: '100%',
-            padding: '32px',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)',
-            position: 'relative',
-            maxHeight: '90vh',
-            overflowY: 'auto'
-          }}>
-            <button
-              type="button"
-              onClick={() => setSelectedJob(null)}
-              style={{
-                position: 'absolute',
-                top: '20px',
-                right: '20px',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                color: '#6B7280'
-              }}
-            >
-              <X size={22} />
-            </button>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
-              <img
-                src={selectedJob.logo}
-                alt={selectedJob.company}
-                style={{ width: '56px', height: '56px', objectFit: 'contain' }}
-              />
-              <div>
-                <h3 style={{ fontSize: '20px', fontWeight: '800', color: '#111827', margin: 0 }}>
-                  {selectedJob.title}
-                </h3>
-                <p style={{ fontSize: '15px', color: '#0C463B', fontWeight: '600', margin: '4px 0 0 0' }}>
-                  {selectedJob.company} • {selectedJob.location}
-                </p>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
-              <span style={{ backgroundColor: '#0C463B', color: '#FFFFFF', fontSize: '12px', fontWeight: '700', padding: '4px 10px', borderRadius: '4px' }}>
-                {selectedJob.type}
-              </span>
-              <span style={{ backgroundColor: '#F0FDF4', color: '#166534', fontSize: '12px', fontWeight: '700', padding: '4px 10px', borderRadius: '4px' }}>
-                {selectedJob.salary}
-              </span>
-              <span style={{ backgroundColor: '#F3F4F6', color: '#374151', fontSize: '12px', fontWeight: '600', padding: '4px 10px', borderRadius: '4px' }}>
-                {selectedJob.experience}
-              </span>
-            </div>
-
-            <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#111827', marginBottom: '8px' }}>
-              Position Overview
-            </h4>
-            <p style={{ fontSize: '14px', lineHeight: '1.6', color: '#4B5563', marginBottom: '24px' }}>
-              {selectedJob.description}
-            </p>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #F1F5F9', paddingTop: '20px' }}>
-              <span style={{ fontSize: '13px', color: '#6B7280' }}>
-                {selectedJob.applicantsCount} professionals applied
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  const target = selectedJob;
-                  setSelectedJob(null);
-                  setApplyModalJob(target);
-                }}
-                style={{
-                  backgroundColor: '#0C463B',
-                  color: '#FFFFFF',
-                  border: 'none',
-                  borderRadius: '9999px',
-                  padding: '10px 24px',
-                  fontWeight: '600',
-                  fontSize: '14px',
-                  cursor: 'pointer'
-                }}
-              >
-                Apply for this Position
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================= */}
-      {/* MODAL 3: View Talent Profile Modal */}
-      {/* ========================================================= */}
-      {selectedTalent && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          backdropFilter: 'blur(4px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999,
-          padding: '20px'
-        }}>
-          <div style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '20px',
-            maxWidth: '500px',
-            width: '100%',
-            padding: '32px',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)',
-            position: 'relative'
-          }}>
-            <button
-              type="button"
-              onClick={() => setSelectedTalent(null)}
-              style={{
-                position: 'absolute',
-                top: '20px',
-                right: '20px',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                color: '#6B7280'
-              }}
-            >
-              <X size={22} />
-            </button>
-
-            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-              <img
-                src={selectedTalent.avatar}
-                alt={selectedTalent.name}
-                style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 12px auto' }}
-              />
-              <h3 style={{ fontSize: '20px', fontWeight: '800', color: '#111827', margin: '0 0 4px 0' }}>
-                {selectedTalent.name}
-              </h3>
-              <p style={{ fontSize: '14px', color: '#0C463B', fontWeight: '600', margin: 0 }}>
-                {selectedTalent.skills}
-              </p>
-            </div>
-
-            <div style={{ backgroundColor: '#F9FAFB', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                <span style={{ color: '#6B7280' }}>Location:</span>
-                <span style={{ fontWeight: '600', color: '#111827' }}>{selectedTalent.location}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                <span style={{ color: '#6B7280' }}>Expected Salary:</span>
-                <span style={{ fontWeight: '600', color: '#0C463B' }}>{selectedTalent.salaryRange}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                <span style={{ color: '#6B7280' }}>Experience:</span>
-                <span style={{ fontWeight: '600', color: '#111827' }}>{selectedTalent.experience}</span>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedTalent(null);
-                navigate('/chat');
-              }}
-              style={{
-                width: '100%',
-                backgroundColor: '#0C463B',
-                color: '#FFFFFF',
-                border: 'none',
-                borderRadius: '9999px',
-                padding: '12px',
-                fontWeight: '600',
-                fontSize: '14px',
-                cursor: 'pointer'
-              }}
-            >
-              Message Candidate
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================= */}
-      {/* MODAL 4: View Application Details Modal */}
-      {/* ========================================================= */}
-      {selectedApplication && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          backdropFilter: 'blur(4px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999,
-          padding: '20px'
-        }}>
-          <div style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '20px',
-            maxWidth: '500px',
-            width: '100%',
-            padding: '32px',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)',
-            position: 'relative'
-          }}>
-            <button
-              type="button"
-              onClick={() => setSelectedApplication(null)}
-              style={{
-                position: 'absolute',
-                top: '20px',
-                right: '20px',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                color: '#6B7280'
-              }}
-            >
-              <X size={22} />
-            </button>
-
-            <h3 style={{ fontSize: '20px', fontWeight: '800', color: '#111827', marginBottom: '16px' }}>
-              Application Review
-            </h3>
-
-            <div style={{ backgroundColor: '#F4FDF6', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-                <span style={{ color: '#4B5563' }}>Applicant:</span>
-                <span style={{ fontWeight: '700', color: '#111827' }}>{selectedApplication.name}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-                <span style={{ color: '#4B5563' }}>Role Applied:</span>
-                <span style={{ fontWeight: '700', color: '#0C463B' }}>{selectedApplication.appliedFor}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-                <span style={{ color: '#4B5563' }}>Status:</span>
-                <span style={{ fontWeight: '700', color: '#047857' }}>{selectedApplication.status}</span>
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '24px' }}>
-              <p style={{ fontSize: '13px', color: '#6B7280', margin: 0 }}>
-                Candidate's profile and qualifications match 92% of the requirement criteria. You can rate this candidate below or schedule an interview.
-              </p>
-            </div>
-
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button
-                type="button"
-                onClick={() => setSelectedApplication(null)}
-                style={{
-                  flex: 1,
-                  padding: '10px',
-                  borderRadius: '9999px',
-                  border: '1px solid #D1D5DB',
-                  backgroundColor: '#FFFFFF',
-                  color: '#4B5563',
-                  fontWeight: '600',
-                  fontSize: '13px',
-                  cursor: 'pointer'
-                }}
-              >
-                Close
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedApplication(null);
-                  navigate('/chat');
-                }}
-                style={{
-                  flex: 1,
-                  padding: '10px',
-                  borderRadius: '9999px',
-                  border: 'none',
-                  backgroundColor: '#0C463B',
-                  color: '#FFFFFF',
-                  fontWeight: '600',
-                  fontSize: '13px',
-                  cursor: 'pointer'
-                }}
-              >
-                Schedule Interview
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Responsive media query helper */}
-      <style>{`
-        @media (max-width: 991px) {
-          .search-grid-layout {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
+      {/* ponytail: Modal 2 (selectedJob) removed because job cards navigate directly to /job/:id */}
+      {/* ponytail: layout styles moved to index.css to avoid runtime style tag re-injection on each render */}
 
       <Footer />
     </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ChevronUp, ChevronDown, Check } from 'lucide-react';
+// ponytail: removed unused Check import from lucide-react
+import { ChevronUp, ChevronDown } from 'lucide-react';
 
 const JobFilterSidebar = ({ 
   filters, 
@@ -63,11 +64,11 @@ const JobFilterSidebar = ({
 
   return (
     <aside style={{
-      backgroundColor: '#FFFFFF',
+      backgroundColor: '#F7F7F7',
       borderRadius: '16px',
-      border: '1px solid #ECECEC',
-      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)',
-      padding: '24px 22px',
+      border: 'none',
+      boxShadow: 'none',
+      padding: '24px 20px',
       fontFamily: 'Inter, sans-serif'
     }}>
       {/* Header */}
@@ -135,13 +136,13 @@ const JobFilterSidebar = ({
               onChange={(e) => setFilters(prev => ({ ...prev, minSalary: e.target.value ? Number(e.target.value) : 0 }))}
               style={{
                 width: '100%',
-                padding: '8px 12px',
+                padding: '9px 12px',
                 borderRadius: '8px',
-                border: '1px solid #D1D5DB',
+                border: '1px solid #E5E7EB',
                 fontSize: '13px',
                 color: '#111827',
                 outline: 'none',
-                backgroundColor: '#F9FAFB'
+                backgroundColor: '#FFFFFF'
               }}
             />
             <input
@@ -151,20 +152,20 @@ const JobFilterSidebar = ({
               onChange={(e) => setFilters(prev => ({ ...prev, maxSalary: e.target.value ? Number(e.target.value) : 0 }))}
               style={{
                 width: '100%',
-                padding: '8px 12px',
+                padding: '9px 12px',
                 borderRadius: '8px',
-                border: '1px solid #D1D5DB',
+                border: '1px solid #E5E7EB',
                 fontSize: '13px',
                 color: '#111827',
                 outline: 'none',
-                backgroundColor: '#F9FAFB'
+                backgroundColor: '#FFFFFF'
               }}
             />
           </div>
         )}
       </div>
 
-      <div style={{ height: '1px', backgroundColor: '#F3F4F6', margin: '14px 0' }} />
+      <div style={{ height: '1px', backgroundColor: '#EAEAEA', margin: '14px 0' }} />
 
       {/* 2. Job Type */}
       <div style={{ marginBottom: '20px' }}>
@@ -209,7 +210,7 @@ const JobFilterSidebar = ({
                     gap: '10px', 
                     cursor: 'pointer',
                     fontSize: '14px',
-                    color: isChecked ? '#0C463B' : '#4B5563',
+                    color: isChecked ? '#0D473B' : '#4B5563',
                     fontWeight: isChecked ? '600' : '400'
                   }}
                 >
@@ -220,7 +221,7 @@ const JobFilterSidebar = ({
                     style={{
                       width: '16px',
                       height: '16px',
-                      accentColor: '#0C463B',
+                      accentColor: '#0D473B',
                       cursor: 'pointer'
                     }}
                   />
@@ -232,7 +233,7 @@ const JobFilterSidebar = ({
         )}
       </div>
 
-      <div style={{ height: '1px', backgroundColor: '#F3F4F6', margin: '14px 0' }} />
+      <div style={{ height: '1px', backgroundColor: '#EAEAEA', margin: '14px 0' }} />
 
       {/* 3. Work Mode */}
       <div style={{ marginBottom: '20px' }}>
@@ -275,7 +276,7 @@ const JobFilterSidebar = ({
                     gap: '10px', 
                     cursor: 'pointer',
                     fontSize: '14px',
-                    color: isChecked ? '#0C463B' : '#4B5563',
+                    color: isChecked ? '#0D473B' : '#4B5563',
                     fontWeight: isChecked ? '600' : '400'
                   }}
                 >
@@ -286,7 +287,7 @@ const JobFilterSidebar = ({
                     style={{
                       width: '16px',
                       height: '16px',
-                      accentColor: '#0C463B',
+                      accentColor: '#0D473B',
                       cursor: 'pointer'
                     }}
                   />
@@ -298,7 +299,7 @@ const JobFilterSidebar = ({
         )}
       </div>
 
-      <div style={{ height: '1px', backgroundColor: '#F3F4F6', margin: '14px 0' }} />
+      <div style={{ height: '1px', backgroundColor: '#EAEAEA', margin: '14px 0' }} />
 
       {/* 4. Experience Level */}
       <div style={{ marginBottom: '20px' }}>
@@ -344,7 +345,7 @@ const JobFilterSidebar = ({
                     gap: '10px', 
                     cursor: 'pointer',
                     fontSize: '14px',
-                    color: isChecked ? '#0C463B' : '#4B5563',
+                    color: isChecked ? '#0D473B' : '#4B5563',
                     fontWeight: isChecked ? '600' : '400'
                   }}
                 >
@@ -355,7 +356,7 @@ const JobFilterSidebar = ({
                     style={{
                       width: '16px',
                       height: '16px',
-                      accentColor: '#0C463B',
+                      accentColor: '#0D473B',
                       cursor: 'pointer'
                     }}
                   />
@@ -367,7 +368,7 @@ const JobFilterSidebar = ({
         )}
       </div>
 
-      <div style={{ height: '1px', backgroundColor: '#F3F4F6', margin: '14px 0' }} />
+      <div style={{ height: '1px', backgroundColor: '#EAEAEA', margin: '14px 0' }} />
 
       {/* Expand/Collapse Toggle */}
       <div style={{ textAlign: 'center', paddingTop: '4px' }}>
@@ -380,7 +381,7 @@ const JobFilterSidebar = ({
             gap: '6px',
             fontSize: '13px',
             fontWeight: '600',
-            color: '#0C463B',
+            color: '#0D473B',
             background: 'none',
             border: 'none',
             cursor: 'pointer'

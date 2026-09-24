@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import Navbar from '../components/common/Navbar';
 import { useAuth } from '../context/AuthContext';
-import { Check, X, AlertCircle } from 'lucide-react';
+import { Check, X, AlertCircle, Mail } from 'lucide-react';
 
 const Loginpage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [emailOrUsername, setEmailOrUsername] = useState('rehan.candidate@jobfiesta.io');
-  const [password, setPassword] = useState('Password123');
+  const [emailOrUsername, setEmailOrUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -95,13 +96,22 @@ const Loginpage = () => {
       backgroundColor: '#FAFDFB',
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '40px 20px',
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
     }}>
-      {/* Outer Wrapper for Left-Aligned Title and Card */}
-      <div style={{ width: '100%', maxWidth: '980px' }}>
+      {/* Clean Original Navbar (Shows only website name on sign in/registration) */}
+      <Navbar />
+
+      <main style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '40px 20px',
+        width: '100%'
+      }}>
+        {/* Outer Wrapper for Left-Aligned Title and Card */}
+        <div style={{ width: '100%', maxWidth: '980px' }}>
         
         {/* Title & Subtitle Above the Card (Matches Figma Screenshot Exactly) */}
         <div style={{ marginBottom: '28px', paddingLeft: '12px' }}>
@@ -208,99 +218,43 @@ const Loginpage = () => {
               
               {/* Field 1: Email ID / Username */}
               <div style={{ marginBottom: '22px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '15px',
-                  fontWeight: '600',
-                  color: '#0284C7',
-                  marginBottom: '8px'
-                }}>
+                <label className="figma-label">
                   Email ID / Username
                 </label>
-                <input
-                  type="text"
-                  placeholder="Enter email id / username"
-                  value={emailOrUsername}
-                  onChange={(e) => setEmailOrUsername(e.target.value)}
-                  style={{
-                    width: '100%',
-                    height: '50px',
-                    padding: '0 16px',
-                    borderRadius: '8px',
-                    border: '1px solid #D1D5DB',
-                    fontSize: '14px',
-                    color: '#1F2937',
-                    backgroundColor: '#FFFFFF',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                    transition: 'border-color 0.15s ease, box-shadow 0.15s ease'
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#0284C7';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(2, 132, 199, 0.15)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = '#D1D5DB';
-                    e.target.style.boxShadow = 'none';
-                  }}
-                />
+                <div style={{ position: 'relative', width: '100%' }}>
+                  <Mail 
+                    size={18} 
+                    color="#9CA3AF" 
+                    style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} 
+                  />
+                  <input
+                    type="text"
+                    className="figma-input"
+                    style={{ paddingLeft: '44px' }}
+                    placeholder="Enter email id / username"
+                    value={emailOrUsername}
+                    onChange={(e) => setEmailOrUsername(e.target.value)}
+                  />
+                </div>
               </div>
 
               {/* Field 2: Password */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '15px',
-                  fontWeight: '600',
-                  color: '#0284C7',
-                  marginBottom: '8px'
-                }}>
+                <label className="figma-label">
                   Password
                 </label>
                 <div style={{ position: 'relative', width: '100%' }}>
                   <input
                     type={showPassword ? 'text' : 'password'}
+                    className="figma-input figma-input-password"
                     placeholder="Enter password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    style={{
-                      width: '100%',
-                      height: '50px',
-                      padding: '0 70px 0 16px',
-                      borderRadius: '8px',
-                      border: '1px solid #D1D5DB',
-                      fontSize: '14px',
-                      color: '#1F2937',
-                      backgroundColor: '#FFFFFF',
-                      outline: 'none',
-                      boxSizing: 'border-box',
-                      transition: 'border-color 0.15s ease, box-shadow 0.15s ease'
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = '#0284C7';
-                      e.target.style.boxShadow = '0 0 0 3px rgba(2, 132, 199, 0.15)';
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = '#D1D5DB';
-                      e.target.style.boxShadow = 'none';
-                    }}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    style={{
-                      position: 'absolute',
-                      right: '16px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
-                      border: 'none',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      color: '#111827',
-                      cursor: 'pointer',
-                      padding: 0
-                    }}
+                    className="figma-show-btn"
                   >
                     {showPassword ? 'Hide' : 'Show'}
                   </button>
@@ -546,6 +500,7 @@ const Loginpage = () => {
 
         </div>
       </div>
+      </main>
 
       {/* Forgot Password Modal */}
       {forgotModalOpen && (
@@ -681,8 +636,73 @@ const Loginpage = () => {
         </div>
       )}
 
-      {/* Responsive Styles */}
+      {/* Custom Figma Input & Responsive Styles */}
       <style>{`
+        .figma-label {
+          display: block !important;
+          font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+          font-size: 15px !important;
+          font-weight: 600 !important;
+          color: #0284C7 !important;
+          margin-bottom: 8px !important;
+          letter-spacing: -0.01em !important;
+        }
+
+        .figma-input {
+          display: block !important;
+          width: 100% !important;
+          height: 48px !important;
+          padding: 12px 16px !important;
+          border: 1px solid #D1D5DB !important;
+          border-radius: 8px !important;
+          background-color: #FFFFFF !important;
+          font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+          font-size: 14px !important;
+          line-height: 1.5 !important;
+          color: #1F2937 !important;
+          box-sizing: border-box !important;
+          transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+          -webkit-appearance: none !important;
+          appearance: none !important;
+        }
+
+        .figma-input::placeholder {
+          color: #9CA3AF !important;
+          font-size: 14px !important;
+          font-weight: 400 !important;
+          opacity: 1 !important;
+        }
+
+        .figma-input:focus {
+          outline: none !important;
+          border-color: #0284C7 !important;
+          box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
+        }
+
+        .figma-input-password {
+          padding-right: 70px !important;
+        }
+
+        .figma-show-btn {
+          position: absolute !important;
+          right: 16px !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+          background: transparent !important;
+          border: none !important;
+          font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+          font-size: 14px !important;
+          font-weight: 500 !important;
+          color: #111827 !important;
+          cursor: pointer !important;
+          padding: 4px 6px !important;
+          user-select: none !important;
+        }
+
+        .figma-show-btn:hover {
+          color: #0284C7 !important;
+        }
+
         @media (max-width: 820px) {
           .login-card-grid {
             grid-template-columns: 1fr !important;

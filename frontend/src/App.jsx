@@ -42,6 +42,8 @@ function App() {
               <Route path="/login" element={<Loginpage />} />
               <Route path="/register" element={<RegistrationForjobseekerPage />} />
               <Route path="/register-jobseeker" element={<RegistrationForjobseekerPage />} />
+              <Route path="/register-recruiter" element={<RegistrationForjobseekerPage />} />
+              <Route path="/signup" element={<RegistrationForjobseekerPage />} />
 
               {/* Dashboards */}
               <Route path="/jobseeker-dashboard" element={<JobSeekerDashBoardPage />} />

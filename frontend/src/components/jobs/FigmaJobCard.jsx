@@ -26,10 +26,10 @@ const FigmaJobCard = ({
   return (
     <div 
       style={{
-        backgroundColor: '#F4FDF6',
+        backgroundColor: '#F2FFF2',
         borderRadius: '16px',
-        border: '1px solid rgba(12, 70, 59, 0.08)',
-        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.02)',
+        border: '1px solid rgba(13, 71, 59, 0.04)',
+        boxShadow: 'none',
         padding: '24px 22px',
         display: 'flex',
         flexDirection: 'column',
@@ -38,12 +38,12 @@ const FigmaJobCard = ({
         fontFamily: 'Inter, sans-serif'
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-3px)';
-        e.currentTarget.style.boxShadow = '0 10px 24px rgba(12, 70, 59, 0.08)';
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = '0 8px 20px rgba(13, 71, 59, 0.06)';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.02)';
+        e.currentTarget.style.boxShadow = 'none';
       }}
     >
       <div>
@@ -67,11 +67,11 @@ const FigmaJobCard = ({
               border: 'none',
               cursor: 'pointer',
               padding: '2px',
-              color: bookmarked ? '#0C463B' : '#9CA3AF',
+              color: bookmarked ? '#0D473B' : '#9CA3AF',
               flexShrink: 0
             }}
           >
-            <Bookmark size={20} fill={bookmarked ? '#0C463B' : 'none'} />
+            <Bookmark size={20} fill={bookmarked ? '#0D473B' : 'none'} />
           </button>
         </div>
 
@@ -82,10 +82,10 @@ const FigmaJobCard = ({
             fontWeight: '700',
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
-            padding: '3px 8px',
+            padding: '4px 9px',
             borderRadius: '4px',
-            backgroundColor: isPartTime ? '#D1FAE5' : '#EDE9FE',
-            color: isPartTime ? '#065F46' : '#6D28D9'
+            backgroundColor: isPartTime ? '#DCFCE7' : '#F1E0FF',
+            color: isPartTime ? '#0D473B' : '#7C3AED'
           }}>
             {job.type || 'Full-Time'}
           </span>
@@ -161,18 +161,24 @@ const FigmaJobCard = ({
           onClick={() => navigate(`/job/${job.id}`)}
           style={{
             backgroundColor: '#FFFFFF',
-            color: '#0C463B',
-            border: '1.5px solid #0C463B',
+            color: '#0D473B',
+            border: '1.5px solid #0D473B',
             borderRadius: '50px',
             padding: '8px 16px',
             fontSize: '13.5px',
             fontWeight: '600',
             cursor: 'pointer',
             textAlign: 'center',
-            transition: 'background-color 0.15s ease'
+            transition: 'all 0.15s ease'
           }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F0FDF4'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FFFFFF'}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#0D473B';
+            e.currentTarget.style.color = '#FFFFFF';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#FFFFFF';
+            e.currentTarget.style.color = '#0D473B';
+          }}
         >
           View details
         </button>
@@ -182,9 +188,9 @@ const FigmaJobCard = ({
             type="button"
             disabled
             style={{
-              backgroundColor: '#ECFDF5',
-              color: '#065F46',
-              border: '1px solid #A7F3D0',
+              backgroundColor: '#DCFCE7',
+              color: '#0D473B',
+              border: '1px solid #86EFAC',
               borderRadius: '50px',
               padding: '8px 16px',
               fontSize: '13.5px',
@@ -200,7 +206,7 @@ const FigmaJobCard = ({
             type="button"
             onClick={() => onApply && onApply(job)}
             style={{
-              backgroundColor: '#0C463B',
+              backgroundColor: '#0D473B',
               color: '#FFFFFF',
               border: 'none',
               borderRadius: '50px',
@@ -209,11 +215,11 @@ const FigmaJobCard = ({
               fontWeight: '600',
               cursor: 'pointer',
               textAlign: 'center',
-              boxShadow: '0 2px 8px rgba(12, 70, 59, 0.2)',
+              boxShadow: 'none',
               transition: 'background-color 0.15s ease'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#08342c'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0C463B'}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#092F27'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0D473B'}
           >
             Apply now
           </button>

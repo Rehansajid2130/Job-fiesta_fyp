@@ -242,7 +242,8 @@ const LandingPage = () => {
     >
       
       {/* 1. FIGMA NAVBAR (Fully Functional & Responsive) */}
-      <header style={{ width: '100%', maxWidth: '1360px', margin: '0 auto', padding: '20px clamp(16px, 4vw, 32px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
+      {/* ponytail: reusing global .container */}
+      <header className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', paddingTop: '20px', paddingBottom: '20px' }}>
         {/* Logo */}
         <Link 
           to="/" 
@@ -510,7 +511,8 @@ const LandingPage = () => {
       )}
 
       {/* 2. HERO SECTION */}
-      <section style={{ position: 'relative', width: '100%', maxWidth: '1360px', margin: '0 auto', paddingTop: '16px', paddingBottom: '20px', textAlign: 'center' }}>
+      {/* ponytail: reusing global .container */}
+      <section className="container" style={{ position: 'relative', paddingTop: '16px', paddingBottom: '20px', textAlign: 'center' }}>
         
         {/* Top-Left Lightbulb Doodle */}
         <div className="hero-doodle" style={{ position: 'absolute', left: '4%', top: '10px', pointerEvents: 'none', zIndex: 1 }}>
@@ -641,7 +643,8 @@ const LandingPage = () => {
       </section>
 
         {/* 3. OUR FEATURES JOBS (Permanent Featured Jobs) */}
-        <section id="jobs" style={{ width: '100%', maxWidth: '1360px', margin: '40px auto 80px', padding: '0 clamp(16px, 4vw, 32px)' }}>
+        {/* ponytail: reusing global .container */}
+        <section id="jobs" className="container" style={{ marginTop: '40px', marginBottom: '80px' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '36px' }}>
             <div>
               <h2 style={{ fontFamily: "'Martel', serif", fontSize: 'clamp(30px, 5vw, 56px)', fontWeight: '700', color: '#0C463B', margin: 0, textAlign: 'left' }}>
@@ -803,7 +806,8 @@ const LandingPage = () => {
       </section>
 
       {/* 4. OUR CATEGORIES (Interactive Click-to-Filter) */}
-      <section id="categories" style={{ width: '100%', maxWidth: '1360px', margin: '0 auto 100px', padding: '0 clamp(16px, 4vw, 32px)' }}>
+      {/* ponytail: reusing global .container */}
+      <section id="categories" className="container" style={{ marginBottom: '100px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '36px' }}>
           <div>
             <h2 style={{ fontFamily: "'Martel', serif", fontSize: 'clamp(30px, 5vw, 56px)', fontWeight: '700', color: '#0C463B', margin: 0, textAlign: 'left' }}>
@@ -894,7 +898,8 @@ const LandingPage = () => {
       </section>
 
       {/* 5. WHAT OUR CLIENT SAY */}
-      <section style={{ width: '100%', maxWidth: '1360px', margin: '0 auto 80px', padding: '0 clamp(16px, 4vw, 32px)', textAlign: 'center' }}>
+      {/* ponytail: reusing global .container */}
+      <section className="container" style={{ marginBottom: '80px', textAlign: 'center' }}>
         <h2 style={{ fontFamily: "'Martel', serif", fontSize: 'clamp(30px, 5vw, 56px)', fontWeight: '700', color: '#0C463B', marginBottom: '36px', textAlign: 'left' }}>
           What our Client say
         </h2>
@@ -968,7 +973,8 @@ const LandingPage = () => {
       </section>
 
       {/* 6. CONTACT US (Interactive Form with Local Persistence) */}
-      <section id="contact" style={{ width: '100%', maxWidth: '1360px', margin: '0 auto 100px', padding: '0 clamp(16px, 4vw, 32px)', position: 'relative' }}>
+      {/* ponytail: reusing global .container */}
+      <section id="contact" className="container" style={{ marginBottom: '100px', position: 'relative' }}>
         
         {/* Floating Paper Airplane Top Right */}
         <div className="contact-doodle" style={{ position: 'absolute', right: '5%', top: '-20px', pointerEvents: 'none', zIndex: 1 }}>
@@ -1184,7 +1190,8 @@ const LandingPage = () => {
 
       {/* 7. FIGMA FOOTER (All Links Fully Working & Responsive) */}
       <footer style={{ backgroundColor: '#111111', color: '#FFFFFF', paddingTop: '60px', paddingBottom: '30px' }}>
-        <div style={{ width: '100%', maxWidth: '1360px', margin: '0 auto', padding: '0 clamp(16px, 4vw, 32px)' }}>
+        {/* ponytail: reusing global .container */}
+        <div className="container">
           
           {/* Footer Navigation Columns & Origami Doodle */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))', gap: '30px', alignItems: 'start', marginBottom: '40px' }}>
