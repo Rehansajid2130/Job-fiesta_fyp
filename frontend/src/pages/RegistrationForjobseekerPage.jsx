@@ -22,7 +22,7 @@ import {
 
 const RegistrationPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register, login } = useAuth();
 
   // Step state: 
   // 'primary' (Name, Email, Password, Mobile, Role selector)
@@ -143,19 +143,41 @@ const RegistrationPage = () => {
   const handleFinalSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMsg('');
 
     try {
-      await login(formData.email, formData.password, formData.role);
-      setLoading(false);
-      setCompletedSuccess(true);
+      const payload = {
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.mobileNumber,
+        role: formData.role === 'recruiter' ? 'employer' : 'jobseeker',
+        headline: formData.role === 'recruiter' ? formData.recruiterTitle : formData.jobTitle,
+        location: formData.location || formData.companyAddress || '',
+        skills: formData.preferredIndustry ? [formData.preferredIndustry] : [],
+        companyDetails: formData.role === 'recruiter' ? {
+          companyName: formData.companyName,
+          companyWebsite: formData.companyWebsite,
+          companySize: formData.teamSize,
+          industry: formData.companyIndustry,
+        } : undefined,
+      };
 
-      setTimeout(() => {
-        if (formData.role === 'recruiter') {
-          navigate('/recruiter-dashboard');
-        } else {
-          navigate('/jobseeker-dashboard');
-        }
-      }, 1600);
+      const res = await register(payload);
+      setLoading(false);
+
+      if (res?.success) {
+        setCompletedSuccess(true);
+        setTimeout(() => {
+          if (formData.role === 'recruiter') {
+            navigate('/recruiter-dashboard');
+          } else {
+            navigate('/jobseeker-dashboard');
+          }
+        }, 1600);
+      } else {
+        setErrorMsg(res?.message || 'Registration failed. Please try again.');
+      }
     } catch (err) {
       setLoading(false);
       setErrorMsg(err.message || 'Registration failed. Please try again.');

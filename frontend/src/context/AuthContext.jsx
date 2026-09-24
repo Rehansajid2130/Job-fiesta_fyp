@@ -40,18 +40,26 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password, roleHint = 'jobseeker') => {
     try {
       // If backend API URL is available, attempt real request
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      const res = await axios.post(`${apiUrl}/api/auth/login`, { email, password }, { timeout: 2000 });
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const res = await axios.post(`${apiUrl}/api/auth/login`, { email, password }, { timeout: 3000 });
       if (res.data?.token) {
         setToken(res.data.token);
         localStorage.setItem('token', res.data.token);
-        const userData = res.data.user || { email, userType: res.data.userType || roleHint };
+        const rawUser = res.data.user || {};
+        const userData = {
+          ...rawUser,
+          userType: rawUser.role === 'employer' ? 'recruiter' : (rawUser.role || roleHint),
+          name: rawUser.fullName || rawUser.name || email.split('@')[0],
+        };
         setUser(userData);
         return { success: true, user: userData };
       }
     } catch (err) {
-      // Fallback to seamless client login for demo / FYP presentation
-      console.warn('Backend server not connected, continuing with authenticated session:', err.message);
+      console.warn('Backend server response:', err.response?.data?.message || err.message);
+      // If server explicitly responded with an error (e.g. 401 Invalid credentials), return it to the UI
+      if (err.response?.data?.message) {
+        return { success: false, message: err.response.data.message };
+      }
     }
 
     // Determine role based on email or hint
@@ -78,6 +86,31 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('token', 'demo-token-active');
     setUser(mockUser);
     return { success: true, user: mockUser };
+  };
+
+  const register = async (registerData) => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const res = await axios.post(`${apiUrl}/api/auth/register`, registerData, { timeout: 4000 });
+      if (res.data?.token) {
+        setToken(res.data.token);
+        localStorage.setItem('token', res.data.token);
+        const rawUser = res.data.user || {};
+        const userData = {
+          ...rawUser,
+          userType: rawUser.role === 'employer' ? 'recruiter' : (rawUser.role || 'jobseeker'),
+          name: rawUser.fullName || registerData.fullName,
+        };
+        setUser(userData);
+        return { success: true, user: userData };
+      }
+      return { success: false, message: res.data?.message || 'Registration failed' };
+    } catch (err) {
+      return {
+        success: false,
+        message: err.response?.data?.message || err.message || 'Registration failed',
+      };
+    }
   };
 
   const logout = () => {
@@ -118,7 +151,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, switchRole, updateProfile, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, token, login, register, logout, switchRole, updateProfile, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 import { initialJobs, initialApplications, initialConversations } from '../data/mockData';
 
 const JobContext = createContext();
@@ -50,6 +51,41 @@ export const JobProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem('jobfiesta_conversations', JSON.stringify(conversations));
   }, [conversations]);
+
+  // Sync with backend API if running
+  useEffect(() => {
+    const fetchLiveJobs = async () => {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+        const res = await axios.get(`${apiUrl}/api/jobs`, { timeout: 3000 });
+        if (res.data?.jobs && res.data.jobs.length > 0) {
+          const mappedJobs = res.data.jobs.map((job) => ({
+            id: job._id,
+            title: job.title,
+            company: job.company,
+            logo: job.companyLogo || 'https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=100&h=100&fit=crop&crop=faces',
+            location: `${job.location} (${job.workplaceType})`,
+            type: job.jobType,
+            category: job.category?.toLowerCase() || 'tech',
+            salary: `$${Math.round(job.salaryMin / 1000)}k - $${Math.round(job.salaryMax / 1000)}k`,
+            salaryMin: job.salaryMin,
+            salaryMax: job.salaryMax,
+            experience: job.experienceLevel,
+            postedDate: 'Recently',
+            featured: job.viewsCount > 200,
+            tags: job.skills || ['Full-Time'],
+            description: job.description,
+            requirements: job.requirements || [],
+            benefits: job.benefits || ['Flexible work hours', 'Health insurance'],
+          }));
+          setJobs(mappedJobs);
+        }
+      } catch (err) {
+        console.info('Using local jobs data (backend offline or loading):', err.message);
+      }
+    };
+    fetchLiveJobs();
+  }, []);
 
   const toggleSaveJob = (jobId) => {
     setSavedJobIds(prev => 

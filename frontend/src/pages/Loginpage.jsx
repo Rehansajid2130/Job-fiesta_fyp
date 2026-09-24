@@ -22,15 +22,16 @@ const Loginpage = () => {
 
   // Quick Demo Role selector (Jobseeker vs Recruiter)
   const [activeRole, setActiveRole] = useState('jobseeker');
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
   const handleRoleQuickFill = (role) => {
     setActiveRole(role);
     if (role === 'recruiter') {
-      setEmailOrUsername('recruiter@nexusinnovations.com');
-      setPassword('Recruiter2026!');
+      setEmailOrUsername('recruiter@jobfiesta.com');
+      setPassword('password123');
     } else {
-      setEmailOrUsername('rehan.candidate@jobfiesta.io');
-      setPassword('Password123');
+      setEmailOrUsername('jobseeker@jobfiesta.com');
+      setPassword('password123');
     }
     setErrorMsg('');
   };
@@ -54,14 +55,16 @@ const Loginpage = () => {
       setLoading(false);
 
       if (res?.success) {
-        if (res.user?.userType === 'recruiter' || activeRole === 'recruiter') {
-          navigate('/recruiter-dashboard');
-        } else {
-          navigate('/jobseeker-dashboard');
-        }
+        setLoginSuccess(true);
+        setTimeout(() => {
+          if (res.user?.userType === 'recruiter' || res.user?.role === 'employer' || activeRole === 'recruiter') {
+            navigate('/recruiter-dashboard');
+          } else {
+            navigate('/jobseeker-dashboard');
+          }
+        }, 800);
       } else {
-        // Fallback default redirect if authenticated
-        navigate('/jobseeker-dashboard');
+        setErrorMsg(res?.message || 'Invalid email or password.');
       }
     } catch (err) {
       setLoading(false);
@@ -211,6 +214,25 @@ const Loginpage = () => {
               }}>
                 <AlertCircle size={16} />
                 <span>{errorMsg}</span>
+              </div>
+            )}
+
+            {/* Success Message */}
+            {loginSuccess && (
+              <div style={{
+                backgroundColor: '#F0FDF4',
+                border: '1px solid #86EFAC',
+                borderRadius: '8px',
+                padding: '10px 14px',
+                color: '#166534',
+                fontSize: '13px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginBottom: '16px'
+              }}>
+                <Check size={16} color="#166534" />
+                <span>Login successful! Redirecting to your dashboard...</span>
               </div>
             )}
 
