@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
+import IconSwap from '../components/common/IconSwap';
 import { 
   Sparkles, 
   Download, 
@@ -361,8 +362,12 @@ const ResumeBuilderPage = () => {
                           border: '1px solid #A7F3D0'
                         }}
                       >
-                        <Sparkles size={13} color="#10B981" />
-                        {isEnhancing ? 'Enhancing...' : 'AI Enhance'}
+                        <IconSwap 
+                          state={enhanceSuccess} 
+                          iconA={<Check size={13} color="#10B981" />} 
+                          iconB={<Sparkles size={13} color="#10B981" />} 
+                        />
+                        {isEnhancing ? 'Enhancing...' : enhanceSuccess ? 'Enhanced!' : 'AI Enhance'}
                       </button>
                     </div>
 

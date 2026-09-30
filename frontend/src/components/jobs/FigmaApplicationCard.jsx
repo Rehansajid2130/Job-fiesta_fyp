@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Star, Eye } from 'lucide-react';
+import IconSwap from '../common/IconSwap';
 
 const FigmaApplicationCard = ({ application, onViewApplication, onRate }) => {
   const [userRating, setUserRating] = useState(application.rating || 0);
@@ -122,10 +123,10 @@ const FigmaApplicationCard = ({ application, onViewApplication, onRate }) => {
                     justifyContent: 'center'
                   }}
                 >
-                  <Star
-                    size={18}
-                    fill={(hoverRating || userRating) >= star ? '#F59E0B' : 'transparent'}
-                    color={(hoverRating || userRating) >= star ? '#F59E0B' : '#D1D5DB'}
+                  <IconSwap 
+                    state={(hoverRating || userRating) >= star} 
+                    iconA={<Star size={18} fill="#F59E0B" color="#F59E0B" />} 
+                    iconB={<Star size={18} fill="transparent" color="#D1D5DB" />} 
                   />
                 </button>
               ))}

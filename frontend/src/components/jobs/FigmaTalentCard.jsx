@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { MapPin, Bookmark } from 'lucide-react';
+import IconSwap from '../common/IconSwap';
 
 const FigmaTalentCard = ({ talent, onViewProfile }) => {
   const [bookmarked, setBookmarked] = useState(false);
@@ -45,7 +46,11 @@ const FigmaTalentCard = ({ talent, onViewProfile }) => {
               padding: 0
             }}
           >
-            <Bookmark size={20} fill={bookmarked ? '#0C463B' : 'none'} />
+            <IconSwap 
+              state={bookmarked} 
+              iconA={<Bookmark size={20} fill="#0C463B" color="#0C463B" />} 
+              iconB={<Bookmark size={20} fill="none" color="#9CA3AF" />} 
+            />
           </button>
         </div>
 

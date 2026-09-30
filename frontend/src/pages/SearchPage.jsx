@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/common/Navbar';
@@ -146,6 +146,20 @@ const SearchPage = () => {
 
   const [selectedSort, setSelectedSort] = useState('popular');
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
+  const sortDropdownRef = useRef(null);
+
+  // Close sort dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (sortDropdownRef.current && !sortDropdownRef.current.contains(e.target)) {
+        setSortDropdownOpen(false);
+      }
+    };
+    if (sortDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [sortDropdownOpen]);
   const [liveJobs, setLiveJobs] = useState([]);
   const [isLiveLoading, setIsLiveLoading] = useState(false);
   const [usingLiveApi, setUsingLiveApi] = useState(false);
@@ -156,8 +170,9 @@ const SearchPage = () => {
   const [coverNote, setCoverNote] = useState('');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
-  // Synchronize URL parameters
+  // Synchronize URL parameters & ensure page starts at the top
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     const kw = searchParams.get('keyword');
     const loc = searchParams.get('location');
     const cat = searchParams.get('category');
@@ -536,10 +551,12 @@ const SearchPage = () => {
                 </h2>
 
                 {/* Interactive Sort Dropdown Pill */}
-                <div style={{ position: 'relative' }}>
+                <div ref={sortDropdownRef} style={{ position: 'relative' }}>
                   <button
                     type="button"
                     onClick={() => setSortDropdownOpen(!sortDropdownOpen)}
+                    aria-expanded={sortDropdownOpen}
+                    aria-haspopup="true"
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
@@ -551,7 +568,8 @@ const SearchPage = () => {
                       color: '#374151',
                       fontSize: '13px',
                       fontWeight: '500',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      transition: 'all var(--dropdown-open-dur) var(--dropdown-ease)'
                     }}
                   >
                     <span>
@@ -563,11 +581,20 @@ const SearchPage = () => {
                         ? 'Salary: Low to High'
                         : 'Newest'}
                     </span>
-                    <ChevronDown size={14} color="#6B7280" />
+                    <ChevronDown 
+                      size={14} 
+                      color="#6B7280" 
+                      style={{
+                        transition: 'transform var(--dropdown-open-dur) var(--dropdown-ease)',
+                        transform: sortDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+                      }}
+                    />
                   </button>
 
-                  {sortDropdownOpen && (
-                    <div style={{
+                  <div 
+                    className={`t-dropdown ${sortDropdownOpen ? 'is-open' : ''}`}
+                    data-origin="top-right"
+                    style={{
                       position: 'absolute',
                       right: 0,
                       top: 'calc(100% + 6px)',
@@ -581,37 +608,38 @@ const SearchPage = () => {
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '2px'
-                    }}>
-                      {[
-                        { id: 'popular', label: 'Popular' },
-                        { id: 'newest', label: 'Newest' },
-                        { id: 'salary_high', label: 'Salary: High to Low' },
-                        { id: 'salary_low', label: 'Salary: Low to High' }
-                      ].map((opt) => (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => {
-                            setSelectedSort(opt.id);
-                            setSortDropdownOpen(false);
-                          }}
-                          style={{
-                            textAlign: 'left',
-                            padding: '8px 12px',
-                            fontSize: '13px',
-                            borderRadius: '8px',
-                            border: 'none',
-                            backgroundColor: selectedSort === opt.id ? '#F2FFF2' : 'transparent',
-                            color: selectedSort === opt.id ? '#0D473B' : '#374151',
-                            fontWeight: selectedSort === opt.id ? '600' : '400',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                    }}
+                  >
+                    {[
+                      { id: 'popular', label: 'Popular' },
+                      { id: 'newest', label: 'Newest' },
+                      { id: 'salary_high', label: 'Salary: High to Low' },
+                      { id: 'salary_low', label: 'Salary: Low to High' }
+                    ].map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedSort(opt.id);
+                          setSortDropdownOpen(false);
+                        }}
+                        style={{
+                          textAlign: 'left',
+                          padding: '8px 12px',
+                          fontSize: '13px',
+                          borderRadius: '8px',
+                          border: 'none',
+                          backgroundColor: selectedSort === opt.id ? '#F2FFF2' : 'transparent',
+                          color: selectedSort === opt.id ? '#0D473B' : '#374151',
+                          fontWeight: selectedSort === opt.id ? '600' : '400',
+                          cursor: 'pointer',
+                          transition: 'background-color 0.15s ease, color 0.15s ease'
+                        }}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 

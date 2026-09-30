@@ -1,6 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
-import { initialJobs, initialApplications, initialConversations } from '../data/mockData';
+import { 
+  initialJobs, 
+  initialApplications, 
+  initialConversations, 
+  initialCompanies, 
+  initialCandidates, 
+  initialNotifications 
+} from '../data/mockData';
 
 const JobContext = createContext();
 
@@ -11,6 +18,31 @@ export const JobProvider = ({ children }) => {
     const saved = localStorage.getItem('jobfiesta_jobs');
     return saved ? JSON.parse(saved) : initialJobs;
   });
+
+  const [companies, setCompanies] = useState(() => {
+    const saved = localStorage.getItem('jobfiesta_companies');
+    return saved ? JSON.parse(saved) : initialCompanies;
+  });
+
+  const [candidates, setCandidates] = useState(() => {
+    const saved = localStorage.getItem('jobfiesta_candidates');
+    return saved ? JSON.parse(saved) : initialCandidates;
+  });
+
+  const [notifications, setNotifications] = useState(() => {
+    const saved = localStorage.getItem('jobfiesta_notifications');
+    return saved ? JSON.parse(saved) : initialNotifications;
+  });
+
+  // Global toast state for transitions-dev 22-toast
+  const [toast, setToast] = useState({ open: false, message: '', type: 'success' });
+
+  const showToast = (message, type = 'success') => {
+    setToast({ open: true, message, type });
+    setTimeout(() => {
+      setToast(prev => ({ ...prev, open: false }));
+    }, 3800);
+  };
 
   const [applications, setApplications] = useState(() => {
     const saved = localStorage.getItem('jobfiesta_applications');
@@ -24,7 +56,17 @@ export const JobProvider = ({ children }) => {
 
   const [conversations, setConversations] = useState(() => {
     const saved = localStorage.getItem('jobfiesta_conversations');
-    return saved ? JSON.parse(saved) : initialConversations;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.some(c => c.id === 'conv-suzana')) {
+          return parsed;
+        }
+      } catch (e) {
+        // fallback
+      }
+    }
+    return initialConversations;
   });
 
   const [searchFilters, setSearchFilters] = useState({
@@ -235,9 +277,65 @@ export const JobProvider = ({ children }) => {
     }));
   };
 
+  useEffect(() => {
+    localStorage.setItem('jobfiesta_companies', JSON.stringify(companies));
+  }, [companies]);
+
+  useEffect(() => {
+    localStorage.setItem('jobfiesta_candidates', JSON.stringify(candidates));
+  }, [candidates]);
+
+  useEffect(() => {
+    localStorage.setItem('jobfiesta_notifications', JSON.stringify(notifications));
+  }, [notifications]);
+
+  const updateCandidateStage = (candidateId, newStage) => {
+    setCandidates(prev => prev.map(cand => {
+      if (cand.id === candidateId) {
+        return { ...cand, stage: newStage };
+      }
+      return cand;
+    }));
+    showToast(`Candidate moved to ${newStage.toUpperCase()}`, 'success');
+  };
+
+  const markNotificationAsRead = (notifId) => {
+    setNotifications(prev => prev.map(n => 
+      n.id === notifId ? { ...n, unread: false } : n
+    ));
+  };
+
+  const markAllNotificationsAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
+    showToast('All notifications marked as read', 'info');
+  };
+
+  const addNotification = (notifData) => {
+    const newNotif = {
+      id: `notif-${Date.now()}`,
+      time: 'Just now',
+      unread: true,
+      ...notifData
+    };
+    setNotifications(prev => [newNotif, ...prev]);
+    showToast(newNotif.title, 'info');
+  };
+
+  const unreadNotificationsCount = notifications.filter(n => n.unread).length;
+
   return (
     <JobContext.Provider value={{
       jobs,
+      companies,
+      candidates,
+      updateCandidateStage,
+      notifications,
+      unreadNotificationsCount,
+      markNotificationAsRead,
+      markAllNotificationsAsRead,
+      addNotification,
+      toast,
+      showToast,
       applications,
       savedJobIds,
       conversations,
@@ -254,3 +352,4 @@ export const JobProvider = ({ children }) => {
     </JobContext.Provider>
   );
 };
+

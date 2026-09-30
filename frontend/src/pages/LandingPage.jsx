@@ -4,6 +4,7 @@ import { useJobs } from '../context/JobContext';
 import { useAuth } from '../context/AuthContext';
 import HeroOfficeIllustration from '../components/landing/HeroOfficeIllustration';
 import Modal from '../components/common/Modal';
+import Footer from '../components/common/Footer';
 
 const LandingPage = () => {
   const { jobs, applications, setSearchFilters, applyToJob } = useJobs();
@@ -14,8 +15,6 @@ const LandingPage = () => {
   const [keyword, setKeyword] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Category selection (default active is Web Development index 1)
-  const [activeCategory, setActiveCategory] = useState(1);
 
   // Quick Apply Modal State
   const [applyModalOpen, setApplyModalOpen] = useState(false);
@@ -35,9 +34,7 @@ const LandingPage = () => {
   });
   const [contactSubmitted, setContactSubmitted] = useState(false);
 
-  // Policy Modals State
-  const [termsModalOpen, setTermsModalOpen] = useState(false);
-  const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
+  // Reviews Modal State
   const [moreReviewsOpen, setMoreReviewsOpen] = useState(false);
 
   // Check for saved resume from Resume Builder
@@ -837,63 +834,25 @@ const LandingPage = () => {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))', gap: 'clamp(14px, 2vw, 22px)' }}>
-          {categories.map((cat, idx) => {
-            const isSelected = activeCategory === idx;
-            return (
-              <div
-                key={cat.name}
-                onClick={() => handleCategoryClick(cat)}
-                style={{
-                  backgroundColor: isSelected ? '#0C463B' : '#F2FFF2',
-                  color: isSelected ? '#FFFFFF' : '#0C463B',
-                  borderRadius: '16px',
-                  padding: 'clamp(24px, 4vw, 36px) 14px',
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  transition: 'all 0.25s ease',
-                  boxShadow: isSelected ? '0 10px 25px rgba(12, 70, 59, 0.2)' : 'none',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '16px'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isSelected) {
-                    e.currentTarget.style.transform = 'translateY(-4px)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
-                <div 
-                  style={{ 
-                    width: '64px', 
-                    height: '64px', 
-                    borderRadius: '50%', 
-                    backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.15)' : '#FFFFFF', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center' 
-                  }}
-                >
-                  <img 
-                    src={cat.icon} 
-                    alt={cat.name} 
-                    style={{ 
-                      width: '34px', 
-                      height: '34px',
-                      filter: isSelected ? 'brightness(0) invert(1)' : 'none'
-                    }} 
-                  />
-                </div>
-                <span style={{ fontFamily: 'Inter, sans-serif', fontSize: '18px', fontWeight: '600' }}>
-                  {cat.name}
-                </span>
+          {/* ponytail: reusable .category-card driven by pure CSS :hover (zero JS re-renders, 60fps) */}
+          {categories.map((cat) => (
+            <div
+              key={cat.name}
+              className="category-card"
+              onClick={() => handleCategoryClick(cat)}
+            >
+              <div className="category-icon-wrap">
+                <img 
+                  src={cat.icon} 
+                  alt={cat.name} 
+                  className="category-icon-img"
+                />
               </div>
-            );
-          })}
+              <span className="category-title">
+                {cat.name}
+              </span>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -1188,192 +1147,8 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* 7. FIGMA FOOTER (All Links Fully Working & Responsive) */}
-      <footer style={{ backgroundColor: '#111111', color: '#FFFFFF', paddingTop: '60px', paddingBottom: '30px' }}>
-        {/* ponytail: reusing global .container */}
-        <div className="container">
-          
-          {/* Footer Navigation Columns & Origami Doodle */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))', gap: '30px', alignItems: 'start', marginBottom: '40px' }}>
-            
-            {/* Company Column */}
-            <div>
-              <h4 style={{ fontFamily: 'Inter, sans-serif', fontSize: '17px', fontWeight: '600', marginBottom: '18px', color: '#FFFFFF' }}>
-                Company
-              </h4>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <li>
-                  <button 
-                    onClick={() => navigate('/search')} 
-                    style={{ color: '#9CA3AF', background: 'none', border: 'none', fontSize: '14px', fontFamily: 'Inter, sans-serif', cursor: 'pointer', padding: 0 }}
-                  >
-                    Jobs
-                  </button>
-                </li>
-                <li>
-                  <button 
-                    onClick={() => scrollToSection('categories')} 
-                    style={{ color: '#9CA3AF', background: 'none', border: 'none', fontSize: '14px', fontFamily: 'Inter, sans-serif', cursor: 'pointer', padding: 0 }}
-                  >
-                    Categories
-                  </button>
-                </li>
-              </ul>
-            </div>
-
-            {/* Help Column */}
-            <div>
-              <h4 style={{ fontFamily: 'Inter, sans-serif', fontSize: '17px', fontWeight: '600', marginBottom: '18px', color: '#FFFFFF' }}>
-                Help
-              </h4>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <li>
-                  <button 
-                    onClick={() => {
-                      scrollToSection('contact');
-                      document.getElementById('contact-message-input')?.focus();
-                    }} 
-                    style={{ color: '#9CA3AF', background: 'none', border: 'none', fontSize: '14px', fontFamily: 'Inter, sans-serif', cursor: 'pointer', padding: 0 }}
-                  >
-                    Customer Support
-                  </button>
-                </li>
-                <li>
-                  <button 
-                    onClick={() => scrollToSection('contact')} 
-                    style={{ color: '#9CA3AF', background: 'none', border: 'none', fontSize: '14px', fontFamily: 'Inter, sans-serif', cursor: 'pointer', padding: 0 }}
-                  >
-                    Contact Us
-                  </button>
-                </li>
-                <li>
-                  <button 
-                    onClick={() => setTermsModalOpen(true)} 
-                    style={{ color: '#9CA3AF', background: 'none', border: 'none', fontSize: '14px', fontFamily: 'Inter, sans-serif', cursor: 'pointer', padding: 0 }}
-                  >
-                    Terms &amp; Conditions
-                  </button>
-                </li>
-                <li>
-                  <button 
-                    onClick={() => setPrivacyModalOpen(true)} 
-                    style={{ color: '#9CA3AF', background: 'none', border: 'none', fontSize: '14px', fontFamily: 'Inter, sans-serif', cursor: 'pointer', padding: 0 }}
-                  >
-                    Privacy Policy
-                  </button>
-                </li>
-              </ul>
-            </div>
-
-            {/* Resources 1 Column */}
-            <div>
-              <h4 style={{ fontFamily: 'Inter, sans-serif', fontSize: '17px', fontWeight: '600', marginBottom: '18px', color: '#FFFFFF' }}>
-                Resources
-              </h4>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <li>
-                  <button 
-                    onClick={() => navigate('/resume-builder')} 
-                    style={{ color: '#9CA3AF', background: 'none', border: 'none', fontSize: '14px', fontFamily: 'Inter, sans-serif', cursor: 'pointer', padding: 0 }}
-                  >
-                    AI Resume Builder
-                  </button>
-                </li>
-                <li>
-                  <button 
-                    onClick={() => navigate('/search')} 
-                    style={{ color: '#9CA3AF', background: 'none', border: 'none', fontSize: '14px', fontFamily: 'Inter, sans-serif', cursor: 'pointer', padding: 0 }}
-                  >
-                    Browse Jobs
-                  </button>
-                </li>
-              </ul>
-            </div>
-
-            {/* Resources 2 Column */}
-            <div>
-              <h4 style={{ fontFamily: 'Inter, sans-serif', fontSize: '17px', fontWeight: '600', marginBottom: '18px', color: '#FFFFFF' }}>
-                Quick Links
-              </h4>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <li>
-                  <button 
-                    onClick={() => navigate('/post-job')} 
-                    style={{ color: '#9CA3AF', background: 'none', border: 'none', fontSize: '14px', fontFamily: 'Inter, sans-serif', cursor: 'pointer', padding: 0 }}
-                  >
-                    Post a Job
-                  </button>
-                </li>
-                <li>
-                  <button 
-                    onClick={() => navigate('/login')} 
-                    style={{ color: '#9CA3AF', background: 'none', border: 'none', fontSize: '14px', fontFamily: 'Inter, sans-serif', cursor: 'pointer', padding: 0 }}
-                  >
-                    Employer Sign In
-                  </button>
-                </li>
-              </ul>
-            </div>
-
-            {/* Right Airplane Origami Doodle */}
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minWidth: '120px' }}>
-              <img 
-                src="/assets/Landingpageimages/group_24.svg" 
-                alt="Origami plane" 
-                style={{ width: '120px', height: 'auto', filter: 'brightness(0) invert(0.6)', opacity: 0.5 }}
-              />
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div style={{ width: '100%', height: '1px', backgroundColor: '#262626', marginBottom: '24px' }}></div>
-
-          {/* Bottom Bar: Logo, Copyright, Social Icons */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-            {/* Logo */}
-            <span style={{ fontFamily: "'League Script', cursive", fontSize: '32px', fontWeight: 'bold', color: '#FFFFFF' }}>
-              Job fiesta
-            </span>
-
-            {/* Copyright */}
-            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '13px', color: '#9CA3AF' }}>
-              &copy; Copyright 2024. All rights reserved by JobFiesta
-            </div>
-
-            {/* Social Icons (Open official channels in new tab) */}
-            <div style={{ display: 'flex', gap: '12px' }}>
-              {[
-                { name: 'X', url: 'https://twitter.com' },
-                { name: 'F', url: 'https://facebook.com' },
-                { name: 'L', url: 'https://linkedin.com' },
-                { name: 'I', url: 'https://instagram.com' }
-              ].map((s) => (
-                <a 
-                  key={s.name} 
-                  href={s.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ 
-                    width: '32px', 
-                    height: '32px', 
-                    borderRadius: '50%', 
-                    backgroundColor: '#FFFFFF', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    textDecoration: 'none'
-                  }}
-                >
-                  <span style={{ color: '#000000', fontSize: '12px', fontWeight: 'bold' }}>
-                    {s.name}
-                  </span>
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-      </footer>
+      {/* 7. FIGMA FOOTER (Reused across pages) */}
+      <Footer />
 
       {/* QUICK APPLY MODAL (With Resume Link & State Sync) */}
       <Modal
@@ -1559,49 +1334,7 @@ const LandingPage = () => {
         </div>
       </Modal>
 
-      {/* TERMS & CONDITIONS MODAL */}
-      <Modal
-        isOpen={termsModalOpen}
-        onClose={() => setTermsModalOpen(false)}
-        title="JobFiesta Terms &amp; Conditions"
-      >
-        <div style={{ fontSize: '14px', color: '#374151', lineHeight: '1.6', maxHeight: '60vh', overflowY: 'auto', paddingRight: '8px' }}>
-          <h4 style={{ color: '#0C463B', marginBottom: '6px' }}>1. Acceptance of Terms</h4>
-          <p style={{ marginBottom: '14px' }}>
-            By accessing or using JobFiesta, you agree to comply with and be bound by these Terms of Service. If you do not agree, please refrain from using the platform.
-          </p>
-          <h4 style={{ color: '#0C463B', marginBottom: '6px' }}>2. Job Seekers &amp; Recruiters</h4>
-          <p style={{ marginBottom: '14px' }}>
-            Job seekers may browse positions and submit applications free of charge. Recruiters agree to post genuine opportunities and uphold equal employment standards.
-          </p>
-          <h4 style={{ color: '#0C463B', marginBottom: '6px' }}>3. Privacy &amp; Data Security</h4>
-          <p>
-            Your information is safeguarded following industry standard encryption and privacy guidelines. We do not sell your personal information to third parties.
-          </p>
-        </div>
-      </Modal>
 
-      {/* PRIVACY POLICY MODAL */}
-      <Modal
-        isOpen={privacyModalOpen}
-        onClose={() => setPrivacyModalOpen(false)}
-        title="JobFiesta Privacy Policy"
-      >
-        <div style={{ fontSize: '14px', color: '#374151', lineHeight: '1.6', maxHeight: '60vh', overflowY: 'auto', paddingRight: '8px' }}>
-          <h4 style={{ color: '#0C463B', marginBottom: '6px' }}>1. Information We Collect</h4>
-          <p style={{ marginBottom: '14px' }}>
-            We collect profile information, resumes, and communications necessary to facilitate employment applications and interview scheduling.
-          </p>
-          <h4 style={{ color: '#0C463B', marginBottom: '6px' }}>2. How We Use Your Data</h4>
-          <p style={{ marginBottom: '14px' }}>
-            Your resume and contact information are shared only with employers when you explicitly apply for a job position.
-          </p>
-          <h4 style={{ color: '#0C463B', marginBottom: '6px' }}>3. Your Rights</h4>
-          <p>
-            You have the right to edit, export, or delete your account and personal data at any time from your account settings.
-          </p>
-        </div>
-      </Modal>
 
     </div>
   );

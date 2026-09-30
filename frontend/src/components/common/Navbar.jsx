@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useJobs } from '../../context/JobContext';
 import { 
   FileText, 
   MessageSquare, 
@@ -8,14 +9,48 @@ import {
   User, 
   LogOut, 
   Menu, 
-  X,
-  Repeat
+  X, 
+  Repeat,
+  Bell,
+  Building2,
+  TrendingUp,
+  Users2,
+  CheckCheck
 } from 'lucide-react';
+import IconSwap from './IconSwap';
 
 const Navbar = () => {
   const { user, logout, switchRole } = useAuth();
+  const { 
+    notifications, 
+    unreadNotificationsCount, 
+    markNotificationAsRead, 
+    markAllNotificationsAsRead 
+  } = useJobs();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
+
+  const profileDropdownRef = useRef(null);
+  const notifDropdownRef = useRef(null);
+
+  // Close dropdowns on click outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(e.target)) {
+        setProfileDropdownOpen(false);
+      }
+      if (notifDropdownRef.current && !notifDropdownRef.current.contains(e.target)) {
+        setNotifDropdownOpen(false);
+      }
+    };
+    if (profileDropdownOpen || notifDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [profileDropdownOpen, notifDropdownOpen]);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -127,6 +162,53 @@ const Navbar = () => {
               </a>
 
               <Link 
+                to="/companies" 
+                style={{
+                  fontSize: '0.92rem',
+                  fontWeight: isActive('/companies') ? '700' : '500',
+                  color: isActive('/companies') ? '#0C463B' : '#475569',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                Companies
+              </Link>
+
+              <Link 
+                to="/salaries" 
+                style={{
+                  fontSize: '0.92rem',
+                  fontWeight: isActive('/salaries') ? '700' : '500',
+                  color: isActive('/salaries') ? '#0C463B' : '#475569',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                Salaries
+              </Link>
+
+              {isRecruiter && (
+                <Link 
+                  to="/candidates" 
+                  style={{
+                    fontSize: '0.92rem',
+                    fontWeight: isActive('/candidates') ? '700' : '500',
+                    color: isActive('/candidates') ? '#0C463B' : '#475569',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  Candidates (ATS)
+                </Link>
+              )}
+
+              <Link 
                 to="/resume-builder" 
                 style={{
                   fontSize: '0.92rem',
@@ -143,8 +225,8 @@ const Navbar = () => {
               </Link>
             </div>
 
-            {/* Right Navigation: Role Indicator, Browse Jobs & Profile / Login */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            {/* Right Navigation: Role Indicator, Browse Jobs, Notifications & Profile */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
               {/* Role switcher indicator */}
               <button
                 type="button"
@@ -182,8 +264,177 @@ const Navbar = () => {
                 Browse Jobs
               </Link>
 
+              {/* ── transitions-dev: 03-notification-badge & 05-menu-dropdown ── */}
+              <div style={{ position: 'relative' }} ref={notifDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
+                  aria-label="View notifications"
+                  title="Notifications"
+                  style={{
+                    position: 'relative',
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '10px',
+                    border: '1px solid #E2E8F0',
+                    backgroundColor: notifDropdownOpen ? '#F1F5F9' : '#FFFFFF',
+                    color: '#334155',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <Bell size={18} />
+                  {/* transitions-dev: 03-notification-badge */}
+                  <span className="t-badge" data-open={unreadNotificationsCount > 0 ? "true" : "false"}>
+                    <span className="t-badge-dot">
+                      {unreadNotificationsCount}
+                    </span>
+                  </span>
+                </button>
+
+                {/* transitions-dev: 05-menu-dropdown */}
+                <div
+                  className={`t-dropdown ${notifDropdownOpen ? 'is-open' : ''}`}
+                  data-origin="top-right"
+                  style={{
+                    position: 'absolute',
+                    right: 0,
+                    top: '48px',
+                    width: '360px',
+                    maxWidth: '90vw',
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '14px',
+                    boxShadow: 'var(--shadow-xl)',
+                    border: '1px solid #E2E8F0',
+                    overflow: 'hidden',
+                    zIndex: 1100
+                  }}
+                >
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '14px 18px',
+                    borderBottom: '1px solid #F1F5F9',
+                    backgroundColor: '#FAFAFA'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontWeight: '700', fontSize: '0.95rem', color: '#0F172A' }}>
+                        Notifications
+                      </span>
+                      {unreadNotificationsCount > 0 && (
+                        <span style={{
+                          padding: '2px 8px',
+                          borderRadius: '12px',
+                          backgroundColor: '#EBF8F4',
+                          color: '#0C463B',
+                          fontSize: '0.72rem',
+                          fontWeight: '800'
+                        }}>
+                          {unreadNotificationsCount} New
+                        </span>
+                      )}
+                    </div>
+                    {unreadNotificationsCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={markAllNotificationsAsRead}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#0C463B',
+                          fontSize: '0.78rem',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <CheckCheck size={14} />
+                        Mark all read
+                      </button>
+                    )}
+                  </div>
+
+                  <div style={{ maxHeight: '340px', overflowY: 'auto' }}>
+                    {notifications.length === 0 ? (
+                      <div style={{ padding: '32px 20px', textAlign: 'center', color: '#94A3B8', fontSize: '0.88rem' }}>
+                        No notifications yet.
+                      </div>
+                    ) : (
+                      notifications.slice(0, 4).map(item => (
+                        <Link
+                          key={item.id}
+                          to={item.link || '/notifications'}
+                          onClick={() => {
+                            markNotificationAsRead(item.id);
+                            setNotifDropdownOpen(false);
+                          }}
+                          style={{
+                            display: 'block',
+                            padding: '12px 18px',
+                            borderBottom: '1px solid #F8FAFC',
+                            backgroundColor: item.unread ? '#F2FFF2' : '#FFFFFF',
+                            transition: 'background-color 0.15s ease',
+                            textDecoration: 'none'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '2px' }}>
+                            <span style={{
+                              fontWeight: item.unread ? '700' : '600',
+                              fontSize: '0.85rem',
+                              color: '#0F172A'
+                            }}>
+                              {item.title}
+                            </span>
+                            <span style={{ fontSize: '0.72rem', color: '#94A3B8', whiteSpace: 'nowrap' }}>
+                              {item.time}
+                            </span>
+                          </div>
+                          <p style={{
+                            fontSize: '0.8rem',
+                            color: '#64748B',
+                            margin: 0,
+                            lineHeight: 1.35,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical'
+                          }}>
+                            {item.message}
+                          </p>
+                        </Link>
+                      ))
+                    )}
+                  </div>
+
+                  <Link
+                    to="/notifications"
+                    onClick={() => setNotifDropdownOpen(false)}
+                    style={{
+                      display: 'block',
+                      padding: '12px',
+                      textAlign: 'center',
+                      fontSize: '0.82rem',
+                      fontWeight: '700',
+                      color: '#0C463B',
+                      backgroundColor: '#F8FAFC',
+                      borderTop: '1px solid #F1F5F9',
+                      textDecoration: 'none'
+                    }}
+                  >
+                    View All Notifications →
+                  </Link>
+                </div>
+              </div>
+
               {user ? (
-                <div style={{ position: 'relative' }}>
+                <div style={{ position: 'relative' }} ref={profileDropdownRef}>
                   <div 
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                     style={{
@@ -208,8 +459,11 @@ const Navbar = () => {
                     />
                   </div>
 
-                  {profileDropdownOpen && (
-                    <div style={{
+                  {/* transitions-dev: 05-menu-dropdown */}
+                  <div 
+                    className={`t-dropdown ${profileDropdownOpen ? 'is-open' : ''}`}
+                    data-origin="top-right"
+                    style={{
                       position: 'absolute',
                       right: 0,
                       top: '48px',
@@ -220,7 +474,8 @@ const Navbar = () => {
                       border: '1px solid #E2E8F0',
                       padding: '8px 0',
                       zIndex: 1100
-                    }}>
+                    }}
+                  >
                       <div style={{ padding: '8px 16px', borderBottom: '1px solid #F1F5F9' }}>
                         <div style={{ fontWeight: '700', fontSize: '0.92rem', color: '#0F172A' }}>{user.name}</div>
                         <div style={{ fontSize: '0.78rem', color: '#64748B' }}>{user.email}</div>
@@ -254,6 +509,36 @@ const Navbar = () => {
                       >
                         <MessageSquare size={16} />
                         Messages
+                      </Link>
+                      <Link
+                        to="/profile/furqan12"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '10px 16px',
+                          fontSize: '0.88rem',
+                          color: '#334155'
+                        }}
+                      >
+                        <User size={16} />
+                        Public Profile
+                      </Link>
+                      <Link
+                        to="/notifications"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '10px 16px',
+                          fontSize: '0.88rem',
+                          color: '#334155'
+                        }}
+                      >
+                        <Bell size={16} />
+                        Notifications Center
                       </Link>
                       <Link
                         to="/account-settings"
@@ -291,7 +576,6 @@ const Navbar = () => {
                         Log Out
                       </button>
                     </div>
-                  )}
                 </div>
               ) : (
                 <Link 
@@ -328,7 +612,11 @@ const Navbar = () => {
                 className="mobile-nav-toggle"
                 aria-label="Toggle mobile menu"
               >
-                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                <IconSwap 
+                  state={mobileMenuOpen} 
+                  iconA={<X size={24} />} 
+                  iconB={<Menu size={24} />} 
+                />
               </button>
             </div>
           </>

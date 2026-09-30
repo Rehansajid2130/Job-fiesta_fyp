@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 // ponytail: removed unused Check import from lucide-react
 import { ChevronUp, ChevronDown } from 'lucide-react';
+import IconSwap from '../common/IconSwap';
 
 const JobFilterSidebar = ({ 
   filters, 
@@ -124,7 +125,11 @@ const JobFilterSidebar = ({
           }}
         >
           <span>Salary Range</span>
-          {openSections.salary ? <ChevronUp size={18} color="#6B7280" /> : <ChevronDown size={18} color="#6B7280" />}
+          <IconSwap 
+            state={openSections.salary} 
+            iconA={<ChevronUp size={18} color="#6B7280" />} 
+            iconB={<ChevronDown size={18} color="#6B7280" />} 
+          />
         </button>
 
         {openSections.salary && (
@@ -188,7 +193,11 @@ const JobFilterSidebar = ({
           }}
         >
           <span>Job Type</span>
-          {openSections.jobType ? <ChevronUp size={18} color="#6B7280" /> : <ChevronDown size={18} color="#6B7280" />}
+          <IconSwap 
+            state={openSections.jobType} 
+            iconA={<ChevronUp size={18} color="#6B7280" />} 
+            iconB={<ChevronDown size={18} color="#6B7280" />} 
+          />
         </button>
 
         {openSections.jobType && (
@@ -256,7 +265,11 @@ const JobFilterSidebar = ({
           }}
         >
           <span>Work Mode</span>
-          {openSections.workMode ? <ChevronUp size={18} color="#6B7280" /> : <ChevronDown size={18} color="#6B7280" />}
+          <IconSwap 
+            state={openSections.workMode} 
+            iconA={<ChevronUp size={18} color="#6B7280" />} 
+            iconB={<ChevronDown size={18} color="#6B7280" />} 
+          />
         </button>
 
         {openSections.workMode && (
@@ -322,7 +335,11 @@ const JobFilterSidebar = ({
           }}
         >
           <span>Experience Level</span>
-          {openSections.experience ? <ChevronUp size={18} color="#6B7280" /> : <ChevronDown size={18} color="#6B7280" />}
+          <IconSwap 
+            state={openSections.experience} 
+            iconA={<ChevronUp size={18} color="#6B7280" />} 
+            iconB={<ChevronDown size={18} color="#6B7280" />} 
+          />
         </button>
 
         {openSections.experience && (
@@ -387,7 +404,11 @@ const JobFilterSidebar = ({
             cursor: 'pointer'
           }}
         >
-          {allOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          <IconSwap 
+            state={allOpen} 
+            iconA={<ChevronUp size={16} />} 
+            iconB={<ChevronDown size={16} />} 
+          />
           <span>{allOpen ? 'Collapse all' : 'Expand all'}</span>
         </button>
       </div>

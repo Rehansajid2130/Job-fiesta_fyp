@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext.jsx';
 import { JobProvider } from './context/JobContext.jsx';
 import { SocketProvider } from './context/SocketContext.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
+import ScrollToTop from './components/common/ScrollToTop.jsx';
 
 import LandingPage from './pages/LandingPage.jsx';
 import SearchPage from './pages/SearchPage.jsx';
@@ -17,18 +18,48 @@ import PostJobPage from './pages/PostJobPage.jsx';
 import ChatMainPage from './pages/ChatMainPage.jsx';
 import AccountsettingsPage from './pages/AccountsettingsPage.jsx';
 
+// Newly added SaaS Pages
+import CompaniesPage from './pages/CompaniesPage.jsx';
+import CompanyDetailPage from './pages/CompanyDetailPage.jsx';
+import CandidatesAtsPage from './pages/CandidatesAtsPage.jsx';
+import PublicProfilePage from './pages/PublicProfilePage.jsx';
+import NotificationsPage from './pages/NotificationsPage.jsx';
+import SalaryInsightsPage from './pages/SalaryInsightsPage.jsx';
+import Toast from './components/common/Toast.jsx';
+
 function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
         <JobProvider>
           <SocketProvider userId={localStorage.getItem('userId')}>
+            <ScrollToTop />
+            <Toast />
             <Routes>
               {/* Home & Discovery */}
               <Route path="/" element={<LandingPage />} />
               <Route path="/search" element={<SearchPage />} />
               <Route path="/jobs" element={<SearchPage />} />
               <Route path="/SearchPage" element={<Navigate to="/search" replace />} />
+
+              {/* Companies Directory & Profiles */}
+              <Route path="/companies" element={<CompaniesPage />} />
+              <Route path="/company/:id" element={<CompanyDetailPage />} />
+
+              {/* Salary Insights */}
+              <Route path="/salaries" element={<SalaryInsightsPage />} />
+              <Route path="/salary-insights" element={<Navigate to="/salaries" replace />} />
+
+              {/* Candidate ATS Pipeline */}
+              <Route path="/candidates" element={<CandidatesAtsPage />} />
+              <Route path="/ats" element={<Navigate to="/candidates" replace />} />
+
+              {/* Public Profiles */}
+              <Route path="/profile/:username" element={<PublicProfilePage />} />
+              <Route path="/profile" element={<Navigate to="/profile/furqan12" replace />} />
+
+              {/* Notification Center */}
+              <Route path="/notifications" element={<NotificationsPage />} />
               
               {/* Job Details */}
               <Route path="/job/:id" element={<JobdetailsPage />} />

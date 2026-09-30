@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Bookmark } from 'lucide-react';
+import IconSwap from '../common/IconSwap';
 
 const FigmaJobCard = ({ 
   job, 
@@ -71,7 +72,11 @@ const FigmaJobCard = ({
               flexShrink: 0
             }}
           >
-            <Bookmark size={20} fill={bookmarked ? '#0D473B' : 'none'} />
+            <IconSwap 
+              state={bookmarked} 
+              iconA={<Bookmark size={20} fill="#0D473B" color="#0D473B" />} 
+              iconB={<Bookmark size={20} fill="none" color="#9CA3AF" />} 
+            />
           </button>
         </div>
 

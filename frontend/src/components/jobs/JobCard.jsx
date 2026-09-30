@@ -4,6 +4,7 @@ import { MapPin, DollarSign, Bookmark, ArrowRight, CheckCircle2 } from 'lucide-r
 import { useJobs } from '../../context/JobContext';
 import Badge from '../common/Badge';
 import Modal from '../common/Modal';
+import IconSwap from '../common/IconSwap';
 
 const JobCard = ({ job }) => {
   const { savedJobIds, toggleSaveJob, applyToJob, applications } = useJobs();
@@ -93,7 +94,11 @@ const JobCard = ({ job }) => {
                 transition: 'var(--transition)'
               }}
             >
-              <Bookmark size={18} fill={isSaved ? '#0C463B' : 'none'} />
+              <IconSwap 
+                state={isSaved} 
+                iconA={<Bookmark size={18} fill="#0C463B" color="#0C463B" />} 
+                iconB={<Bookmark size={18} fill="none" color="#94A3B8" />} 
+              />
             </button>
           </div>
 

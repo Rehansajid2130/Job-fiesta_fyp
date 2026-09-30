@@ -4,6 +4,7 @@ import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import Badge from '../components/common/Badge';
 import Modal from '../components/common/Modal';
+import IconSwap from '../components/common/IconSwap';
 import { useJobs } from '../context/JobContext';
 import { 
   MapPin, 
@@ -129,7 +130,12 @@ const JobdetailsPage = () => {
                     {job.title}
                   </h1>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.95rem', color: '#475569' }}>
-                    <span style={{ fontWeight: '600', color: '#0C463B' }}>{job.company}</span>
+                    <Link 
+                      to={job.company.toLowerCase().includes('aurora') ? '/company/aurora-creative-labs' : job.company.toLowerCase().includes('cognitive') ? '/company/cognitive-dynamics-ai' : job.company.toLowerCase().includes('apex') ? '/company/apex-financial-systems' : '/company/nexus-innovations'}
+                      style={{ fontWeight: '700', color: '#0C463B', textDecoration: 'underline', textUnderlineOffset: '3px' }}
+                    >
+                      {job.company}
+                    </Link>
                     <span>•</span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <MapPin size={15} /> {job.location}
@@ -155,7 +161,11 @@ const JobdetailsPage = () => {
                     justifyContent: 'center'
                   }}
                 >
-                  {copied ? <Check size={18} color="#10B981" /> : <Share2 size={18} />}
+                  <IconSwap 
+                    state={copied} 
+                    iconA={<Check size={18} color="#10B981" />} 
+                    iconB={<Share2 size={18} />} 
+                  />
                 </button>
                 <button
                   onClick={() => toggleSaveJob(job.id)}
@@ -359,6 +369,26 @@ const JobdetailsPage = () => {
                 <div><strong>Company Size:</strong> 250 - 500 Employees</div>
                 <div><strong>Website:</strong> www.{job.company.toLowerCase().replace(/\s+/g, '')}.io</div>
               </div>
+              <Link
+                to={job.company.toLowerCase().includes('aurora') ? '/company/aurora-creative-labs' : job.company.toLowerCase().includes('cognitive') ? '/company/cognitive-dynamics-ai' : job.company.toLowerCase().includes('apex') ? '/company/apex-financial-systems' : '/company/nexus-innovations'}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  marginTop: '16px',
+                  width: '100%',
+                  padding: '9px',
+                  borderRadius: '8px',
+                  backgroundColor: '#EBF8F4',
+                  color: '#0C463B',
+                  fontWeight: '700',
+                  fontSize: '0.84rem',
+                  textDecoration: 'none'
+                }}
+              >
+                View Full Company Profile →
+              </Link>
             </div>
           </div>
 
