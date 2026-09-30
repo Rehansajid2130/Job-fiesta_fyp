@@ -65,10 +65,10 @@ const JobFilterSidebar = ({
 
   return (
     <aside style={{
-      backgroundColor: '#F7F7F7',
+      backgroundColor: '#FFFFFF',
       borderRadius: '16px',
-      border: 'none',
-      boxShadow: 'none',
+      border: '1px solid #ECECEC',
+      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)',
       padding: '24px 20px',
       fontFamily: 'Inter, sans-serif'
     }}>

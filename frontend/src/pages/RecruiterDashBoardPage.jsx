@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import Badge from '../components/common/Badge';
@@ -19,8 +19,9 @@ import {
 } from 'lucide-react';
 
 const RecruiterDashBoardPage = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
-  const { jobs, applications, updateApplicationStatus } = useJobs();
+  const { jobs, applications, updateApplicationStatus, candidates, startOrGetConversation, showToast } = useJobs();
   const [filterStatus, setFilterStatus] = useState('all');
 
   const recruiterJobs = jobs.filter(j => j.company.toLowerCase().includes('nexus') || j.company.toLowerCase().includes(user?.company?.toLowerCase() || ''));
@@ -32,6 +33,27 @@ const RecruiterDashBoardPage = () => {
 
   const handleStatusChange = (appId, newStatus) => {
     updateApplicationStatus(appId, newStatus);
+  };
+
+  const handleMessageApplicant = (applicant, candInfo) => {
+    const candidateData = {
+      id: candInfo?.id || applicant.candidateId || `app-${applicant.id}`,
+      name: candInfo?.name || applicant.candidateName || applicant.applicantName || 'Candidate Applicant',
+      role: candInfo?.role || applicant.jobTitle || 'Applicant',
+      avatar: candInfo?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces',
+      company: applicant.company || 'Nexus Innovations'
+    };
+
+    if (startOrGetConversation) {
+      const convId = startOrGetConversation(candidateData);
+      navigate(`/chat?convId=${convId}`, { state: { candidate: candidateData } });
+    } else {
+      navigate('/chat', { state: { candidate: candidateData } });
+    }
+
+    if (showToast) {
+      showToast(`Opening conversation with ${candidateData.name}`, 'info');
+    }
   };
 
   return (
@@ -193,81 +215,112 @@ const RecruiterDashBoardPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredApplications.map(app => (
-                  <tr key={app.id} style={{ borderBottom: '1px solid #F1F5F9', fontSize: '0.92rem' }}>
-                    <td style={{ padding: '18px 24px' }}>
-                      <div style={{ fontWeight: '700', color: '#0F172A' }}>Alice Johnson</div>
-                      <div style={{ fontSize: '0.8rem', color: '#64748B' }}>alice.jobseeker@example.com</div>
-                    </td>
-                    <td style={{ padding: '18px 20px', fontWeight: '600', color: '#334155' }}>
-                      {app.jobTitle}
-                    </td>
-                    <td style={{ padding: '18px 20px' }}>
-                      <span style={{
-                        display: 'inline-flex',
-                        padding: '4px 8px',
-                        borderRadius: '6px',
-                        backgroundColor: '#ECFDF5',
-                        color: '#065F46',
-                        fontWeight: '700',
-                        fontSize: '0.85rem'
-                      }}>
-                        {app.matchScore}% Match
-                      </span>
-                    </td>
-                    <td style={{ padding: '18px 20px' }}>
-                      <Badge 
-                        variant={
-                          app.status === 'Interview Scheduled' ? 'success' :
-                          app.status === 'Shortlisted' ? 'primary' :
-                          app.status === 'Rejected' ? 'danger' : 'warning'
-                        }
-                      >
-                        {app.status}
-                      </Badge>
-                    </td>
-                    <td style={{ padding: '18px 20px' }}>
-                      <select
-                        value={app.status}
-                        onChange={(e) => handleStatusChange(app.id, e.target.value)}
-                        style={{
-                          padding: '6px 10px',
-                          borderRadius: '6px',
-                          border: '1px solid #CBD5E1',
-                          fontSize: '0.85rem',
-                          backgroundColor: '#FFFFFF',
-                          color: '#0F172A',
-                          outline: 'none',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <option value="Under Review">Under Review</option>
-                        <option value="Shortlisted">Shortlisted</option>
-                        <option value="Interview Scheduled">Interview Scheduled</option>
-                        <option value="Offer Extended">Offer Extended</option>
-                        <option value="Rejected">Rejected</option>
-                      </select>
-                    </td>
-                    <td style={{ padding: '18px 24px', textAlign: 'right' }}>
-                      <Link
-                        to="/chat"
-                        style={{
+                {filteredApplications.map((app, index) => {
+                  const cand = candidates?.find(c => c.id === app.candidateId || c.role === app.jobTitle) || 
+                               candidates?.[index % (candidates?.length || 1)] || null;
+                  const candidateName = cand?.name || app.candidateName || (index === 0 ? 'Furqan Zeeshan' : index === 1 ? 'Rehan Sajjid' : 'Hassan Raza');
+                  const candidateEmail = cand?.email || (index === 0 ? 'furqan@jobfiesta.com' : index === 1 ? 'rehansajid.prof@gmail.com' : 'hassan.raza@example.com');
+                  const candidateAvatar = cand?.avatar || (index === 0 
+                    ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces' 
+                    : 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&h=120&fit=crop&crop=faces');
+
+                  return (
+                    <tr key={app.id} style={{ borderBottom: '1px solid #F1F5F9', fontSize: '0.92rem' }}>
+                      <td style={{ padding: '18px 24px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <img 
+                            src={candidateAvatar} 
+                            alt={candidateName} 
+                            style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover' }}
+                          />
+                          <div>
+                            <div style={{ fontWeight: '700', color: '#0F172A' }}>{candidateName}</div>
+                            <div style={{ fontSize: '0.8rem', color: '#64748B' }}>{candidateEmail}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ padding: '18px 20px', fontWeight: '600', color: '#334155' }}>
+                        {app.jobTitle}
+                      </td>
+                      <td style={{ padding: '18px 20px' }}>
+                        <span style={{
                           display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: '6px 14px',
+                          padding: '4px 8px',
                           borderRadius: '6px',
-                          backgroundColor: '#EBF8F4',
-                          color: '#0C463B',
-                          fontWeight: '600',
+                          backgroundColor: '#ECFDF5',
+                          color: '#065F46',
+                          fontWeight: '700',
                           fontSize: '0.85rem'
-                        }}
-                      >
-                        <MessageSquare size={14} /> Message
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
+                        }}>
+                          {app.matchScore}% Match
+                        </span>
+                      </td>
+                      <td style={{ padding: '18px 20px' }}>
+                        <Badge 
+                          variant={
+                            app.status === 'Interview Scheduled' ? 'success' :
+                            app.status === 'Shortlisted' ? 'primary' :
+                            app.status === 'Rejected' ? 'danger' : 'warning'
+                          }
+                        >
+                          {app.status}
+                        </Badge>
+                      </td>
+                      <td style={{ padding: '18px 20px' }}>
+                        <select
+                          value={app.status}
+                          onChange={(e) => handleStatusChange(app.id, e.target.value)}
+                          style={{
+                            padding: '6px 10px',
+                            borderRadius: '6px',
+                            border: '1px solid #CBD5E1',
+                            fontSize: '0.85rem',
+                            backgroundColor: '#FFFFFF',
+                            color: '#0F172A',
+                            outline: 'none',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <option value="Under Review">Under Review</option>
+                          <option value="Shortlisted">Shortlisted</option>
+                          <option value="Interview Scheduled">Interview Scheduled</option>
+                          <option value="Offer Extended">Offer Extended</option>
+                          <option value="Rejected">Rejected</option>
+                        </select>
+                      </td>
+                      <td style={{ padding: '18px 24px', textAlign: 'right' }}>
+                        <button
+                          type="button"
+                          onClick={() => handleMessageApplicant(app, cand || { name: candidateName, role: app.jobTitle, avatar: candidateAvatar, email: candidateEmail })}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '7px 14px',
+                            borderRadius: '6px',
+                            backgroundColor: '#EBF8F4',
+                            color: '#0C463B',
+                            fontWeight: '700',
+                            fontSize: '0.85rem',
+                            border: 'none',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#0C463B';
+                            e.currentTarget.style.color = '#FFFFFF';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = '#EBF8F4';
+                            e.currentTarget.style.color = '#0C463B';
+                          }}
+                        >
+                          <MessageSquare size={14} /> Message
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

@@ -24,7 +24,7 @@ import {
 const PublicProfilePage = () => {
   const { username } = useParams();
   const navigate = useNavigate();
-  const { showToast } = useJobs();
+  const { showToast, startOrGetConversation } = useJobs();
 
   // Find profile by username, fallback to furqan12
   const profileKey = (username || '').toLowerCase();
@@ -40,7 +40,19 @@ const PublicProfilePage = () => {
   };
 
   const handleMessage = () => {
-    navigate('/chat');
+    const candidateData = {
+      id: profileKey || 'profile-cand',
+      name: profile.name,
+      role: profile.headline || profile.title || 'Applicant',
+      avatar: profile.avatar,
+      company: 'Job Fiesta Candidate'
+    };
+    if (startOrGetConversation) {
+      const convId = startOrGetConversation(candidateData);
+      navigate(`/chat?convId=${convId}`, { state: { candidate: candidateData } });
+    } else {
+      navigate('/chat', { state: { candidate: candidateData } });
+    }
     showToast(`Starting chat with ${profile.name}`, 'info');
   };
 

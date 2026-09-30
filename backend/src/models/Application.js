@@ -1,5 +1,19 @@
 const mongoose = require('mongoose');
 
+const screeningAnswerSchema = new mongoose.Schema(
+  {
+    question: {
+      type: String,
+      required: true,
+    },
+    answer: {
+      type: String,
+      required: true,
+    },
+  },
+  { _id: false }
+);
+
 const applicationSchema = new mongoose.Schema(
   {
     job: {
@@ -20,9 +34,39 @@ const applicationSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    expectedSalary: {
+      type: String,
+      default: '',
+    },
+    portfolioUrl: {
+      type: String,
+      default: '',
+    },
+    githubUrl: {
+      type: String,
+      default: '',
+    },
+    experience: {
+      type: String,
+      default: '',
+    },
+    skills: {
+      type: [String],
+      default: [],
+    },
+    matchScore: {
+      type: Number,
+      default: 85,
+      min: 0,
+      max: 100,
+    },
+    screeningAnswers: {
+      type: [screeningAnswerSchema],
+      default: [],
+    },
     status: {
       type: String,
-      enum: ['applied', 'under_review', 'shortlisted', 'interview', 'rejected', 'hired'],
+      enum: ['applied', 'screening', 'interviewing', 'offered', 'rejected', 'under_review', 'shortlisted', 'interview', 'hired'],
       default: 'applied',
     },
     notes: {

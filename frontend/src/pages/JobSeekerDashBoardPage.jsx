@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import Badge from '../components/common/Badge';
@@ -19,12 +19,42 @@ import {
 } from 'lucide-react';
 
 const JobSeekerDashBoardPage = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
-  const { applications, savedJobIds, jobs } = useJobs();
+  const { applications, savedJobIds, jobs, startOrGetConversation, showToast } = useJobs();
   const [activeTab, setActiveTab] = useState('applications'); // applications, saved, recommended
 
   const savedJobs = jobs.filter(j => savedJobIds.includes(j.id));
   const recommendedJobs = jobs.slice(0, 3);
+
+  const handleMessageCompany = (app) => {
+    let recruiterName = 'Suzana Colin';
+    let recruiterRole = 'Executive Talent Partner';
+    let recruiterAvatar = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&h=120&fit=crop&crop=faces';
+    let convId = 'conv-suzana';
+
+    if (app.company?.toLowerCase().includes('cognitive')) {
+      recruiterName = 'Hassan';
+      recruiterRole = 'Tech Lead @ Cognitive Dynamics';
+      recruiterAvatar = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces';
+      convId = 'conv-hassan';
+    } else if (!app.company?.toLowerCase().includes('nexus')) {
+      const recruiterData = {
+        name: `${app.company} Hiring Team`,
+        role: `Talent Partner @ ${app.company}`,
+        company: app.company,
+        initialMessage: `Hi there! I am following up on my application for the ${app.jobTitle} position.`
+      };
+      if (startOrGetConversation) {
+        convId = startOrGetConversation(recruiterData);
+      }
+    }
+
+    navigate(`/chat?convId=${convId}`);
+    if (showToast) {
+      showToast(`Opening chat with ${recruiterName}`, 'info');
+    }
+  };
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -207,19 +237,31 @@ const JobSeekerDashBoardPage = () => {
                           {getStatusBadge(app.status)}
                         </td>
                         <td style={{ padding: '18px 24px', textAlign: 'right' }}>
-                          <Link
-                            to="/chat"
+                          <button
+                            type="button"
+                            onClick={() => handleMessageCompany(app)}
                             style={{
                               fontSize: '0.85rem',
                               fontWeight: '600',
                               color: '#0C463B',
                               padding: '6px 12px',
                               borderRadius: '6px',
-                              backgroundColor: '#EBF8F4'
+                              backgroundColor: '#EBF8F4',
+                              border: 'none',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = '#0C463B';
+                              e.currentTarget.style.color = '#FFFFFF';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = '#EBF8F4';
+                              e.currentTarget.style.color = '#0C463B';
                             }}
                           >
                             Message
-                          </Link>
+                          </button>
                         </td>
                       </tr>
                     ))}

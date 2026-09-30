@@ -1,49 +1,202 @@
-# Dependencies
+# ==============================================================================
+# JobFiesta - Root .gitignore
+# Prevents sensitive credentials, dependencies, build artifacts, OS & IDE noise
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. DEPENDENCIES & PACKAGE MANAGERS
+# ------------------------------------------------------------------------------
 node_modules/
 */node_modules/
+**/node_modules/
+.pnp/
+.pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnpm-store/
 
-# Production builds
-dist/
-dist-ssr/
-*/dist/
-build/
-.vite/
-*/.vite/
-
-# Local environment and secret files
+# ------------------------------------------------------------------------------
+# 2. LOCAL ENVIRONMENT & SECRETS (NEVER COMMIT TO GITHUB)
+# ------------------------------------------------------------------------------
 .env
+.env.*
+*.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 *.local
 
-# Logs
+# Preserve example config templates for teammates
+!.env.example
+!.env.sample
+!.env.template
+
+# Security keys, certificates and tokens
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+id_rsa*
+id_ed25519*
+
+# ------------------------------------------------------------------------------
+# 3. BUILD OUTPUTS, CACHES & COMPILER ARTIFACTS
+# ------------------------------------------------------------------------------
+dist/
+dist-ssr/
+*/dist/
+**/dist/
+build/
+*/build/
+**/build/
+out/
+*/out/
+**/out/
+
+# Vite, Webpack, Parcel, Babel & Framework Caches
+.vite/
+*/.vite/
+**/.vite/
+.parcel-cache/
+.next/
+.nuxt/
+.cache/
+**/cache/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+
+# ------------------------------------------------------------------------------
+# 4. LOGS & DIAGNOSTICS
+# ------------------------------------------------------------------------------
 logs/
+*/logs/
+**/logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+vite.log
 
-# Editor and IDE files
+# ------------------------------------------------------------------------------
+# 5. RUNTIME, LOCAL STORAGE & UPLOADS
+# ------------------------------------------------------------------------------
+pids/
+*.pid
+*.seed
+*.pid.lock
+uploads/
+*/uploads/
+**/uploads/
+storage/
+temp/
+tmp/
+*/tmp/
+**/tmp/
+
+# Local databases and dumps
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+dump.rdb
+
+# ------------------------------------------------------------------------------
+# 6. TESTING & CODE COVERAGE
+# ------------------------------------------------------------------------------
+coverage/
+*/coverage/
+**/coverage/
+.nyc_output/
+*.lcov
+.playwright/
+test-results/
+playwright-report/
+blob-report/
+
+# ------------------------------------------------------------------------------
+# 7. IDE, EDITORS & WORKSPACE SETTINGS
+# ------------------------------------------------------------------------------
+# Visual Studio Code
 .vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
 !.vscode/extensions.json
+*.code-workspace
+
+# JetBrains (WebStorm, IntelliJ IDEA, etc.)
 .idea/
+*.iws
+*.iml
+
+# Visual Studio / Windows Dev Tools
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+*.user
+*.userosscache
+*.sln.docstates
+
+# Sublime Text & Vim
 *.sublime-project
 *.sublime-workspace
+*.swp
+*.swo
+*.swn
+*.sw?
+*~
 
-# OS Generated Files
+# ------------------------------------------------------------------------------
+# 8. OPERATING SYSTEM GENERATED FILES
+# ------------------------------------------------------------------------------
+# macOS
 .DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
-ehthumbs.db
+
+# Windows
 Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ------------------------------------------------------------------------------
+# 9. MICROSOFT OFFICE TEMPORARY LOCK FILES
+# (Generated automatically when opening FYP presentations, docs, or sheets)
+# ------------------------------------------------------------------------------
+~$*
+~$*.docx
+~$*.pptx
+~$*.xlsx
+~$*.doc
+~$*.ppt
+~$*.xls
+
+# ------------------------------------------------------------------------------
+# 10. AI AGENTS, LOCAL BRAIN & TEMPORARY SCRIPTS
+# ------------------------------------------------------------------------------
+.agents/
+.gemini/
+.claude/
+.cursor/
+.copilot/
+**/scratch/
+scratch/

@@ -370,12 +370,12 @@ const SearchPage = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#FFFFFF' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#F7F7F7' }}>
       <Navbar />
 
       {/* Top Banner / Hero Matching Figma */}
       <section style={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#F7F7F7',
         padding: '36px 0 28px 0'
       }}>
         {/* ponytail: reusing global .container */}
@@ -405,15 +405,15 @@ const SearchPage = () => {
           <form 
             onSubmit={handleSearchSubmit}
             style={{
-              backgroundColor: '#F7F7F7',
+              backgroundColor: '#FFFFFF',
               borderRadius: '9999px',
-              boxShadow: 'none',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)',
               padding: '6px 8px 6px 24px',
               display: 'flex',
               alignItems: 'center',
               maxWidth: '780px',
               margin: '0 auto',
-              border: 'none',
+              border: '1px solid #ECECEC',
               gap: '12px',
               flexWrap: 'wrap'
             }}
@@ -498,8 +498,9 @@ const SearchPage = () => {
                 width: '100%',
                 padding: '12px',
                 borderRadius: '12px',
-                backgroundColor: '#F7F7F7',
-                border: 'none',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #ECECEC',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
                 color: '#0D473B',
                 fontWeight: '700',
                 fontSize: '14px',

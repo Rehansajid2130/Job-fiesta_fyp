@@ -122,6 +122,16 @@ export const JobProvider = ({ children }) => {
           }));
           setJobs(mappedJobs);
         }
+
+        // Also sync live companies if available
+        try {
+          const compRes = await axios.get(`${apiUrl}/api/companies`, { timeout: 3000 });
+          if (compRes.data?.data && compRes.data.data.length > 0) {
+            setCompanies(compRes.data.data);
+          }
+        } catch (e) {
+          // ignore, keep mock companies
+        }
       } catch (err) {
         console.info('Using local jobs data (backend offline or loading):', err.message);
       }
@@ -277,6 +287,68 @@ export const JobProvider = ({ children }) => {
     }));
   };
 
+  const startOrGetConversation = (candidateInfo) => {
+    if (!candidateInfo) return null;
+
+    const candId = candidateInfo.id || candidateInfo.candidateId;
+    const candName = (candidateInfo.name || candidateInfo.candidateName || candidateInfo.fullName || candidateInfo.participantName || '').trim();
+    const candRole = candidateInfo.role || candidateInfo.jobTitle || candidateInfo.participantRole || 'Candidate Applicant';
+    const candAvatar = candidateInfo.avatar || candidateInfo.participantAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces';
+    const companyName = candidateInfo.company || 'Nexus Innovations';
+
+    // 1. Search for existing conversation
+    let existing = null;
+    if (candId) {
+      existing = conversations.find(c => c.candidateId === candId || c.id === `conv-${candId}`);
+    }
+    if (!existing && candName) {
+      existing = conversations.find(c => 
+        c.participantName && c.participantName.trim().toLowerCase() === candName.toLowerCase()
+      );
+    }
+
+    if (existing) {
+      return existing.id;
+    }
+
+    // 2. First time opening chat with this candidate! Create new conversation
+    const newConvId = `conv-${candId || Date.now()}`;
+    const initialText = candidateInfo.initialMessage || 
+      `Hi ${candName || 'there'}, thank you for applying for the ${candRole} role. We've reviewed your profile and would love to connect with you!`;
+
+    const newConv = {
+      id: newConvId,
+      candidateId: candId || null,
+      participantName: candName || 'Candidate Applicant',
+      participantRole: candRole,
+      participantAvatar: candAvatar,
+      company: companyName,
+      date: 'Just now',
+      lastMessage: initialText,
+      messages: [
+        {
+          id: Date.now(),
+          sender: 'recruiter',
+          text: initialText,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }
+      ],
+      rated: false
+    };
+
+    setConversations(prev => {
+      const updated = [newConv, ...prev];
+      try {
+        localStorage.setItem('jobfiesta_conversations', JSON.stringify(updated));
+      } catch (e) {
+        // ignore
+      }
+      return updated;
+    });
+
+    return newConvId;
+  };
+
   useEffect(() => {
     localStorage.setItem('jobfiesta_companies', JSON.stringify(companies));
   }, [companies]);
@@ -346,7 +418,8 @@ export const JobProvider = ({ children }) => {
       postNewJob,
       updateApplicationStatus,
       sendMessage,
-      rateJobseeker
+      rateJobseeker,
+      startOrGetConversation
     }}>
       {children}
     </JobContext.Provider>

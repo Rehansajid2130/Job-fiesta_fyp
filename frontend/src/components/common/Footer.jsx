@@ -161,6 +161,14 @@ const Footer = () => {
                     Browse Jobs
                   </Link>
                 </li>
+                <li>
+                  <Link 
+                    to="/system-status" 
+                    style={{ color: '#34D399', fontSize: '14px', fontFamily: 'Inter, sans-serif', textDecoration: 'none', fontWeight: '500' }}
+                  >
+                    ⚡ System Diagnostics &amp; Tests
+                  </Link>
+                </li>
               </ul>
             </div>
 

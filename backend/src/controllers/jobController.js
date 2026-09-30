@@ -254,3 +254,77 @@ exports.toggleSaveJob = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Match candidate resume against a job for ATS scoring
+// @route   POST /api/jobs/:id/match-resume
+// @access  Public / Private
+exports.matchResumeToJob = async (req, res, next) => {
+  try {
+    const job = await Job.findById(req.params.id);
+    if (!job) {
+      return res.status(404).json({
+        success: false,
+        message: 'Job not found',
+      });
+    }
+
+    const { resumeText = '', skills = [] } = req.body;
+
+    const normalizedResume = (resumeText + ' ' + skills.join(' ')).toLowerCase();
+    const jobRequirements = [
+      ...(job.requirements || []),
+      ...(job.skills || []),
+      ...(job.tags || []),
+    ];
+
+    const matchedSkills = [];
+    const missingSkills = [];
+
+    // Collect keywords from job
+    const keywords = [
+      'react', 'typescript', 'javascript', 'node', 'express', 'python', 'mongodb', 
+      'docker', 'aws', 'kubernetes', 'figma', 'ui', 'ux', 'rest', 'graphql',
+      'pytorch', 'sql', 'next.js', 'css', 'html', 'tailwind', 'git'
+    ].filter((k) => 
+      job.title.toLowerCase().includes(k) ||
+      job.description.toLowerCase().includes(k) ||
+      jobRequirements.some((r) => r.toLowerCase().includes(k))
+    );
+
+    keywords.forEach((keyword) => {
+      if (normalizedResume.includes(keyword)) {
+        matchedSkills.push(keyword);
+      } else {
+        missingSkills.push(keyword);
+      }
+    });
+
+    const totalKeyCount = keywords.length || 1;
+    const matchPercentage = Math.min(
+      99,
+      Math.max(50, Math.round((matchedSkills.length / totalKeyCount) * 100))
+    );
+
+    const feedback = [];
+    if (matchPercentage >= 85) {
+      feedback.push('High ATS alignment! Your profile strongly mirrors the role requirements.');
+    } else if (matchPercentage >= 70) {
+      feedback.push('Solid foundation. Adding keyword examples for missing skills will boost your ranking.');
+    } else {
+      feedback.push('Consider tailoring your resume summary and bullet points to include key role technologies.');
+    }
+
+    res.status(200).json({
+      success: true,
+      matchPercentage,
+      matchedSkills,
+      missingSkills,
+      feedback,
+      jobTitle: job.title,
+      company: job.company,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

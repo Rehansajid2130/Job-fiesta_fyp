@@ -27,24 +27,26 @@ const FigmaJobCard = ({
   return (
     <div 
       style={{
-        backgroundColor: '#F2FFF2',
+        backgroundColor: '#FFFFFF',
         borderRadius: '16px',
-        border: '1px solid rgba(13, 71, 59, 0.04)',
-        boxShadow: 'none',
+        border: '1px solid #ECECEC',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)',
         padding: '24px 22px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+        transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
         fontFamily: 'Inter, sans-serif'
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 8px 20px rgba(13, 71, 59, 0.06)';
+        e.currentTarget.style.transform = 'translateY(-4px)';
+        e.currentTarget.style.boxShadow = '0 12px 30px rgba(0, 0, 0, 0.08)';
+        e.currentTarget.style.borderColor = '#0C463B';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = 'none';
+        e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.04)';
+        e.currentTarget.style.borderColor = '#ECECEC';
       }}
     >
       <div>
@@ -102,14 +104,15 @@ const FigmaJobCard = ({
         {/* Company & Location */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
           <div style={{
-            width: '40px',
-            height: '40px',
+            width: '42px',
+            height: '42px',
             borderRadius: '50%',
-            backgroundColor: '#FFFFFF',
+            backgroundColor: '#F8FAFC',
+            border: '1px solid #F1F5F9',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.06)',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
             flexShrink: 0,
             padding: '6px'
           }}>

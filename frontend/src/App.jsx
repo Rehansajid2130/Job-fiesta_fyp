@@ -25,6 +25,7 @@ import CandidatesAtsPage from './pages/CandidatesAtsPage.jsx';
 import PublicProfilePage from './pages/PublicProfilePage.jsx';
 import NotificationsPage from './pages/NotificationsPage.jsx';
 import SalaryInsightsPage from './pages/SalaryInsightsPage.jsx';
+import SystemStatusPage from './pages/SystemStatusPage.jsx';
 import Toast from './components/common/Toast.jsx';
 
 function App() {
@@ -92,6 +93,10 @@ function App() {
 
               {/* Account Settings */}
               <Route path="/account-settings" element={<AccountsettingsPage />} />
+
+              {/* System Diagnostics & Testing Suite */}
+              <Route path="/system-status" element={<SystemStatusPage />} />
+              <Route path="/status" element={<Navigate to="/system-status" replace />} />
 
               {/* 404 Fallback */}
               <Route path="*" element={

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "seed": "node src/seed.js"
+    "seed": "node src/seed.js",
+    "test": "node test-api.js"
   },
   "keywords": ["jobfiesta", "mern", "jobs", "recruitment", "ai-resume"],
   "author": "Rehan Sajid",

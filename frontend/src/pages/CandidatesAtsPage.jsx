@@ -37,7 +37,7 @@ const STAGES = [
 const CandidatesAtsPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { candidates, updateCandidateStage, showToast } = useJobs();
+  const { candidates, updateCandidateStage, showToast, startOrGetConversation } = useJobs();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
@@ -62,7 +62,8 @@ const CandidatesAtsPage = () => {
 
   const handleChatWithCandidate = (cand) => {
     setDetailModalOpen(false);
-    navigate('/chat');
+    const convId = startOrGetConversation(cand);
+    navigate(`/chat?convId=${convId}`, { state: { candidate: cand } });
     showToast(`Opening chat with ${cand.name}`, 'info');
   };
 
@@ -340,7 +341,7 @@ const CandidatesAtsPage = () => {
                             )}
                           </div>
 
-                          {/* Quick Stage Mover */}
+                          {/* Quick Stage Mover & Chat */}
                           <div
                             onClick={(e) => e.stopPropagation()}
                             style={{
@@ -351,26 +352,50 @@ const CandidatesAtsPage = () => {
                               justifyContent: 'space-between'
                             }}
                           >
-                            <span style={{ fontSize: '0.72rem', color: '#94A3B8' }}>Move stage:</span>
-                            <select
-                              value={cand.stage}
-                              onChange={(e) => handleStageChange(cand.id, e.target.value)}
-                              style={{
-                                fontSize: '0.75rem',
-                                fontWeight: '600',
-                                border: '1px solid #E2E8F0',
-                                borderRadius: '6px',
-                                padding: '2px 4px',
-                                color: '#0C463B',
-                                backgroundColor: '#FFFFFF',
-                                outline: 'none',
-                                cursor: 'pointer'
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleChatWithCandidate(cand);
                               }}
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                background: 'none',
+                                border: 'none',
+                                color: '#0C463B',
+                                fontSize: '0.75rem',
+                                fontWeight: '700',
+                                cursor: 'pointer',
+                                padding: '2px 4px',
+                                borderRadius: '4px'
+                              }}
+                              title={`Message ${cand.name}`}
                             >
-                              {STAGES.map(s => (
-                                <option key={s.id} value={s.id}>{s.label}</option>
-                              ))}
-                            </select>
+                              <MessageSquare size={13} /> Chat
+                            </button>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <select
+                                value={cand.stage}
+                                onChange={(e) => handleStageChange(cand.id, e.target.value)}
+                                style={{
+                                  fontSize: '0.75rem',
+                                  fontWeight: '600',
+                                  border: '1px solid #E2E8F0',
+                                  borderRadius: '6px',
+                                  padding: '2px 4px',
+                                  color: '#0C463B',
+                                  backgroundColor: '#FFFFFF',
+                                  outline: 'none',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                {STAGES.map(s => (
+                                  <option key={s.id} value={s.id}>{s.label}</option>
+                                ))}
+                              </select>
+                            </div>
                           </div>
                         </div>
                       ))

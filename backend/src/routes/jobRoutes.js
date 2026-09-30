@@ -7,12 +7,15 @@ const {
   updateJob,
   deleteJob,
   toggleSaveJob,
+  matchResumeToJob,
 } = require('../controllers/jobController');
 const { protect, authorize } = require('../middleware/auth');
 
 router.route('/')
   .get(getJobs)
   .post(protect, authorize('employer', 'recruiter', 'admin'), createJob);
+
+router.post('/:id/match-resume', matchResumeToJob);
 
 router.route('/:id')
   .get(getJobById)
@@ -22,3 +25,4 @@ router.route('/:id')
 router.post('/:id/save', protect, toggleSaveJob);
 
 module.exports = router;
+

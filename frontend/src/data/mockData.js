@@ -552,7 +552,7 @@ export const initialNotifications = [
     time: '35m ago',
     type: 'message',
     unread: true,
-    link: '/chat'
+    link: '/chat?convId=conv-suzana'
   },
   {
     id: 'notif-3',

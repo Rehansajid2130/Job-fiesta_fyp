@@ -1,108 +1,54 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useJobs } from '../context/JobContext';
 import { useAuth } from '../context/AuthContext';
-import HeroOfficeIllustration from '../components/landing/HeroOfficeIllustration';
-import Modal from '../components/common/Modal';
 import Footer from '../components/common/Footer';
+import LandingHeader from '../components/landing/LandingHeader';
+import LandingHero from '../components/landing/LandingHero';
+import FeaturedJobsSection from '../components/landing/FeaturedJobsSection';
+import CategoriesSection from '../components/landing/CategoriesSection';
+import TestimonialsSection from '../components/landing/TestimonialsSection';
+import ContactSection from '../components/landing/ContactSection';
+import QuickApplyModal from '../components/landing/QuickApplyModal';
+import MoreReviewsModal from '../components/landing/MoreReviewsModal';
 
 const LandingPage = () => {
-  const { jobs, applications, setSearchFilters, applyToJob } = useJobs();
+  const { jobs, applications, setSearchFilters } = useJobs();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   // Search state
   const [keyword, setKeyword] = useState('');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-
-  // Quick Apply Modal State
+  // Modals state
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
-  const [coverNote, setCoverNote] = useState('');
-  const [applicantName, setApplicantName] = useState(user?.name || '');
-  const [applicantEmail, setApplicantEmail] = useState(user?.email || '');
-  const [applySuccess, setApplySuccess] = useState('');
-
-  // Contact form state
-  const [contactData, setContactData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    location: '',
-    message: ''
-  });
-  const [contactSubmitted, setContactSubmitted] = useState(false);
-
-  // Reviews Modal State
   const [moreReviewsOpen, setMoreReviewsOpen] = useState(false);
-
-  // Check for saved resume from Resume Builder
-  const savedResume = localStorage.getItem('jobfiesta_resume')
-    ? JSON.parse(localStorage.getItem('jobfiesta_resume'))
-    : null;
-
-  const handleSearchSubmit = (e) => {
-    if (e) e.preventDefault();
-    const q = keyword.trim();
-    setSearchFilters(prev => ({
-      ...prev,
-      keyword: q
-    }));
-    navigate(q ? `/search?keyword=${encodeURIComponent(q)}` : '/search');
-  };
-
-  const handleQuickSearch = (term) => {
-    setKeyword(term);
-    setSearchFilters(prev => ({
-      ...prev,
-      keyword: term
-    }));
-    navigate(`/search?keyword=${encodeURIComponent(term)}`);
-  };
-
-  const handleOpenApply = (job, e) => {
-    if (e) e.stopPropagation();
-    setSelectedJob(job);
-    setApplicantName(user?.name || '');
-    setApplicantEmail(user?.email || '');
-    setCoverNote('');
-    setApplySuccess('');
-    setApplyModalOpen(true);
-  };
-
-  const handleApplySubmit = (e) => {
-    e.preventDefault();
-    if (!selectedJob) return;
-    const res = applyToJob(selectedJob.id, coverNote);
-    if (res.success) {
-      setApplySuccess(res.message);
-      setTimeout(() => {
-        setApplySuccess('');
-        setApplyModalOpen(false);
-      }, 1600);
-    } else {
-      alert(res.message);
-    }
-  };
-
-  const handleContactSubmit = (e) => {
-    e.preventDefault();
-    const existing = JSON.parse(localStorage.getItem('jobfiesta_inquiries') || '[]');
-    const newInquiry = {
-      id: `inq-${Date.now()}`,
-      ...contactData,
-      submittedAt: new Date().toISOString()
-    };
-    localStorage.setItem('jobfiesta_inquiries', JSON.stringify([newInquiry, ...existing]));
-    setContactSubmitted(true);
-  };
 
   const scrollToSection = (id) => {
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const handleSearchSubmit = (e) => {
+    if (e) e.preventDefault();
+    const q = keyword.trim();
+    setSearchFilters(prev => ({ ...prev, keyword: q }));
+    navigate(q ? `/search?keyword=${encodeURIComponent(q)}` : '/search');
+  };
+
+  const handleQuickSearch = (term) => {
+    setKeyword(term);
+    setSearchFilters(prev => ({ ...prev, keyword: term }));
+    navigate(`/search?keyword=${encodeURIComponent(term)}`);
+  };
+
+  const handleOpenApply = (job, e) => {
+    if (e) e.stopPropagation();
+    setSelectedJob(job);
+    setApplyModalOpen(true);
   };
 
   // 6 Featured Jobs matching Figma Screenshot exactly
@@ -192,1150 +138,90 @@ const LandingPage = () => {
     { name: 'Software Engineer', icon: '/assets/Landingpageimages/path1744.svg', filterCategory: 'tech' }
   ];
 
-  // Navigate directly to Search page with selected category
   const handleCategoryClick = (cat) => {
     setSearchFilters(prev => ({
       ...prev,
       category: cat.filterCategory,
       keyword: ''
     }));
-    navigate(`/search?category=${encodeURIComponent(cat.filterCategory)}`);
+    navigate(`/search?category=${cat.filterCategory}`);
   };
 
-  // Testimonials from Figma Screenshot
+  // Testimonials
   const testimonials = [
     {
-      name: 'Janis Reeves',
-      role: 'Designer',
+      name: 'Floyd Miles',
+      role: 'Head of People at Spotify',
+      avatar: '/assets/Landingpageimages/cover.svg',
+      text: 'JobFiesta completely transformed our hiring pipeline. Within 48 hours of posting, we engaged top-tier candidates who perfectly matched our tech stack and company culture.'
+    },
+    {
+      name: 'Jane Cooper',
+      role: 'Talent Lead at Figma',
       avatar: '/assets/Landingpageimages/cover_1.svg',
-      text: "Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs. The passage is attributed to an unknown typesetter in the 15th century who is thought to have scrambled parts of Cicero's De Finibus..."
+      text: 'The quality of candidates and streamlined application tracking is unmatched. We filled three critical design positions in two weeks with zero recruiter friction.'
     },
     {
-      name: 'Francis Guzman',
-      role: 'Designer',
-      avatar: '/assets/Landingpageimages/cover_4.svg',
-      text: "Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs. The passage is attributed to an unknown typesetter in the 15th century who is thought to have scrambled parts of Cicero's De Finibus..."
-    },
-    {
-      name: 'Wilma Taylor',
-      role: 'Designer',
-      avatar: '/assets/Landingpageimages/cover_6.svg',
-      text: "Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs. The passage is attributed to an unknown typesetter in the 15th century who is thought to have scrambled parts of Cicero's De Finibus..."
+      name: 'Robert Fox',
+      role: 'VP Engineering at Stripe',
+      avatar: '/assets/Landingpageimages/cover_2.svg',
+      text: 'A refreshing, highly responsive job platform. The candidate cards and verified resumes give us crystal-clear clarity before setting up the first technical interview.'
     }
   ];
 
   return (
-    <div 
-      className="no-scrollbar" 
-      style={{ 
-        backgroundColor: '#F7F7F7', 
-        minHeight: '100vh', 
-        width: '100%', 
-        overflowX: 'hidden', 
-        color: '#111827', 
-        scrollbarWidth: 'none', 
-        msOverflowStyle: 'none' 
-      }}
-    >
-      
-      {/* 1. FIGMA NAVBAR (Fully Functional & Responsive) */}
-      {/* ponytail: reusing global .container */}
-      <header className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', paddingTop: '20px', paddingBottom: '20px' }}>
-        {/* Logo */}
-        <Link 
-          to="/" 
-          onClick={() => {
-            setMobileMenuOpen(false);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          style={{ textDecoration: 'none', display: 'flex', alignItems: 'baseline', gap: '4px' }}
-        >
-          <span style={{ fontFamily: "'League Script', cursive", fontSize: 'clamp(34px, 5vw, 42px)', fontWeight: 'bold', color: '#000000', lineHeight: 1 }}>
-            Job fiesta
-          </span>
-        </Link>
+    <div style={{ backgroundColor: '#FCFCFC', minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
+      {/* 1. HEADER */}
+      <LandingHeader user={user} logout={logout} scrollToSection={scrollToSection} />
 
-        {/* Desktop Navigation links & CTA */}
-        <div className="landing-desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '36px' }}>
-          <nav style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-            <button 
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', fontWeight: '500', color: '#1A1A1A', cursor: 'pointer', background: 'none', border: 'none' }}
-            >
-              Home
-            </button>
-            <button 
-              onClick={() => navigate('/search')}
-              style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', fontWeight: '500', color: '#1A1A1A', cursor: 'pointer', background: 'none', border: 'none' }}
-            >
-              Jobs
-            </button>
-            <button 
-              onClick={() => scrollToSection('categories')}
-              style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', fontWeight: '500', color: '#1A1A1A', cursor: 'pointer', background: 'none', border: 'none' }}
-            >
-              Categories
-            </button>
-            <button 
-              onClick={() => navigate('/resume-builder')}
-              style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', fontWeight: '500', color: '#1A1A1A', cursor: 'pointer', background: 'none', border: 'none' }}
-            >
-              Resume Builder
-            </button>
-          </nav>
+      {/* 2. HERO */}
+      <LandingHero
+        keyword={keyword}
+        setKeyword={setKeyword}
+        onSearchSubmit={handleSearchSubmit}
+        onQuickSearch={handleQuickSearch}
+      />
 
-          {/* Right CTA - Logged in vs Guest */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <button 
-              onClick={() => navigate('/search')} 
-              style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', fontWeight: '600', color: '#0C463B', cursor: 'pointer', background: 'none', border: 'none' }}
-            >
-              Browse jobs
-            </button>
+      {/* 3. FEATURED JOBS */}
+      <FeaturedJobsSection
+        featuredJobs={featuredJobs}
+        totalJobsCount={jobs?.length || 6}
+        applications={applications}
+        onOpenApply={handleOpenApply}
+      />
 
-            {user ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <Link 
-                  to={user.userType === 'recruiter' ? '/recruiter-dashboard' : '/jobseeker-dashboard'} 
-                  style={{ 
-                    backgroundColor: '#0C463B', 
-                    color: '#FFFFFF', 
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '15px', 
-                    fontWeight: '600', 
-                    padding: '9px 24px', 
-                    borderRadius: '50px', 
-                    textDecoration: 'none',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}
-                >
-                  <span>Dashboard</span>
-                </Link>
-                <button 
-                  onClick={logout}
-                  title="Log out"
-                  style={{ fontSize: '13px', color: '#64748B', fontFamily: 'Inter, sans-serif', cursor: 'pointer', background: 'none', border: 'none' }}
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <Link 
-                to="/login" 
-                style={{ 
-                  backgroundColor: '#0C463B', 
-                  color: '#FFFFFF', 
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '16px', 
-                  fontWeight: '600', 
-                  padding: '10px 32px', 
-                  borderRadius: '50px', 
-                  textDecoration: 'none',
-                  display: 'inline-block'
-                }}
-              >
-                Log In
-              </Link>
-            )}
-          </div>
-        </div>
+      {/* 4. CATEGORIES */}
+      <CategoriesSection
+        categories={categories}
+        onCategoryClick={handleCategoryClick}
+      />
 
-        {/* Mobile Hamburger Toggle Button */}
-        <button
-          type="button"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="landing-mobile-toggle"
-          aria-label="Toggle Navigation Menu"
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: '8px',
-            color: '#0C463B',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          {mobileMenuOpen ? (
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          ) : (
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          )}
-        </button>
-      </header>
+      {/* 5. TESTIMONIALS */}
+      <TestimonialsSection
+        testimonials={testimonials}
+        onOpenMoreReviews={() => setMoreReviewsOpen(true)}
+      />
 
-      {/* Mobile Drawer Navigation Menu */}
-      {mobileMenuOpen && (
-        <div 
-          style={{
-            width: '100%',
-            backgroundColor: '#FFFFFF',
-            borderBottom: '1px solid #ECECEC',
-            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.08)',
-            padding: '20px 24px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '14px',
-            position: 'relative',
-            zIndex: 100
-          }}
-        >
-          <button 
-            onClick={() => {
-              setMobileMenuOpen(false);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            style={{ textAlign: 'left', fontFamily: 'Inter, sans-serif', fontSize: '16px', fontWeight: '600', color: '#1A1A1A', padding: '8px 0', borderBottom: '1px solid #F3F4F6', background: 'none', border: 'none', cursor: 'pointer' }}
-          >
-            Home
-          </button>
-          <button 
-            onClick={() => {
-              setMobileMenuOpen(false);
-              navigate('/search');
-            }}
-            style={{ textAlign: 'left', fontFamily: 'Inter, sans-serif', fontSize: '16px', fontWeight: '600', color: '#1A1A1A', padding: '8px 0', borderBottom: '1px solid #F3F4F6', background: 'none', border: 'none', cursor: 'pointer' }}
-          >
-            Jobs
-          </button>
-          <button 
-            onClick={() => {
-              setMobileMenuOpen(false);
-              scrollToSection('categories');
-            }}
-            style={{ textAlign: 'left', fontFamily: 'Inter, sans-serif', fontSize: '16px', fontWeight: '600', color: '#1A1A1A', padding: '8px 0', borderBottom: '1px solid #F3F4F6', background: 'none', border: 'none', cursor: 'pointer' }}
-          >
-            Categories
-          </button>
-          <button 
-            onClick={() => {
-              setMobileMenuOpen(false);
-              navigate('/resume-builder');
-            }}
-            style={{ textAlign: 'left', fontFamily: 'Inter, sans-serif', fontSize: '16px', fontWeight: '600', color: '#1A1A1A', padding: '8px 0', borderBottom: '1px solid #F3F4F6', background: 'none', border: 'none', cursor: 'pointer' }}
-          >
-            AI Resume Builder
-          </button>
-          
-          <div style={{ paddingTop: '8px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <button 
-              onClick={() => {
-                setMobileMenuOpen(false);
-                navigate('/search');
-              }}
-              style={{
-                width: '100%',
-                padding: '12px',
-                borderRadius: '50px',
-                border: '1.5px solid #0C463B',
-                color: '#0C463B',
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '15px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                background: 'none'
-              }}
-            >
-              Browse All Jobs
-            </button>
-            {user ? (
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <Link
-                  to={user.userType === 'recruiter' ? '/recruiter-dashboard' : '/jobseeker-dashboard'}
-                  onClick={() => setMobileMenuOpen(false)}
-                  style={{
-                    flex: 1,
-                    textAlign: 'center',
-                    backgroundColor: '#0C463B',
-                    color: '#FFFFFF',
-                    padding: '12px',
-                    borderRadius: '50px',
-                    fontWeight: '600',
-                    fontSize: '15px'
-                  }}
-                >
-                  Dashboard
-                </Link>
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    logout();
-                  }}
-                  style={{
-                    padding: '12px 18px',
-                    borderRadius: '50px',
-                    backgroundColor: '#F3F4F6',
-                    color: '#64748B',
-                    fontWeight: '600',
-                    fontSize: '14px',
-                    border: 'none',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <Link
-                to="/login"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  width: '100%',
-                  textAlign: 'center',
-                  backgroundColor: '#0C463B',
-                  color: '#FFFFFF',
-                  padding: '12px',
-                  borderRadius: '50px',
-                  fontWeight: '600',
-                  fontSize: '15px',
-                  display: 'block'
-                }}
-              >
-                Log In
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
+      {/* 6. CONTACT US */}
+      <ContactSection />
 
-      {/* 2. HERO SECTION */}
-      {/* ponytail: reusing global .container */}
-      <section className="container" style={{ position: 'relative', paddingTop: '16px', paddingBottom: '20px', textAlign: 'center' }}>
-        
-        {/* Top-Left Lightbulb Doodle */}
-        <div className="hero-doodle" style={{ position: 'absolute', left: '4%', top: '10px', pointerEvents: 'none', zIndex: 1 }}>
-          <img 
-            src="/assets/Landingpageimages/group_3.svg" 
-            alt="Lightbulb doodle" 
-            style={{ width: '120px', height: 'auto', opacity: 0.95 }}
-          />
-        </div>
-
-        {/* Top-Right Origami Paper Airplane Doodle */}
-        <div className="hero-doodle" style={{ position: 'absolute', right: '5%', top: '20px', pointerEvents: 'none', zIndex: 1 }}>
-          <img 
-            src="/assets/Landingpageimages/group_24.svg" 
-            alt="Airplane doodle" 
-            style={{ width: '130px', height: 'auto', opacity: 0.9 }}
-          />
-        </div>
-
-        {/* Main Headline: Find your Perfecto job */}
-        <div style={{ marginBottom: '24px', position: 'relative', zIndex: 2, padding: '0 16px' }}>
-          <div style={{ fontFamily: "'League Script', cursive", fontSize: 'clamp(36px, 5.5vw, 64px)', color: '#333333', lineHeight: '1.1' }}>
-            Find your
-          </div>
-          <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <span style={{ fontFamily: "'Martel', serif", fontSize: 'clamp(44px, 8vw, 84px)', fontWeight: '700', color: '#0C463B', lineHeight: '1' }}>
-              Perfecto
-            </span>
-            <span style={{ fontFamily: "'League Script', cursive", fontSize: 'clamp(38px, 6.5vw, 72px)', color: '#0C463B', lineHeight: '1' }}>
-              job
-            </span>
-          </div>
-        </div>
-
-        {/* Pill Search Bar - Positioned cleanly right above the illustration SVGs */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '-10px', position: 'relative', zIndex: 10, padding: '0 clamp(12px, 3vw, 20px)' }}>
-          <form 
-            onSubmit={handleSearchSubmit}
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              backgroundColor: '#F2FFF2', 
-              borderRadius: '50px', 
-              boxShadow: '0 8px 30px rgba(0, 0, 0, 0.08)',
-              width: '100%',
-              maxWidth: '660px',
-              minHeight: '62px',
-              height: 'auto',
-              padding: '6px 8px 6px clamp(14px, 3vw, 26px)',
-              border: '1px solid rgba(12, 70, 59, 0.12)'
-            }}
-          >
-            {/* Magnifying Glass Icon */}
-            <img 
-              src="/assets/Landingpageimages/interface__search_magnifying_glass.svg" 
-              alt="Search" 
-              style={{ width: '22px', height: '22px', marginRight: '12px', opacity: 0.7, flexShrink: 0 }}
-            />
-            {/* Input */}
-            <input 
-              type="text" 
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              placeholder="Job Title, keywords......"
-              style={{ 
-                flex: 1, 
-                border: 'none', 
-                background: 'transparent', 
-                outline: 'none',
-                fontFamily: 'Inter, sans-serif',
-                fontSize: 'clamp(15px, 2.4vw, 20px)', 
-                color: '#515151',
-                minWidth: '60px'
-              }}
-            />
-            {/* Search Button */}
-            <button 
-              type="submit" 
-              style={{ 
-                backgroundColor: '#0C463B', 
-                color: '#F2FFF2', 
-                border: 'none', 
-                borderRadius: '50px', 
-                height: 'clamp(48px, 6vw, 60px)', 
-                padding: '0 clamp(18px, 3vw, 36px)', 
-                fontFamily: 'Inter, sans-serif',
-                fontSize: 'clamp(16px, 2.5vw, 22px)', 
-                fontWeight: '600', 
-                cursor: 'pointer',
-                transition: 'opacity 0.2s ease',
-                flexShrink: 0
-              }}
-            >
-              Search
-            </button>
-          </form>
-
-          {/* Quick Clickable Suggestions */}
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '12px' }}>
-            <span style={{ fontSize: '13px', color: '#64748B', fontFamily: 'Inter, sans-serif' }}>Popular:</span>
-            {['Product Manager', 'Software Engineer', 'Product Designer', 'Customer Support'].map((chip) => (
-              <button
-                key={chip}
-                type="button"
-                onClick={() => handleQuickSearch(chip)}
-                style={{
-                  fontSize: '12px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                  border: '1px solid rgba(12, 70, 59, 0.15)',
-                  borderRadius: '20px',
-                  padding: '3px 12px',
-                  color: '#0C463B',
-                  cursor: 'pointer',
-                  fontFamily: 'Inter, sans-serif',
-                  transition: 'background-color 0.15s ease'
-                }}
-              >
-                {chip}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Hero Office Freepik Illustration (Scaled dynamically & smoothly) */}
-        <div style={{ width: '100%', padding: '0 clamp(10px, 3vw, 20px)', position: 'relative', zIndex: 1 }}>
-          <HeroOfficeIllustration maxWidth="840px" />
-        </div>
-      </section>
-
-        {/* 3. OUR FEATURES JOBS (Permanent Featured Jobs) */}
-        {/* ponytail: reusing global .container */}
-        <section id="jobs" className="container" style={{ marginTop: '40px', marginBottom: '80px' }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '36px' }}>
-            <div>
-              <h2 style={{ fontFamily: "'Martel', serif", fontSize: 'clamp(30px, 5vw, 56px)', fontWeight: '700', color: '#0C463B', margin: 0, textAlign: 'left' }}>
-                Our Features Jobs
-              </h2>
-              <p style={{ fontFamily: 'Inter, sans-serif', color: '#6B7280', fontSize: '15px', marginTop: '6px' }}>
-                Explore handpicked premier opportunities featured on JobFiesta. Click any position to view details.
-              </p>
-            </div>
-            <button
-              onClick={() => navigate('/search')}
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '15px',
-                fontWeight: '600',
-                color: '#0C463B',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-            >
-              View All {jobs.length} Jobs &rarr;
-            </button>
-          </div>
-
-          {/* 6 Featured Cards Grid (Clickable & Responsive) */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '26px' }}>
-            {featuredJobs.map((job) => {
-              const isApplied = applications?.some(a => a.jobId === job.id);
-            return (
-              <div 
-                key={job.id} 
-                onClick={() => navigate(`/job/${job.id}`)}
-                style={{ 
-                  backgroundColor: '#FFFFFF', 
-                  borderRadius: '16px', 
-                  padding: 'clamp(22px, 3.5vw, 30px) clamp(18px, 3vw, 26px)', 
-                  border: '1px solid #ECECEC',
-                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s ease, box-shadow 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.boxShadow = '0 12px 30px rgba(0, 0, 0, 0.08)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.04)';
-                }}
-              >
-                {/* Top Tags */}
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
-                  <span style={{ border: '1px solid #D1D5DB', borderRadius: '50px', padding: '4px 14px', fontSize: '13px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
-                    {job.type}
-                  </span>
-                  <span style={{ border: '1px solid #D1D5DB', borderRadius: '50px', padding: '4px 14px', fontSize: '13px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
-                    {job.location}
-                  </span>
-                </div>
-
-                {/* Title & Logo Row */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '14px' }}>
-                  <div 
-                    style={{ 
-                      width: '52px', 
-                      height: '52px', 
-                      borderRadius: '50%', 
-                      backgroundColor: job.logoBg || 'transparent', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center',
-                      flexShrink: 0
-                    }}
-                  >
-                    <img src={job.logo} alt={job.title} style={{ width: '42px', height: '42px', objectFit: 'contain' }} />
-                  </div>
-                  <h3 style={{ fontFamily: "'Martel', serif", fontSize: '22px', fontWeight: '700', color: '#0C463B', margin: 0 }}>
-                    {job.title}
-                  </h3>
-                </div>
-
-                {/* Category & Salary */}
-                <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '15px', color: '#515151', marginBottom: '24px' }}>
-                  <span style={{ fontWeight: '500' }}>{job.category}</span>
-                  <span style={{ margin: '0 8px', color: '#CBD5E1' }}>|</span>
-                  <span>{job.salary}</span>
-                </div>
-
-                {/* Apply Button / Applied Status */}
-                {isApplied ? (
-                  <button
-                    disabled
-                    onClick={(e) => e.stopPropagation()}
-                    style={{
-                      width: '100%',
-                      backgroundColor: '#ECFDF5',
-                      color: '#065F46',
-                      border: '1px solid #A7F3D0',
-                      borderRadius: '50px',
-                      padding: '12px 0',
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '15px',
-                      fontWeight: '600',
-                      cursor: 'default'
-                    }}
-                  >
-                    ✓ Applied
-                  </button>
-                ) : job.isPrimaryBtn ? (
-                  <button
-                    onClick={(e) => handleOpenApply(job, e)}
-                    style={{
-                      width: '100%',
-                      backgroundColor: '#0C463B',
-                      color: '#FFFFFF',
-                      border: 'none',
-                      borderRadius: '50px',
-                      padding: '12px 0',
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '16px',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      transition: 'opacity 0.2s ease'
-                    }}
-                  >
-                    Apply Now
-                  </button>
-                ) : (
-                  <button
-                    onClick={(e) => handleOpenApply(job, e)}
-                    style={{
-                      width: '100%',
-                      backgroundColor: '#FFFFFF',
-                      color: '#0C463B',
-                      border: '1.5px solid #0C463B',
-                      borderRadius: '50px',
-                      padding: '12px 0',
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '16px',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    Apply Now
-                  </button>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* 4. OUR CATEGORIES (Interactive Click-to-Filter) */}
-      {/* ponytail: reusing global .container */}
-      <section id="categories" className="container" style={{ marginBottom: '100px' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '36px' }}>
-          <div>
-            <h2 style={{ fontFamily: "'Martel', serif", fontSize: 'clamp(30px, 5vw, 56px)', fontWeight: '700', color: '#0C463B', margin: 0, textAlign: 'left' }}>
-              Our Categories
-            </h2>
-            <p style={{ fontFamily: 'Inter, sans-serif', color: '#6B7280', fontSize: '15px', marginTop: '6px' }}>
-              Click any category to search open positions in that discipline.
-            </p>
-          </div>
-          <button
-            onClick={() => navigate('/search')}
-            style={{
-              fontFamily: 'Inter, sans-serif',
-              fontSize: '15px',
-              fontWeight: '600',
-              color: '#0C463B',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            Browse All Categories &rarr;
-          </button>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))', gap: 'clamp(14px, 2vw, 22px)' }}>
-          {/* ponytail: reusable .category-card driven by pure CSS :hover (zero JS re-renders, 60fps) */}
-          {categories.map((cat) => (
-            <div
-              key={cat.name}
-              className="category-card"
-              onClick={() => handleCategoryClick(cat)}
-            >
-              <div className="category-icon-wrap">
-                <img 
-                  src={cat.icon} 
-                  alt={cat.name} 
-                  className="category-icon-img"
-                />
-              </div>
-              <span className="category-title">
-                {cat.name}
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 5. WHAT OUR CLIENT SAY */}
-      {/* ponytail: reusing global .container */}
-      <section className="container" style={{ marginBottom: '80px', textAlign: 'center' }}>
-        <h2 style={{ fontFamily: "'Martel', serif", fontSize: 'clamp(30px, 5vw, 56px)', fontWeight: '700', color: '#0C463B', marginBottom: '36px', textAlign: 'left' }}>
-          What our Client say
-        </h2>
-
-        {/* 3 Client Cards (Responsive Grid) */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '24px', textAlign: 'left', marginBottom: '36px' }}>
-          {testimonials.map((client, idx) => (
-            <div
-              key={idx}
-              style={{
-                backgroundColor: '#F2FFF2',
-                borderRadius: '16px',
-                padding: 'clamp(24px, 4vw, 36px) clamp(20px, 3.5vw, 30px)',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)',
-                transition: 'transform 0.2s ease'
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
-            >
-              {/* User Header */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
-                <img 
-                  src={client.avatar} 
-                  alt={client.name} 
-                  style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover' }}
-                />
-                <div>
-                  <h4 style={{ fontFamily: "'Martel', serif", fontSize: '20px', fontWeight: '700', color: '#0C463B', margin: 0 }}>
-                    {client.name}
-                  </h4>
-                  <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px', color: '#718096' }}>
-                    {client.role}
-                  </div>
-                </div>
-              </div>
-
-              {/* 5 Solid Gold Stars */}
-              <div style={{ display: 'flex', gap: '4px', marginBottom: '18px', color: '#F59E0B', fontSize: '18px' }}>
-                {'★★★★★'}
-              </div>
-
-              {/* Review Text */}
-              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px', color: '#515151', lineHeight: '1.6', margin: 0 }}>
-                {client.text}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* See More Button */}
-        <button
-          onClick={() => setMoreReviewsOpen(true)}
-          style={{
-            backgroundColor: '#0C463B',
-            color: '#FFFFFF',
-            border: 'none',
-            borderRadius: '50px',
-            padding: '12px 42px',
-            fontFamily: 'Inter, sans-serif',
-            fontSize: '16px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'background-color 0.2s ease'
-          }}
-        >
-          See More &rarr;
-        </button>
-      </section>
-
-      {/* 6. CONTACT US (Interactive Form with Local Persistence) */}
-      {/* ponytail: reusing global .container */}
-      <section id="contact" className="container" style={{ marginBottom: '100px', position: 'relative' }}>
-        
-        {/* Floating Paper Airplane Top Right */}
-        <div className="contact-doodle" style={{ position: 'absolute', right: '5%', top: '-20px', pointerEvents: 'none', zIndex: 1 }}>
-          <img 
-            src="/assets/Landingpageimages/group_24.svg" 
-            alt="Airplane doodle" 
-            style={{ width: '160px', height: 'auto', opacity: 0.4 }}
-          />
-        </div>
-
-        {/* Floating Lightbulb Bottom Left */}
-        <div className="contact-doodle" style={{ position: 'absolute', left: '3%', bottom: '20px', pointerEvents: 'none', zIndex: 1 }}>
-          <img 
-            src="/assets/Landingpageimages/group_23.svg" 
-            alt="Lightbulb doodle" 
-            style={{ width: '130px', height: 'auto', opacity: 0.5 }}
-          />
-        </div>
-
-        <h2 style={{ fontFamily: "'Martel', serif", fontSize: 'clamp(30px, 5vw, 56px)', fontWeight: '700', color: '#0C463B', textAlign: 'center', marginBottom: '36px' }}>
-          Contact Us
-        </h2>
-
-        {/* White Form Card */}
-        <div
-          style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '24px',
-            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.05)',
-            maxWidth: '920px',
-            margin: '0 auto',
-            padding: 'clamp(28px, 5vw, 50px) clamp(18px, 4vw, 44px)',
-            position: 'relative',
-            zIndex: 2
-          }}
-        >
-          {contactSubmitted ? (
-            <div style={{ textAlign: 'center', padding: '30px 0' }}>
-              <div style={{ fontSize: '48px', color: '#0C463B', marginBottom: '16px' }}>✓</div>
-              <h3 style={{ fontFamily: "'Martel', serif", fontSize: '26px', color: '#0C463B', marginBottom: '10px' }}>
-                Thank You, {contactData.firstName || 'Friend'}!
-              </h3>
-              <p style={{ fontFamily: 'Inter, sans-serif', color: '#6B7280', maxWidth: '480px', margin: '0 auto 20px', fontSize: '15px' }}>
-                Your message has been received! Our support team will review your inquiry and reply to {contactData.email || 'your email'} within 24 hours.
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  setContactSubmitted(false);
-                  setContactData({ firstName: '', lastName: '', email: '', location: '', message: '' });
-                }}
-                style={{
-                  backgroundColor: '#0C463B',
-                  color: '#FFFFFF',
-                  padding: '10px 28px',
-                  borderRadius: '50px',
-                  border: 'none',
-                  fontWeight: '600',
-                  fontFamily: 'Inter, sans-serif',
-                  cursor: 'pointer'
-                }}
-              >
-                Send Another Message
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={handleContactSubmit}>
-              {/* Responsive Form Inputs Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: 'clamp(14px, 2.5vw, 24px)', marginBottom: '24px' }}>
-                
-                {/* First Name */}
-                <div style={{ position: 'relative' }}>
-                  <input
-                    type="text"
-                    required
-                    placeholder="First Name*"
-                    value={contactData.firstName}
-                    onChange={(e) => setContactData({ ...contactData, firstName: e.target.value })}
-                    style={{
-                      width: '100%',
-                      backgroundColor: '#F9FAFB',
-                      border: '1px solid #E5E7EB',
-                      borderRadius: '10px',
-                      padding: '14px 38px 14px 16px',
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '15px',
-                      outline: 'none',
-                      color: '#111827'
-                    }}
-                  />
-                  <span style={{ position: 'absolute', right: '14px', top: '15px', color: '#10B981', fontSize: '16px' }}>✓</span>
-                </div>
-
-                {/* Last Name */}
-                <div style={{ position: 'relative' }}>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Last Name*"
-                    value={contactData.lastName}
-                    onChange={(e) => setContactData({ ...contactData, lastName: e.target.value })}
-                    style={{
-                      width: '100%',
-                      backgroundColor: '#F9FAFB',
-                      border: '1px solid #E5E7EB',
-                      borderRadius: '10px',
-                      padding: '14px 38px 14px 16px',
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '15px',
-                      outline: 'none',
-                      color: '#111827'
-                    }}
-                  />
-                  <span style={{ position: 'absolute', right: '14px', top: '15px', color: '#10B981', fontSize: '16px' }}>✓</span>
-                </div>
-
-                {/* Email Address */}
-                <div style={{ position: 'relative' }}>
-                  <input
-                    type="email"
-                    required
-                    placeholder="Email Address*"
-                    value={contactData.email}
-                    onChange={(e) => setContactData({ ...contactData, email: e.target.value })}
-                    style={{
-                      width: '100%',
-                      backgroundColor: '#F9FAFB',
-                      border: '1px solid #E5E7EB',
-                      borderRadius: '10px',
-                      padding: '14px 38px 14px 16px',
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '15px',
-                      outline: 'none',
-                      color: '#111827'
-                    }}
-                  />
-                  <span style={{ position: 'absolute', right: '14px', top: '15px', color: '#10B981', fontSize: '16px' }}>✓</span>
-                </div>
-
-                {/* Location */}
-                <div style={{ position: 'relative' }}>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Location*"
-                    value={contactData.location}
-                    onChange={(e) => setContactData({ ...contactData, location: e.target.value })}
-                    style={{
-                      width: '100%',
-                      backgroundColor: '#F9FAFB',
-                      border: '1px solid #E5E7EB',
-                      borderRadius: '10px',
-                      padding: '14px 38px 14px 16px',
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '15px',
-                      outline: 'none',
-                      color: '#111827'
-                    }}
-                  />
-                  <span style={{ position: 'absolute', right: '14px', top: '15px', color: '#10B981', fontSize: '16px' }}>✓</span>
-                </div>
-              </div>
-
-              {/* Message */}
-              <div style={{ marginBottom: '28px' }}>
-                <textarea
-                  id="contact-message-input"
-                  rows="4"
-                  required
-                  placeholder="Message"
-                  value={contactData.message}
-                  onChange={(e) => setContactData({ ...contactData, message: e.target.value })}
-                  style={{
-                    width: '100%',
-                    backgroundColor: '#F9FAFB',
-                    border: '1px solid #E5E7EB',
-                    borderRadius: '10px',
-                    padding: '16px',
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '15px',
-                    outline: 'none',
-                    color: '#111827',
-                    resize: 'vertical'
-                  }}
-                />
-              </div>
-
-              {/* Submit Button */}
-              <div style={{ textAlign: 'center' }}>
-                <button
-                  type="submit"
-                  style={{
-                    backgroundColor: '#0C463B',
-                    color: '#FFFFFF',
-                    border: 'none',
-                    borderRadius: '50px',
-                    padding: '14px clamp(32px, 6vw, 52px)',
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '17px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 15px rgba(12, 70, 59, 0.25)',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  Message Us
-                </button>
-              </div>
-            </form>
-          )}
-        </div>
-      </section>
-
-      {/* 7. FIGMA FOOTER (Reused across pages) */}
+      {/* 7. FOOTER */}
       <Footer />
 
-      {/* QUICK APPLY MODAL (With Resume Link & State Sync) */}
-      <Modal
+      {/* QUICK APPLY MODAL */}
+      <QuickApplyModal
         isOpen={applyModalOpen}
         onClose={() => setApplyModalOpen(false)}
-        title={selectedJob ? `Apply to ${selectedJob.title}` : 'Quick Apply'}
-      >
-        {selectedJob && (
-          <div>
-            {applySuccess ? (
-              <div style={{ padding: '24px', textAlign: 'center', color: '#0C463B' }}>
-                <div style={{ fontSize: '48px', marginBottom: '12px' }}>✓</div>
-                <h3 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '8px' }}>Application Submitted!</h3>
-                <p style={{ color: '#6B7280', fontSize: '14px' }}>{applySuccess}</p>
-              </div>
-            ) : (
-              <form onSubmit={handleApplySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div style={{ padding: '14px', backgroundColor: '#F2FFF2', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <img src={selectedJob.logo} alt={selectedJob.company} style={{ width: '36px', height: '36px', objectFit: 'contain' }} />
-                  <div>
-                    <div style={{ fontWeight: '700', color: '#0C463B' }}>{selectedJob.title}</div>
-                    <div style={{ fontSize: '13px', color: '#6B7280' }}>{selectedJob.company} &bull; {selectedJob.location}</div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '4px' }}>
-                      Your Full Name
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={applicantName}
-                      onChange={(e) => setApplicantName(e.target.value)}
-                      placeholder="e.g. Alex Morgan"
-                      style={{
-                        width: '100%',
-                        padding: '10px',
-                        borderRadius: '8px',
-                        border: '1px solid #D1D5DB',
-                        fontSize: '14px',
-                        fontFamily: 'Inter, sans-serif'
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '4px' }}>
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      value={applicantEmail}
-                      onChange={(e) => setApplicantEmail(e.target.value)}
-                      placeholder="e.g. alex@example.com"
-                      style={{
-                        width: '100%',
-                        padding: '10px',
-                        borderRadius: '8px',
-                        border: '1px solid #D1D5DB',
-                        fontSize: '14px',
-                        fontFamily: 'Inter, sans-serif'
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {/* Resume Status Notification */}
-                <div style={{ padding: '10px 14px', backgroundColor: '#F8FAFC', border: '1px dashed #CBD5E1', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontSize: '13px', fontWeight: '600', color: '#1E293B' }}>
-                      {savedResume ? `Attached: ${savedResume.fullName || 'User'}'s AI Resume` : 'Default Profile Resume Attached'}
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#64748B' }}>
-                      Employers will receive your verified profile credentials.
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setApplyModalOpen(false);
-                      navigate('/resume-builder');
-                    }}
-                    style={{ fontSize: '12px', color: '#0C463B', fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
-                  >
-                    Edit Resume
-                  </button>
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
-                    Cover Note / Brief Pitch
-                  </label>
-                  <textarea
-                    rows="3"
-                    required
-                    value={coverNote}
-                    onChange={(e) => setCoverNote(e.target.value)}
-                    placeholder="Briefly describe why you are the best fit for this role..."
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      borderRadius: '8px',
-                      border: '1px solid #D1D5DB',
-                      fontSize: '14px',
-                      outline: 'none',
-                      fontFamily: 'Inter, sans-serif'
-                    }}
-                  />
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '6px' }}>
-                  <button
-                    type="button"
-                    onClick={() => setApplyModalOpen(false)}
-                    style={{
-                      padding: '10px 20px',
-                      borderRadius: '50px',
-                      border: '1px solid #D1D5DB',
-                      backgroundColor: '#FFFFFF',
-                      color: '#4B5563',
-                      fontWeight: '600',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    style={{
-                      padding: '10px 24px',
-                      borderRadius: '50px',
-                      border: 'none',
-                      backgroundColor: '#0C463B',
-                      color: '#FFFFFF',
-                      fontWeight: '600',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Confirm &amp; Submit Application
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        )}
-      </Modal>
+        selectedJob={selectedJob}
+        user={user}
+      />
 
       {/* MORE REVIEWS MODAL */}
-      <Modal
+      <MoreReviewsModal
         isOpen={moreReviewsOpen}
         onClose={() => setMoreReviewsOpen(false)}
-        title="Client Reviews &amp; Testimonials"
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxHeight: '60vh', overflowY: 'auto', paddingRight: '6px' }}>
-          {testimonials.concat([
-            {
-              name: 'David Chen',
-              role: 'Engineering Lead at Velo',
-              avatar: '/assets/Landingpageimages/cover_4.svg',
-              text: 'JobFiesta helped our tech startup source four exceptional engineers in record time. The matching precision and clean profiles saved us weeks of screening.'
-            },
-            {
-              name: 'Sarah Jenkins',
-              role: 'Product Lead at Apex',
-              avatar: '/assets/Landingpageimages/cover_1.svg',
-              text: 'The best talent platform I have used. Clean interface, verified applicant credentials, and instant communication with qualified professionals.'
-            }
-          ]).map((t, i) => (
-            <div key={i} style={{ padding: '16px', backgroundColor: '#F2FFF2', borderRadius: '12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                <img src={t.avatar} alt={t.name} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
-                <div>
-                  <div style={{ fontWeight: '700', color: '#0C463B', fontSize: '15px' }}>{t.name}</div>
-                  <div style={{ fontSize: '12px', color: '#6B7280' }}>{t.role}</div>
-                </div>
-              </div>
-              <div style={{ color: '#F59E0B', fontSize: '14px', marginBottom: '6px' }}>★★★★★</div>
-              <p style={{ fontSize: '13px', color: '#374151', margin: 0, lineHeight: 1.5 }}>{t.text}</p>
-            </div>
-          ))}
-        </div>
-      </Modal>
-
-
-
+        testimonials={testimonials}
+      />
     </div>
   );
 };
