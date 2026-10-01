@@ -1,13 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react";
+import Navbar from "../components/common/Navbar";
 import {
   PageContainer,
-  Header,
-  Logo,
-  LogoText,
-  Navigation,
-  NavItem,
-  BrowseJobsButton,
   FormSection,
   FormTitle,
   FormSubtitle,
@@ -424,20 +419,7 @@ const ResumeGenerationPage = () => {
         </PreviewModal>
       )}
 
-      <Header>
-        <Logo>
-          <LogoText>Job</LogoText>
-          <LogoText font="Matura MT Script Capitals" size="32px" weight="400">Fiesta</LogoText>
-        </Logo>
-        
-        <Navigation>
-          <NavItem data-active={true}>Home</NavItem>
-          <NavItem data-active={false}>Jobs</NavItem>
-          <NavItem data-active={false}>Categories</NavItem>
-        </Navigation>
-        
-        <BrowseJobsButton>Browse jobs</BrowseJobsButton>
-      </Header>
+      <Navbar />
 
       <FormSection>
         <FormTitle>Resume Generation</FormTitle>

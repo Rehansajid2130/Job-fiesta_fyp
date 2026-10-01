@@ -54,16 +54,6 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Check if current page is registration or sign in / login
-  const normalizedPath = (location.pathname || '').toLowerCase().replace(/\/+$/, '') || '/';
-  const isAuthPage = [
-    '/login', 
-    '/register', 
-    '/register-jobseeker', 
-    '/register-recruiter', 
-    '/signup'
-  ].includes(normalizedPath);
-
   const isRecruiter = user?.userType === 'recruiter';
   const isActive = (path) => location.pathname === path;
 
@@ -77,25 +67,34 @@ const Navbar = () => {
     }
   };
 
-  const isSearchPage = normalizedPath === '/search';
+  const handleCategoriesClick = (e) => {
+    if (location.pathname === '/') {
+      e.preventDefault();
+      const el = document.getElementById('categories');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      navigate('/#categories');
+    }
+  };
 
   return (
     <nav style={{
       position: 'sticky',
       top: 0,
       zIndex: 1000,
-      backgroundColor: isSearchPage ? '#F2FFF2' : '#FFFFFF',
-      borderBottom: isSearchPage ? '1px solid rgba(13, 71, 59, 0.08)' : '1px solid #F1F5F9',
-      boxShadow: isSearchPage ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.02)'
+      backgroundColor: '#FFFFFF',
+      borderBottom: '1px solid #F1F5F9',
+      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)'
     }}>
-      {/* ponytail: reusing global .container instead of re-specifying width, margins and padding */}
       <div className="container" style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         height: '76px'
       }}>
-        {/* Original Brand Logo Matching Landing Page */}
+        {/* Brand Logo Matching Everywhere */}
         <Link 
           to="/" 
           style={{ 
@@ -116,14 +115,11 @@ const Navbar = () => {
           </span>
         </Link>
 
-        {/* If on Register or Sign In page: Hide all other links/buttons and show ONLY the website name */}
-        {!isAuthPage && (
-          <>
-            {/* Center Desktop Navigation Links */}
+        {/* Center Desktop Navigation Links */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '32px'
+              gap: '28px'
             }} className="desktop-nav">
               <Link 
                 to="/" 
@@ -131,7 +127,12 @@ const Navbar = () => {
                   fontSize: '0.92rem',
                   fontWeight: isActive('/') ? '700' : '500',
                   color: isActive('/') ? '#0C463B' : '#475569',
-                  transition: 'all 0.2s ease'
+                  textDecoration: 'none',
+                  transition: 'color 0.2s ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#0C463B'}
+                onMouseLeave={(e) => {
+                  if (!isActive('/')) e.currentTarget.style.color = '#475569';
                 }}
               >
                 Home
@@ -143,23 +144,36 @@ const Navbar = () => {
                   fontSize: '0.92rem',
                   fontWeight: isActive('/search') ? '700' : '500',
                   color: isActive('/search') ? '#0C463B' : '#475569',
-                  transition: 'all 0.2s ease'
+                  textDecoration: 'none',
+                  transition: 'color 0.2s ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#0C463B'}
+                onMouseLeave={(e) => {
+                  if (!isActive('/search')) e.currentTarget.style.color = '#475569';
                 }}
               >
                 Jobs
               </Link>
 
-              <a 
-                href="/search#categories" 
+              <button 
+                type="button"
+                onClick={handleCategoriesClick}
                 style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
                   fontSize: '0.92rem',
                   fontWeight: '500',
                   color: '#475569',
-                  transition: 'all 0.2s ease'
+                  transition: 'color 0.2s ease',
+                  fontFamily: 'inherit'
                 }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#0C463B'}
+                onMouseLeave={(e) => e.currentTarget.style.color = '#475569'}
               >
                 Categories
-              </a>
+              </button>
 
               <Link 
                 to="/companies" 
@@ -167,10 +181,15 @@ const Navbar = () => {
                   fontSize: '0.92rem',
                   fontWeight: isActive('/companies') ? '700' : '500',
                   color: isActive('/companies') ? '#0C463B' : '#475569',
-                  transition: 'all 0.2s ease',
+                  textDecoration: 'none',
+                  transition: 'color 0.2s ease',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '4px'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#0C463B'}
+                onMouseLeave={(e) => {
+                  if (!isActive('/companies')) e.currentTarget.style.color = '#475569';
                 }}
               >
                 Companies
@@ -182,10 +201,15 @@ const Navbar = () => {
                   fontSize: '0.92rem',
                   fontWeight: isActive('/salaries') ? '700' : '500',
                   color: isActive('/salaries') ? '#0C463B' : '#475569',
-                  transition: 'all 0.2s ease',
+                  textDecoration: 'none',
+                  transition: 'color 0.2s ease',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '4px'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#0C463B'}
+                onMouseLeave={(e) => {
+                  if (!isActive('/salaries')) e.currentTarget.style.color = '#475569';
                 }}
               >
                 Salaries
@@ -198,13 +222,19 @@ const Navbar = () => {
                     fontSize: '0.92rem',
                     fontWeight: isActive('/candidates') ? '700' : '500',
                     color: isActive('/candidates') ? '#0C463B' : '#475569',
-                    transition: 'all 0.2s ease',
+                    textDecoration: 'none',
+                    transition: 'color 0.2s ease',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '4px'
                   }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#0C463B'}
+                  onMouseLeave={(e) => {
+                    if (!isActive('/candidates')) e.currentTarget.style.color = '#475569';
+                  }}
                 >
-                  Candidates (ATS)
+                  <Users2 size={15} />
+                  Candidates
                 </Link>
               )}
 
@@ -214,10 +244,15 @@ const Navbar = () => {
                   fontSize: '0.92rem',
                   fontWeight: isActive('/resume-builder') ? '700' : '500',
                   color: isActive('/resume-builder') ? '#0C463B' : '#475569',
-                  transition: 'all 0.2s ease',
+                  textDecoration: 'none',
+                  transition: 'color 0.2s ease',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '4px'
+                  gap: '5px'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#0C463B'}
+                onMouseLeave={(e) => {
+                  if (!isActive('/resume-builder')) e.currentTarget.style.color = '#475569';
                 }}
               >
                 <FileText size={15} />
@@ -225,7 +260,7 @@ const Navbar = () => {
               </Link>
             </div>
 
-            {/* Right Navigation: Role Indicator, Browse Jobs, Notifications & Profile */}
+            {/* Right Navigation: Role Indicator, Browse Jobs, Notifications & Auth Buttons */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
               {/* Role switcher indicator */}
               <button
@@ -243,28 +278,15 @@ const Navbar = () => {
                   fontSize: '0.78rem',
                   fontWeight: '700',
                   border: `1px solid ${isRecruiter ? '#FDE68A' : '#A7F3D0'}`,
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
                 }}
               >
                 <Repeat size={12} />
                 <span>{isRecruiter ? 'Recruiter' : 'Job Seeker'}</span>
               </button>
 
-              <Link 
-                to="/search" 
-                style={{
-                  fontSize: '0.92rem',
-                  fontWeight: '700',
-                  color: '#0C463B',
-                  padding: '6px 10px',
-                  transition: 'all 0.2s ease'
-                }}
-                className="browse-jobs-link"
-              >
-                Browse Jobs
-              </Link>
-
-              {/* ── transitions-dev: 03-notification-badge & 05-menu-dropdown ── */}
+              {/* Notifications Badge & Dropdown */}
               <div style={{ position: 'relative' }} ref={notifDropdownRef}>
                 <button
                   type="button"
@@ -287,7 +309,6 @@ const Navbar = () => {
                   }}
                 >
                   <Bell size={18} />
-                  {/* transitions-dev: 03-notification-badge */}
                   <span className="t-badge" data-open={unreadNotificationsCount > 0 ? "true" : "false"}>
                     <span className="t-badge-dot">
                       {unreadNotificationsCount}
@@ -295,7 +316,7 @@ const Navbar = () => {
                   </span>
                 </button>
 
-                {/* transitions-dev: 05-menu-dropdown */}
+                {/* Notifications Dropdown */}
                 <div
                   className={`t-dropdown ${notifDropdownOpen ? 'is-open' : ''}`}
                   data-origin="top-right"
@@ -433,6 +454,7 @@ const Navbar = () => {
                 </div>
               </div>
 
+              {/* User Profile or Guest Auth Buttons */}
               {user ? (
                 <div style={{ position: 'relative' }} ref={profileDropdownRef}>
                   <div 
@@ -459,7 +481,7 @@ const Navbar = () => {
                     />
                   </div>
 
-                  {/* transitions-dev: 05-menu-dropdown */}
+                  {/* Profile Dropdown */}
                   <div 
                     className={`t-dropdown ${profileDropdownOpen ? 'is-open' : ''}`}
                     data-origin="top-right"
@@ -476,125 +498,162 @@ const Navbar = () => {
                       zIndex: 1100
                     }}
                   >
-                      <div style={{ padding: '8px 16px', borderBottom: '1px solid #F1F5F9' }}>
-                        <div style={{ fontWeight: '700', fontSize: '0.92rem', color: '#0F172A' }}>{user.name}</div>
-                        <div style={{ fontSize: '0.78rem', color: '#64748B' }}>{user.email}</div>
-                      </div>
-                      <Link
-                        to={isRecruiter ? '/recruiter-dashboard' : '/jobseeker-dashboard'}
-                        onClick={() => setProfileDropdownOpen(false)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          padding: '10px 16px',
-                          fontSize: '0.88rem',
-                          color: '#334155'
-                        }}
-                      >
-                        <LayoutDashboard size={16} />
-                        Dashboard
-                      </Link>
-                      <Link
-                        to="/chat"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          padding: '10px 16px',
-                          fontSize: '0.88rem',
-                          color: '#334155'
-                        }}
-                      >
-                        <MessageSquare size={16} />
-                        Messages
-                      </Link>
-                      <Link
-                        to="/profile/furqan12"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          padding: '10px 16px',
-                          fontSize: '0.88rem',
-                          color: '#334155'
-                        }}
-                      >
-                        <User size={16} />
-                        Public Profile
-                      </Link>
-                      <Link
-                        to="/notifications"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          padding: '10px 16px',
-                          fontSize: '0.88rem',
-                          color: '#334155'
-                        }}
-                      >
-                        <Bell size={16} />
-                        Notifications Center
-                      </Link>
-                      <Link
-                        to="/account-settings"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          padding: '10px 16px',
-                          fontSize: '0.88rem',
-                          color: '#334155'
-                        }}
-                      >
-                        <User size={16} />
-                        Account Settings
-                      </Link>
-                      <button
-                        onClick={() => {
-                          setProfileDropdownOpen(false);
-                          logout();
-                          navigate('/login');
-                        }}
-                        style={{
-                          width: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          padding: '10px 16px',
-                          fontSize: '0.88rem',
-                          color: '#EF4444',
-                          textAlign: 'left'
-                        }}
-                      >
-                        <LogOut size={16} />
-                        Log Out
-                      </button>
+                    <div style={{ padding: '8px 16px', borderBottom: '1px solid #F1F5F9' }}>
+                      <div style={{ fontWeight: '700', fontSize: '0.92rem', color: '#0F172A' }}>{user.name}</div>
+                      <div style={{ fontSize: '0.78rem', color: '#64748B' }}>{user.email}</div>
                     </div>
+                    <Link
+                      to={isRecruiter ? '/recruiter-dashboard' : '/jobseeker-dashboard'}
+                      onClick={() => setProfileDropdownOpen(false)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '10px 16px',
+                        fontSize: '0.88rem',
+                        color: '#334155',
+                        textDecoration: 'none'
+                      }}
+                    >
+                      <LayoutDashboard size={16} />
+                      Dashboard
+                    </Link>
+                    <Link
+                      to="/chat"
+                      onClick={() => setProfileDropdownOpen(false)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '10px 16px',
+                        fontSize: '0.88rem',
+                        color: '#334155',
+                        textDecoration: 'none'
+                      }}
+                    >
+                      <MessageSquare size={16} />
+                      Messages
+                    </Link>
+                    <Link
+                      to="/profile/furqan12"
+                      onClick={() => setProfileDropdownOpen(false)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '10px 16px',
+                        fontSize: '0.88rem',
+                        color: '#334155',
+                        textDecoration: 'none'
+                      }}
+                    >
+                      <User size={16} />
+                      Public Profile
+                    </Link>
+                    <Link
+                      to="/notifications"
+                      onClick={() => setProfileDropdownOpen(false)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '10px 16px',
+                        fontSize: '0.88rem',
+                        color: '#334155',
+                        textDecoration: 'none'
+                      }}
+                    >
+                      <Bell size={16} />
+                      Notifications Center
+                    </Link>
+                    <Link
+                      to="/account-settings"
+                      onClick={() => setProfileDropdownOpen(false)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '10px 16px',
+                        fontSize: '0.88rem',
+                        color: '#334155',
+                        textDecoration: 'none'
+                      }}
+                    >
+                      <User size={16} />
+                      Account Settings
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setProfileDropdownOpen(false);
+                        logout();
+                        navigate('/login');
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '10px 16px',
+                        fontSize: '0.88rem',
+                        color: '#EF4444',
+                        textAlign: 'left',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        borderTop: '1px solid #F1F5F9'
+                      }}
+                    >
+                      <LogOut size={16} />
+                      Log Out
+                    </button>
+                  </div>
                 </div>
               ) : (
-                <Link 
-                  to="/login"
-                  style={{
-                    fontSize: '0.92rem',
-                    fontWeight: '700',
-                    padding: '10px 24px',
-                    backgroundColor: '#0C463B',
-                    color: '#FFFFFF',
-                    borderRadius: '50px',
-                    transition: 'all 0.2s ease',
-                    display: 'inline-block'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#08342c'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0C463B'}
-                >
-                  Login
-                </Link>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Link 
+                    to="/login"
+                    style={{
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                      color: '#0C463B',
+                      padding: '8px 16px',
+                      borderRadius: '50px',
+                      border: '1px solid #E2E8F0',
+                      backgroundColor: '#FFFFFF',
+                      textDecoration: 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = '#0C463B';
+                      e.currentTarget.style.backgroundColor = '#F2FFF2';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = '#E2E8F0';
+                      e.currentTarget.style.backgroundColor = '#FFFFFF';
+                    }}
+                  >
+                    Log In
+                  </Link>
+
+                  <Link 
+                    to="/register"
+                    style={{
+                      fontSize: '0.9rem',
+                      fontWeight: '700',
+                      padding: '9px 20px',
+                      backgroundColor: '#0C463B',
+                      color: '#FFFFFF',
+                      borderRadius: '50px',
+                      textDecoration: 'none',
+                      transition: 'all 0.2s ease',
+                      display: 'inline-block'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#08342c'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0C463B'}
+                  >
+                    Sign Up
+                  </Link>
+                </div>
               )}
 
               {/* Mobile Menu Toggle Button */}
@@ -607,7 +666,9 @@ const Navbar = () => {
                   display: 'none',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  background: 'none',
+                  border: 'none'
                 }}
                 className="mobile-nav-toggle"
                 aria-label="Toggle mobile menu"
@@ -619,29 +680,138 @@ const Navbar = () => {
                 />
               </button>
             </div>
-          </>
-        )}
       </div>
 
-      {/* Mobile Drawer (Only when not on auth pages) */}
-      {!isAuthPage && mobileMenuOpen && (
+      {/* Mobile Drawer */}
+      {mobileMenuOpen && (
         <div style={{
           backgroundColor: '#FFFFFF',
           borderTop: '1px solid #E2E8F0',
-          padding: '16px 20px',
+          padding: '20px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '12px'
+          gap: '14px',
+          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.05)'
         }}>
-          <Link to="/" onClick={() => setMobileMenuOpen(false)}>Home</Link>
-          <Link to="/search" onClick={() => setMobileMenuOpen(false)}>Jobs</Link>
-          <a href="/search#categories" onClick={() => setMobileMenuOpen(false)}>Categories</a>
-          <Link to="/resume-builder" onClick={() => setMobileMenuOpen(false)}>AI Resume Builder</Link>
-          {user && (
-            <>
-              <Link to={isRecruiter ? '/recruiter-dashboard' : '/jobseeker-dashboard'} onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
-              <Link to="/chat" onClick={() => setMobileMenuOpen(false)}>Messages</Link>
-            </>
+          <Link 
+            to="/" 
+            onClick={() => setMobileMenuOpen(false)}
+            style={{ fontSize: '1rem', fontWeight: isActive('/') ? '700' : '500', color: isActive('/') ? '#0C463B' : '#334155', textDecoration: 'none' }}
+          >
+            Home
+          </Link>
+          <Link 
+            to="/search" 
+            onClick={() => setMobileMenuOpen(false)}
+            style={{ fontSize: '1rem', fontWeight: isActive('/search') ? '700' : '500', color: isActive('/search') ? '#0C463B' : '#334155', textDecoration: 'none' }}
+          >
+            Jobs
+          </Link>
+          <button 
+            type="button"
+            onClick={(e) => {
+              setMobileMenuOpen(false);
+              handleCategoriesClick(e);
+            }}
+            style={{ background: 'none', border: 'none', padding: 0, textAlign: 'left', fontSize: '1rem', fontWeight: '500', color: '#334155', cursor: 'pointer', fontFamily: 'inherit' }}
+          >
+            Categories
+          </button>
+          <Link 
+            to="/companies" 
+            onClick={() => setMobileMenuOpen(false)}
+            style={{ fontSize: '1rem', fontWeight: isActive('/companies') ? '700' : '500', color: isActive('/companies') ? '#0C463B' : '#334155', textDecoration: 'none' }}
+          >
+            Companies
+          </Link>
+          <Link 
+            to="/salaries" 
+            onClick={() => setMobileMenuOpen(false)}
+            style={{ fontSize: '1rem', fontWeight: isActive('/salaries') ? '700' : '500', color: isActive('/salaries') ? '#0C463B' : '#334155', textDecoration: 'none' }}
+          >
+            Salaries
+          </Link>
+          {isRecruiter && (
+            <Link 
+              to="/candidates" 
+              onClick={() => setMobileMenuOpen(false)}
+              style={{ fontSize: '1rem', fontWeight: isActive('/candidates') ? '700' : '500', color: isActive('/candidates') ? '#0C463B' : '#334155', textDecoration: 'none' }}
+            >
+              Candidates (ATS)
+            </Link>
+          )}
+          <Link 
+            to="/resume-builder" 
+            onClick={() => setMobileMenuOpen(false)}
+            style={{ fontSize: '1rem', fontWeight: isActive('/resume-builder') ? '700' : '500', color: isActive('/resume-builder') ? '#0C463B' : '#334155', textDecoration: 'none' }}
+          >
+            AI Resume Builder
+          </Link>
+
+          <hr style={{ border: 'none', borderTop: '1px solid #F1F5F9', margin: '4px 0' }} />
+
+          {user ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <Link 
+                to={isRecruiter ? '/recruiter-dashboard' : '/jobseeker-dashboard'} 
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ fontSize: '0.95rem', fontWeight: '600', color: '#0C463B', textDecoration: 'none' }}
+              >
+                Dashboard
+              </Link>
+              <Link 
+                to="/chat" 
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ fontSize: '0.95rem', fontWeight: '600', color: '#334155', textDecoration: 'none' }}
+              >
+                Messages
+              </Link>
+              <button 
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  logout();
+                  navigate('/login');
+                }}
+                style={{ background: 'none', border: 'none', padding: 0, textAlign: 'left', fontSize: '0.95rem', fontWeight: '600', color: '#EF4444', cursor: 'pointer' }}
+              >
+                Log Out
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
+              <Link 
+                to="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  flex: 1,
+                  textAlign: 'center',
+                  padding: '10px',
+                  borderRadius: '50px',
+                  border: '1px solid #E2E8F0',
+                  color: '#0C463B',
+                  fontWeight: '600',
+                  textDecoration: 'none'
+                }}
+              >
+                Log In
+              </Link>
+              <Link 
+                to="/register"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  flex: 1,
+                  textAlign: 'center',
+                  padding: '10px',
+                  borderRadius: '50px',
+                  backgroundColor: '#0C463B',
+                  color: '#FFFFFF',
+                  fontWeight: '700',
+                  textDecoration: 'none'
+                }}
+              >
+                Sign Up
+              </Link>
+            </div>
           )}
         </div>
       )}

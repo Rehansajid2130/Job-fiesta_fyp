@@ -22,15 +22,12 @@ exports.getJobs = async (req, res, next) => {
 
     const query = { status: 'active' };
 
-    // Search query keyword
-    const searchTerm = q || keyword;
+    // Search query: Use high-efficiency MongoDB text index
+    const searchTerm = (q || keyword || '').trim();
+    let isTextSearch = false;
     if (searchTerm) {
-      query.$or = [
-        { title: { $regex: searchTerm, $options: 'i' } },
-        { company: { $regex: searchTerm, $options: 'i' } },
-        { description: { $regex: searchTerm, $options: 'i' } },
-        { skills: { $regex: searchTerm, $options: 'i' } },
-      ];
+      query.$text = { $search: searchTerm };
+      isTextSearch = true;
     }
 
     // Location filter
@@ -66,7 +63,9 @@ exports.getJobs = async (req, res, next) => {
 
     // Sorting
     let sortOption = { createdAt: -1 }; // default newest
-    if (sort === 'popular') {
+    if (isTextSearch && (!sort || sort === 'relevance')) {
+      sortOption = { score: { $meta: 'textScore' } };
+    } else if (sort === 'popular') {
       sortOption = { applicantsCount: -1, viewsCount: -1 };
     } else if (sort === 'salary_high') {
       sortOption = { salaryMax: -1 };
@@ -82,7 +81,7 @@ exports.getJobs = async (req, res, next) => {
     const skip = (pageNum - 1) * limitNum;
 
     const total = await Job.countDocuments(query);
-    const jobs = await Job.find(query)
+    const jobs = await Job.find(query, isTextSearch ? { score: { $meta: 'textScore' } } : {})
       .sort(sortOption)
       .skip(skip)
       .limit(limitNum)
@@ -163,15 +162,12 @@ exports.updateJob = async (req, res, next) => {
       });
     }
 
-    // Verify ownership or admin role
-    if (
-      job.postedBy &&
-      job.postedBy.toString() !== req.user.id &&
-      req.user.role !== 'admin'
-    ) {
+    // Verify ownership or admin role (Strict IDOR Prevention)
+    const isOwner = job.postedBy && job.postedBy.toString() === req.user.id.toString();
+    if (!isOwner && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'You are not authorized to update this job posting',
+        message: 'Forbidden: You are not authorized to update this job posting',
       });
     }
 
@@ -203,14 +199,12 @@ exports.deleteJob = async (req, res, next) => {
       });
     }
 
-    if (
-      job.postedBy &&
-      job.postedBy.toString() !== req.user.id &&
-      req.user.role !== 'admin'
-    ) {
+    // Verify ownership or admin role (Strict IDOR Prevention)
+    const isOwner = job.postedBy && job.postedBy.toString() === req.user.id.toString();
+    if (!isOwner && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'You are not authorized to delete this job posting',
+        message: 'Forbidden: You are not authorized to delete this job posting',
       });
     }
 

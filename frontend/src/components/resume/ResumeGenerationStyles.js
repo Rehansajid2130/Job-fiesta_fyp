@@ -67,7 +67,7 @@ export const BrowseJobsButton = styled.div`
 `;
 
 export const FormSection = styled.div`
-  margin-top: 120px;
+  margin-top: 24px;
   padding: 20px;
   max-width: 1200px;
   margin-left: auto;

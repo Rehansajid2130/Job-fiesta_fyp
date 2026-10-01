@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useJobs } from '../context/JobContext';
 import { useAuth } from '../context/AuthContext';
+import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
-import LandingHeader from '../components/landing/LandingHeader';
 import LandingHero from '../components/landing/LandingHero';
 import FeaturedJobsSection from '../components/landing/FeaturedJobsSection';
 import CategoriesSection from '../components/landing/CategoriesSection';
@@ -171,8 +171,8 @@ const LandingPage = () => {
 
   return (
     <div style={{ backgroundColor: '#FCFCFC', minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
-      {/* 1. HEADER */}
-      <LandingHeader user={user} logout={logout} scrollToSection={scrollToSection} />
+      {/* 1. HEADER (Unified Global Navbar) */}
+      <Navbar />
 
       {/* 2. HERO */}
       <LandingHero

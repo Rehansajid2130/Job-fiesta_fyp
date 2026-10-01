@@ -217,6 +217,52 @@ async function runTests() {
     }
   });
 
+  // 13. Public Profile Gap & Strict Sanitization (No email, password, or phone leaked)
+  await assert('GET /api/users/:username — Public profile sanitization (zero email/phone/password exposure)', async () => {
+    const res = await request('GET', '/api/users/furqan12');
+    if (res.status !== 200 || !res.body.success || !res.body.user) {
+      throw new Error(`Public profile lookup failed: ${res.status}`);
+    }
+    const user = res.body.user;
+    if (user.password !== undefined) throw new Error('SECURITY VIOLATION: password exposed in public profile!');
+    if (user.email !== undefined) throw new Error('SECURITY VIOLATION: email exposed in public profile!');
+    if (user.phone !== undefined) throw new Error('SECURITY VIOLATION: phone exposed in public profile!');
+    if (user.savedJobs !== undefined) throw new Error('SECURITY VIOLATION: savedJobs exposed in public profile!');
+    if (user.username !== 'furqan12') throw new Error(`Expected username furqan12, got: ${user.username}`);
+  });
+
+  // 14. Server-Verified Role Switch (Issues genuine server-signed JWT)
+  await assert('POST /api/auth/demo-switch-role — Server-authenticated role switching', async () => {
+    const res = await request('POST', '/api/auth/demo-switch-role', { targetRole: 'recruiter' });
+    if (res.status !== 200 || !res.body.success || !res.body.token) {
+      throw new Error(`Role switch failed: ${res.status}`);
+    }
+    if (res.body.user?.role !== 'recruiter') {
+      throw new Error(`Expected recruiter role from server, got: ${res.body.user?.role}`);
+    }
+  });
+
+  // 15. Application State Transition Validation (Rejecting invalid stage moves)
+  await assert('PATCH /api/applications/:id/stage — State machine rejects invalid stage skips', async () => {
+    // Attempting invalid stage string
+    const res = await request('PATCH', '/api/applications/6abe5d9d16aef5be1d5a9a67/stage', {
+      stage: 'astronaut_stage'
+    }, authToken);
+    if (res.status !== 400) {
+      throw new Error(`Expected 400 Bad Request for invalid stage, got: ${res.status}`);
+    }
+  });
+
+  // 16. IDOR Protection (Non-authenticated or forbidden job updates)
+  await assert('PUT /api/jobs/:id — IDOR protection against unauthorized job modification', async () => {
+    const res = await request('PUT', '/api/jobs/6abe5d9d16aef5be1d5a9a63', {
+      title: 'Hacked Job Title'
+    }, 'invalid_spoofed_token_xyz');
+    if (res.status !== 401) {
+      throw new Error(`Expected 401 Unauthorized for spoofed token, got: ${res.status}`);
+    }
+  });
+
   console.log('\n════════════════════════════════════════════════════════════');
   console.log(`🏁 TEST RESULTS: ${passed} PASSED, ${failed} FAILED (TOTAL: ${passed + failed})`);
   console.log('════════════════════════════════════════════════════════════');

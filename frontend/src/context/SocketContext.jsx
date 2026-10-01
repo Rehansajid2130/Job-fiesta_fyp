@@ -14,11 +14,13 @@ export const SocketProvider = ({ children, userId }) => {
 
     try {
       const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const authToken = localStorage.getItem('token') || '';
       const newSocket = io(serverUrl, {
-        query: { userId },
-        autoConnect: false, // Prevents aggressive reconnection spam if backend is not running
-        reconnectionAttempts: 2,
-        timeout: 2000
+        auth: { token: authToken },
+        query: { userId, token: authToken },
+        autoConnect: true,
+        reconnectionAttempts: 5,
+        timeout: 4000
       });
 
       socketRef.current = newSocket;

@@ -52,3 +52,36 @@ exports.getSavedJobs = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Get public user profile by username (Strictly sanitized)
+// @route   GET /api/users/:username
+// @access  Public
+exports.getUserByUsername = async (req, res, next) => {
+  try {
+    const rawUsername = (req.params.username || '').trim().toLowerCase();
+
+    let query = { username: rawUsername };
+    if (rawUsername.match(/^[0-9a-fA-F]{24}$/)) {
+      query = { $or: [{ username: rawUsername }, { _id: rawUsername }] };
+    }
+
+    // STRICT PROJECTION: Explicitly select ONLY public fields. NEVER expose email, password, phone, or savedJobs.
+    const user = await User.findOne(query).select(
+      'fullName username avatar headline bio location skills resumeUrl companyDetails role createdAt'
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: `Public profile for user '${rawUsername}' was not found`,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

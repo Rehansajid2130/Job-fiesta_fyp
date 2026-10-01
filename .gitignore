@@ -200,3 +200,36 @@ $RECYCLE.BIN/
 .copilot/
 **/scratch/
 scratch/
+
+# ------------------------------------------------------------------------------
+# 11. FIGMA SCREENS, DESIGN FILES, DOCS & PROJECT SUMMARIES
+# ------------------------------------------------------------------------------
+# Figma design dumps, prototypes and raw screen captures
+figma ss/
+Job_fiesta_screens/
+*.fig
+*.figma
+*.sketch
+*.xd
+screenshots/
+screens/
+
+# Heavy presentation slide decks (40MB+ binaries)
+*.pptx
+*.ppt
+*.key
+
+# Word documents, specifications, user manuals and reports
+*.docx
+*.doc
+*.odt
+*.rtf
+*.tmp
+~*
+
+# Project summary documents & internal briefing files
+PROJECT_SUMMARY.md
+*SUMMARY*.md
+*summary*.md
+*.drawio
+notes/

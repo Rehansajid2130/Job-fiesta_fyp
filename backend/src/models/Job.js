@@ -105,7 +105,12 @@ const jobSchema = new mongoose.Schema(
   }
 );
 
-// Add index for fast keyword search and filtering
+// Text index for fast full-text keyword search
 jobSchema.index({ title: 'text', company: 'text', description: 'text', skills: 'text' });
+
+// Compound indexes for faceted filtering, sorting, and recruiter lookups
+jobSchema.index({ status: 1, createdAt: -1 });
+jobSchema.index({ jobType: 1, category: 1, location: 1 });
+jobSchema.index({ postedBy: 1, status: 1 });
 
 module.exports = mongoose.model('Job', jobSchema);

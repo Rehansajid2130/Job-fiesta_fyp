@@ -37,6 +37,12 @@ const conversationSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    // Per-user unread message counters: { [userId]: count }
+    unreadCounts: {
+      type: Map,
+      of: Number,
+      default: {},
+    },
   },
   {
     timestamps: true,

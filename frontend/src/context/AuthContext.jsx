@@ -122,26 +122,51 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('userId');
   };
 
-  const switchRole = (newRole) => {
+  const switchRole = async (newRole) => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const res = await axios.post(`${apiUrl}/api/auth/demo-switch-role`, {
+        targetRole: newRole
+      }, { timeout: 3000 });
+
+      if (res.data?.token && res.data?.user) {
+        setToken(res.data.token);
+        localStorage.setItem('token', res.data.token);
+
+        const rawUser = res.data.user;
+        const userData = {
+          ...rawUser,
+          id: rawUser._id || rawUser.id,
+          userType: rawUser.role === 'employer' ? 'recruiter' : rawUser.role,
+          name: rawUser.fullName || rawUser.name,
+        };
+        setUser(userData);
+        return userData;
+      }
+    } catch (err) {
+      console.warn('Backend demo-switch-role unavailable, using local mock profile:', err.message);
+    }
+
+    // Safe dev fallback matching seeded database accounts if backend is offline
     if (newRole === 'recruiter') {
       setUser({
         id: 'rec-1',
-        name: 'Robert Miller',
-        email: 'bob.recruiter@example.com',
+        name: 'Suzana Colin',
+        email: 'suzana@nexusinnovations.io',
         userType: 'recruiter',
         company: 'Nexus Innovations',
         location: 'San Francisco, CA',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&h=120&fit=crop&crop=faces'
+        avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&h=120&fit=crop&crop=faces'
       });
     } else {
       setUser({
         id: 'usr-1',
-        name: 'Alice Johnson',
-        email: 'alice.jobseeker@example.com',
+        name: 'Furqan Zeeshan',
+        email: 'furqan@jobfiesta.com',
         userType: 'jobseeker',
-        title: 'Senior Frontend Developer',
+        title: 'Senior Frontend Engineer & UI Specialist',
         location: 'San Francisco, CA',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&crop=faces'
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces'
       });
     }
   };

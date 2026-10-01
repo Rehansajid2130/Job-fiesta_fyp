@@ -163,6 +163,19 @@ exports.getCandidatePipeline = asyncHandler(async (req, res) => {
 });
 
 /**
+ * State machine rules for candidate application progression
+ * Prevents invalid stage skips (e.g. a rejected candidate cannot jump directly to hired)
+ */
+const ALLOWED_STAGE_TRANSITIONS = {
+  applied: ['screening', 'rejected'],
+  screening: ['interviewing', 'rejected'],
+  interviewing: ['offered', 'rejected'],
+  offered: ['hired', 'rejected'],
+  hired: [], // Terminal state
+  rejected: [], // Terminal state: rejected candidates cannot jump straight to hired
+};
+
+/**
  * @desc    Get all applications for a specific job
  * @route   GET /api/applications/job/:jobId
  * @access  Private (Employer/Admin)
@@ -173,6 +186,12 @@ exports.getJobApplications = asyncHandler(async (req, res) => {
 
   if (!job) {
     return sendError(res, 'Job posting not found', 404);
+  }
+
+  // IDOR Security: Only the recruiter who created this job (or an admin) can view its applicants
+  const isOwner = job.postedBy && job.postedBy.toString() === req.user.id.toString();
+  if (!isOwner && req.user.role !== 'admin') {
+    return sendError(res, 'Forbidden: You can only view applications for your own job postings', 403);
   }
 
   const applications = await Application.find({ job: jobId })
@@ -198,12 +217,35 @@ exports.updateCandidateStage = asyncHandler(async (req, res) => {
     return sendError(res, `Invalid stage. Must be one of: ${validStages.join(', ')}`, 400);
   }
 
-  const application = await Application.findById(id).populate('job', 'title company');
+  const application = await Application.findById(id).populate('job', 'title company postedBy');
   if (!application) {
     return sendError(res, 'Application not found', 404);
   }
 
-  if (stage) application.status = stage;
+  const job = application.job;
+  if (!job) {
+    return sendError(res, 'Associated job posting not found', 404);
+  }
+
+  // IDOR Security: Recruiter A cannot manipulate candidates for Recruiter B's jobs
+  const isOwner = job.postedBy && job.postedBy.toString() === req.user.id.toString();
+  if (!isOwner && req.user.role !== 'admin') {
+    return sendError(res, 'Forbidden: You can only update candidates for job postings you created', 403);
+  }
+
+  // State Transition Machine Validation
+  if (stage && stage !== application.status) {
+    const allowedNext = ALLOWED_STAGE_TRANSITIONS[application.status] || [];
+    if (!allowedNext.includes(stage) && req.user.role !== 'admin') {
+      return sendError(
+        res,
+        `Invalid status transition: Cannot move an application from '${application.status}' directly to '${stage}'. Allowed transitions: [${allowedNext.join(', ')}]`,
+        400
+      );
+    }
+    application.status = stage;
+  }
+
   if (notes !== undefined) application.notes = notes;
 
   await application.save();
@@ -214,6 +256,7 @@ exports.updateCandidateStage = asyncHandler(async (req, res) => {
     interviewing: 'Interview Stage',
     offered: 'Offer Extended! 🎉',
     rejected: 'Application Update',
+    hired: 'Hired! Welcome to the Team 🎉',
   };
 
   const stageLabel = stageLabels[stage] || stage;

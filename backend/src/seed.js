@@ -36,6 +36,7 @@ const seedDatabase = async () => {
     const users = await User.create([
       {
         fullName: 'Furqan Zeeshan',
+        username: 'furqan12',
         email: 'furqan@jobfiesta.com',
         password: 'password123',
         role: 'jobseeker',
@@ -47,6 +48,7 @@ const seedDatabase = async () => {
       },
       {
         fullName: 'Rehan Sajjid',
+        username: 'rehansajid',
         email: 'rehansajid.prof@gmail.com',
         password: 'password123',
         role: 'jobseeker',
@@ -58,6 +60,7 @@ const seedDatabase = async () => {
       },
       {
         fullName: 'Suzana Colin',
+        username: 'suzana',
         email: 'suzana@nexusinnovations.io',
         password: 'password123',
         role: 'recruiter',
@@ -68,6 +71,7 @@ const seedDatabase = async () => {
       },
       {
         fullName: 'Hassan Raza',
+        username: 'hassan',
         email: 'hassan@cognitivedynamics.ai',
         password: 'password123',
         role: 'recruiter',

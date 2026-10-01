@@ -124,3 +124,56 @@ exports.getMe = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Dev-only switch role endpoint: issues a genuine, server-signed JWT for the target role
+// @route   POST /api/auth/demo-switch-role
+// @access  Public (Dev / Non-production only)
+exports.demoSwitchRole = async (req, res, next) => {
+  try {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({
+        success: false,
+        message: 'Role switching without credentials is strictly disabled in production environments.',
+      });
+    }
+
+    const { targetRole } = req.body;
+    const isRecruiter = targetRole === 'recruiter' || targetRole === 'employer';
+
+    // Find the real seeded account corresponding to this role in MongoDB
+    let user = await User.findOne({
+      role: isRecruiter ? { $in: ['recruiter', 'employer'] } : 'jobseeker',
+    });
+
+    if (!user) {
+      user = await User.create({
+        fullName: isRecruiter ? 'Suzana Colin' : 'Furqan Zeeshan',
+        email: isRecruiter ? 'suzana@nexusinnovations.io' : 'furqan@jobfiesta.com',
+        username: isRecruiter ? 'suzana' : 'furqan12',
+        password: 'password123',
+        role: isRecruiter ? 'recruiter' : 'jobseeker',
+      });
+    }
+
+    const token = generateToken(user._id);
+
+    res.status(200).json({
+      success: true,
+      token,
+      user: {
+        id: user._id,
+        _id: user._id,
+        fullName: user.fullName,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+        phone: user.phone,
+        headline: user.headline,
+        bio: user.bio,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

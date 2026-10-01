@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import styled from "styled-components";
+import Navbar from "../components/common/Navbar";
 
 const PageContainer = styled.div`
   position: relative;
@@ -11,65 +12,8 @@ const PageContainer = styled.div`
   width: 100%;
 `;
 
-const Header = styled.div`
-  position: absolute;
-  background: #F2FFF2;
-  height: 89px;
-  width: 100%;
-  top: 0;
-  left: 0;
-`;
-
-const Logo = styled.div`
-  position: absolute;
-  left: 40px;
-  top: 29px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-`;
-
-const LogoText = styled.span`
-  font-family: ${props => props.font || 'Martel'};
-  font-size: ${props => props.size || '24px'};
-  font-weight: ${props => props.weight || '900'};
-  color: #000000;
-`;
-
-const Navigation = styled.div`
-  position: absolute;
-  height: 50px;
-  width: 359.72px;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 27px;
-  display: flex;
-  gap: 20px;
-`;
-
-const NavItem = styled.div`
-  padding: 10px;
-  cursor: pointer;
-  font-family: Inter;
-  font-size: 20px;
-  font-weight: ${props => props['data-active'] ? '700' : '500'};
-  color: #282828;
-`;
-
-const BrowseJobsButton = styled.div`
-  position: absolute;
-  right: 40px;
-  top: 27px;
-  padding: 10px;
-  cursor: pointer;
-  font-family: Inter;
-  font-size: 20px;
-  font-weight: 700;
-  color: #0C463B;
-`;
-
 const ContentSection = styled.div`
-  margin-top: 120px;
+  margin-top: 24px;
   padding: 20px;
   max-width: 1200px;
   margin-left: auto;
@@ -346,20 +290,7 @@ const ResumePreviewPage = () => {
   if (!formData || !template) {
     return (
       <PageContainer>
-        <Header>
-          <Logo>
-            <LogoText>Job</LogoText>
-            <LogoText font="Matura MT Script Capitals" size="32px" weight="400">Fiesta</LogoText>
-          </Logo>
-          
-          <Navigation>
-            <NavItem data-active={true}>Home</NavItem>
-            <NavItem data-active={false}>Jobs</NavItem>
-            <NavItem data-active={false}>Categories</NavItem>
-          </Navigation>
-          
-          <BrowseJobsButton>Browse jobs</BrowseJobsButton>
-        </Header>
+        <Navbar />
         <ContentSection>
           <ErrorMessage>
             Missing resume data. Please go back and try again.
@@ -398,20 +329,7 @@ const ResumePreviewPage = () => {
         </ErrorMessage>
       )}
 
-      <Header>
-        <Logo>
-          <LogoText>Job</LogoText>
-          <LogoText font="Matura MT Script Capitals" size="32px" weight="400">Fiesta</LogoText>
-        </Logo>
-        
-        <Navigation>
-          <NavItem data-active={true}>Home</NavItem>
-          <NavItem data-active={false}>Jobs</NavItem>
-          <NavItem data-active={false}>Categories</NavItem>
-        </Navigation>
-        
-        <BrowseJobsButton>Browse jobs</BrowseJobsButton>
-      </Header>
+      <Navbar />
 
       <ContentSection>
         <PreviewContainer>
