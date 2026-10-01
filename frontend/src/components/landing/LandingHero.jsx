@@ -47,7 +47,9 @@ const LandingHero = ({ keyword, setKeyword, onSearchSubmit, onQuickSearch }) => 
 
       {/* Pill Search Bar - Positioned cleanly right above the illustration SVGs */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '-10px', position: 'relative', zIndex: 10, padding: '0 clamp(12px, 3vw, 20px)' }}>
+        {/* ponytail: pill-search-form class provides focus-within ring without extra JS state */}
         <form 
+          className="pill-search-form"
           onSubmit={onSearchSubmit}
           style={{ 
             display: 'flex', 
@@ -74,7 +76,7 @@ const LandingHero = ({ keyword, setKeyword, onSearchSubmit, onQuickSearch }) => 
             type="text" 
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
-            placeholder="Job Title, keywords......"
+            placeholder="Job title, skills, or company..."
             style={{ 
               flex: 1, 
               border: 'none', 
@@ -82,7 +84,7 @@ const LandingHero = ({ keyword, setKeyword, onSearchSubmit, onQuickSearch }) => 
               outline: 'none',
               fontFamily: 'Inter, sans-serif',
               fontSize: 'clamp(15px, 2.4vw, 20px)', 
-              color: '#515151',
+              color: '#1E293B',
               minWidth: '60px'
             }}
           />

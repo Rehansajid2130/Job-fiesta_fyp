@@ -32,6 +32,8 @@ const RegistrationPage = () => {
     password: '',
     mobileNumber: '',
     role: 'jobseeker', // 'jobseeker' or 'recruiter'
+    // ponytail: consent state for Terms of Service and Privacy Policy
+    agreeToTerms: false,
 
     // Job Seeker Specific Questions
     jobTitle: '',
@@ -89,6 +91,11 @@ const RegistrationPage = () => {
     }
     if (!formData.password || formData.password.length < 6) {
       setErrorMsg('Password must be at least 6 characters.');
+      return;
+    }
+    // ponytail: enforce GDPR Art. 7 affirmative consent prior to advancing registration
+    if (!formData.agreeToTerms) {
+      setErrorMsg('Please agree to the Terms of Service and Privacy Policy to continue.');
       return;
     }
     goToStep('questions_step_1');

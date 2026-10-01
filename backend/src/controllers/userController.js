@@ -1,4 +1,6 @@
 const User = require('../models/User');
+// ponytail: import Application model to support GDPR data deletion and portability
+const Application = require('../models/Application');
 
 // @desc    Update user profile
 // @route   PUT /api/users/profile
@@ -85,3 +87,46 @@ exports.getUserByUsername = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Delete user account and all personal data (GDPR Art. 17 Right to Erasure)
+// @route   DELETE /api/users/profile
+// @access  Private
+exports.deleteAccount = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    // ponytail: cascade remove user applications to prevent orphan PII records
+    await Application.deleteMany({ applicant: userId });
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Account and associated personal records have been permanently erased (GDPR Art. 17).',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Export full machine-readable personal data dump (GDPR Art. 20 Data Portability)
+// @route   GET /api/users/export-data
+// @access  Private
+exports.exportUserData = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    const applications = await Application.find({ applicant: req.user.id }).populate('job', 'title company location');
+
+    res.status(200).json({
+      success: true,
+      metadata: {
+        format: 'GDPR_ARTICLE_20_JSON_PORTABILITY',
+        exportedAt: new Date().toISOString(),
+        controller: 'JobFiesta Platform',
+      },
+      personalData: user,
+      applications,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

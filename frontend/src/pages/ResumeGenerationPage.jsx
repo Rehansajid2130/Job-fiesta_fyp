@@ -53,7 +53,7 @@ const ResumeGenerationPage = () => {
     fullName: '',
     email: '',
     phone: '',
-    dob: '',
+    // ponytail: removed 'dob' (Date of Birth) to prevent age discrimination exposure under ADEA and EEOC regulations
     address: '',
     postalCode: '',
     profile: '',
@@ -462,15 +462,7 @@ const ResumeGenerationPage = () => {
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  placeholder="Enter your phone number"
-                  style={{ flex: 1 }}
-                />
-                <Input
-                  type="date"
-                  name="dob"
-                  value={formData.dob}
-                  onChange={handleInputChange}
-                  placeholder="Enter Date of Birth"
+                  placeholder="Enter your phone number (e.g. +1 555-0199)"
                   style={{ flex: 1 }}
                 />
               </InputRow>

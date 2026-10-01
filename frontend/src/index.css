@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&family=League+Script&family=Martel:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Poppins:wght@400;500;600;700;800&display=swap');
+/* ponytail: drop unused font families (Caveat, Playfair Display, Poppins) to cut network payload */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=League+Script&family=Martel:wght@400;600;700;800&display=swap');
 
 :root {
   --primary: #0C463B;
@@ -16,7 +17,8 @@
   
   --text-main: #0F172A;
   --text-secondary: #475569;
-  --text-muted: #94A3B8;
+  /* ponytail: boosted --text-muted from #94A3B8 to #64748B to achieve WCAG AA 4.6:1 contrast ratio */
+  --text-muted: #64748B;
   
   --border-light: #E2E8F0;
   --border-subtle: #F1F5F9;
@@ -621,5 +623,18 @@ input:-webkit-autofill:focus {
   .resume-grid {
     grid-template-columns: 1fr !important;
   }
+  /* ponytail: hide decorative hero doodles on smaller screens to prevent collision with headline */
+  .hero-doodle {
+    display: none !important;
+  }
+}
+
+/* ponytail: native focus-within ring for pill search bar */
+.pill-search-form {
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.pill-search-form:focus-within {
+  border-color: rgba(12, 70, 59, 0.35) !important;
+  box-shadow: 0 0 0 3px rgba(12, 70, 59, 0.15), 0 8px 30px rgba(0, 0, 0, 0.08) !important;
 }
 

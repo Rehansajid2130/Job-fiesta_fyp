@@ -10,7 +10,6 @@ import {
   LogOut, 
   Menu, 
   X, 
-  Repeat,
   Bell,
   Building2,
   TrendingUp,
@@ -20,7 +19,7 @@ import {
 import IconSwap from './IconSwap';
 
 const Navbar = () => {
-  const { user, logout, switchRole } = useAuth();
+  const { user, logout } = useAuth();
   const { 
     notifications, 
     unreadNotificationsCount, 
@@ -56,16 +55,6 @@ const Navbar = () => {
 
   const isRecruiter = user?.userType === 'recruiter';
   const isActive = (path) => location.pathname === path;
-
-  const handleRoleToggle = () => {
-    const nextRole = isRecruiter ? 'jobseeker' : 'recruiter';
-    switchRole(nextRole);
-    if (nextRole === 'recruiter') {
-      navigate('/recruiter-dashboard');
-    } else {
-      navigate('/jobseeker-dashboard');
-    }
-  };
 
   const handleCategoriesClick = (e) => {
     if (location.pathname === '/') {
@@ -262,29 +251,6 @@ const Navbar = () => {
 
             {/* Right Navigation: Role Indicator, Browse Jobs, Notifications & Auth Buttons */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-              {/* Role switcher indicator */}
-              <button
-                type="button"
-                onClick={handleRoleToggle}
-                title="Switch between Job Seeker and Recruiter"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '6px 12px',
-                  borderRadius: '50px',
-                  backgroundColor: isRecruiter ? '#FEF3C7' : '#F2FFF2',
-                  color: isRecruiter ? '#92400E' : '#0C463B',
-                  fontSize: '0.78rem',
-                  fontWeight: '700',
-                  border: `1px solid ${isRecruiter ? '#FDE68A' : '#A7F3D0'}`,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                <Repeat size={12} />
-                <span>{isRecruiter ? 'Recruiter' : 'Job Seeker'}</span>
-              </button>
 
               {/* Notifications Badge & Dropdown */}
               <div style={{ position: 'relative' }} ref={notifDropdownRef}>

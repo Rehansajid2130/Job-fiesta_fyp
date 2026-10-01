@@ -210,11 +210,12 @@ exports.getJobApplications = asyncHandler(async (req, res) => {
  */
 exports.updateCandidateStage = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { stage, notes } = req.body;
+  const stage = req.body.stage || req.body.status;
+  const { notes } = req.body;
 
   const validStages = ['applied', 'screening', 'interviewing', 'offered', 'rejected', 'hired'];
-  if (stage && !validStages.includes(stage)) {
-    return sendError(res, `Invalid stage. Must be one of: ${validStages.join(', ')}`, 400);
+  if (!stage || !validStages.includes(stage)) {
+    return sendError(res, `Invalid stage '${stage}'. Must be one of: ${validStages.join(', ')}`, 400);
   }
 
   const application = await Application.findById(id).populate('job', 'title company postedBy');
@@ -234,7 +235,7 @@ exports.updateCandidateStage = asyncHandler(async (req, res) => {
   }
 
   // State Transition Machine Validation
-  if (stage && stage !== application.status) {
+  if (stage !== application.status) {
     const allowedNext = ALLOWED_STAGE_TRANSITIONS[application.status] || [];
     if (!allowedNext.includes(stage) && req.user.role !== 'admin') {
       return sendError(

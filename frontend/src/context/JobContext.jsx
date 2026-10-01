@@ -15,8 +15,14 @@ export const useJobs = () => useContext(JobContext);
 
 export const JobProvider = ({ children }) => {
   const [jobs, setJobs] = useState(() => {
-    const saved = localStorage.getItem('jobfiesta_jobs');
-    return saved ? JSON.parse(saved) : initialJobs;
+    try {
+      const saved = localStorage.getItem('jobfiesta_jobs');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed.filter(j => j.id && !j.id.startsWith('job-') && !j.id.startsWith('figma-'));
+      }
+    } catch (e) {}
+    return [];
   });
 
   const [companies, setCompanies] = useState(() => {
@@ -25,13 +31,25 @@ export const JobProvider = ({ children }) => {
   });
 
   const [candidates, setCandidates] = useState(() => {
-    const saved = localStorage.getItem('jobfiesta_candidates');
-    return saved ? JSON.parse(saved) : initialCandidates;
+    try {
+      const saved = localStorage.getItem('jobfiesta_candidates');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed.filter(c => c.id && !c.id.startsWith('cand-'));
+      }
+    } catch (e) {}
+    return [];
   });
 
   const [notifications, setNotifications] = useState(() => {
-    const saved = localStorage.getItem('jobfiesta_notifications');
-    return saved ? JSON.parse(saved) : initialNotifications;
+    try {
+      const saved = localStorage.getItem('jobfiesta_notifications');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed.filter(n => n.id && !n.id.startsWith('notif-'));
+      }
+    } catch (e) {}
+    return [];
   });
 
   // Global toast state for transitions-dev 22-toast
@@ -45,13 +63,25 @@ export const JobProvider = ({ children }) => {
   };
 
   const [applications, setApplications] = useState(() => {
-    const saved = localStorage.getItem('jobfiesta_applications');
-    return saved ? JSON.parse(saved) : initialApplications;
+    try {
+      const saved = localStorage.getItem('jobfiesta_applications');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed.filter(a => a.id && !a.id.startsWith('app-1') && !a.id.startsWith('app-2') && !a.id.startsWith('app-3'));
+      }
+    } catch (e) {}
+    return [];
   });
 
   const [savedJobIds, setSavedJobIds] = useState(() => {
-    const saved = localStorage.getItem('jobfiesta_saved_jobs');
-    return saved ? JSON.parse(saved) : ['job-1', 'job-3'];
+    try {
+      const saved = localStorage.getItem('jobfiesta_saved_jobs');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed.filter(id => !id.startsWith('job-'));
+      }
+    } catch (e) {}
+    return [];
   });
 
   const [conversations, setConversations] = useState(() => {
@@ -87,6 +117,10 @@ export const JobProvider = ({ children }) => {
   }, [applications]);
 
   useEffect(() => {
+    localStorage.setItem('jobfiesta_candidates', JSON.stringify(candidates));
+  }, [candidates]);
+
+  useEffect(() => {
     localStorage.setItem('jobfiesta_saved_jobs', JSON.stringify(savedJobIds));
   }, [savedJobIds]);
 
@@ -94,49 +128,94 @@ export const JobProvider = ({ children }) => {
     localStorage.setItem('jobfiesta_conversations', JSON.stringify(conversations));
   }, [conversations]);
 
-  // Sync with backend API if running
-  useEffect(() => {
-    const fetchLiveJobs = async () => {
-      try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-        const res = await axios.get(`${apiUrl}/api/jobs`, { timeout: 3000 });
-        if (res.data?.jobs && res.data.jobs.length > 0) {
-          const mappedJobs = res.data.jobs.map((job) => ({
-            id: job._id,
-            title: job.title,
-            company: job.company,
-            logo: job.companyLogo || 'https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=100&h=100&fit=crop&crop=faces',
-            location: `${job.location} (${job.workplaceType})`,
-            type: job.jobType,
-            category: job.category?.toLowerCase() || 'tech',
-            salary: `$${Math.round(job.salaryMin / 1000)}k - $${Math.round(job.salaryMax / 1000)}k`,
-            salaryMin: job.salaryMin,
-            salaryMax: job.salaryMax,
-            experience: job.experienceLevel,
-            postedDate: 'Recently',
-            featured: job.viewsCount > 200,
-            tags: job.skills || ['Full-Time'],
-            description: job.description,
-            requirements: job.requirements || [],
-            benefits: job.benefits || ['Flexible work hours', 'Health insurance'],
-          }));
-          setJobs(mappedJobs);
-        }
-
-        // Also sync live companies if available
-        try {
-          const compRes = await axios.get(`${apiUrl}/api/companies`, { timeout: 3000 });
-          if (compRes.data?.data && compRes.data.data.length > 0) {
-            setCompanies(compRes.data.data);
-          }
-        } catch (e) {
-          // ignore, keep mock companies
-        }
-      } catch (err) {
-        console.info('Using local jobs data (backend offline or loading):', err.message);
+  // Sync jobs from backend API
+  const fetchLiveJobs = async () => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const res = await axios.get(`${apiUrl}/api/jobs`, { timeout: 3500 });
+      if (res.data?.jobs) {
+        const mappedJobs = res.data.jobs.map((job) => ({
+          id: job._id,
+          _id: job._id,
+          title: job.title,
+          company: job.company,
+          logo: job.companyLogo || 'https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=100&h=100&fit=crop&crop=faces',
+          location: `${job.location} (${job.workplaceType || 'On-site'})`,
+          type: job.jobType || 'Full-time',
+          category: job.category?.toLowerCase() || 'tech',
+          salary: `$${Math.round((job.salaryMin || 100000) / 1000)}k - $${Math.round((job.salaryMax || 140000) / 1000)}k`,
+          salaryMin: job.salaryMin || 100000,
+          salaryMax: job.salaryMax || 140000,
+          experience: job.experienceLevel || 'Mid-level',
+          postedDate: 'Recently',
+          featured: job.viewsCount > 200,
+          tags: job.skills || ['Full-Time'],
+          description: job.description || '',
+          requirements: job.requirements || [],
+          benefits: job.benefits || ['Flexible work hours', 'Health insurance'],
+        }));
+        setJobs(mappedJobs);
       }
-    };
+    } catch (err) {
+      console.info('Backend API unavailable or error fetching jobs:', err.message);
+    }
+  };
+
+  // Sync user applications and candidate pipeline based on logged-in role
+  const refreshUserData = async () => {
+    const token = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    let userObj = null;
+    try {
+      if (storedUser) userObj = JSON.parse(storedUser);
+    } catch (e) {}
+
+    if (token && !token.startsWith('demo-token')) {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      // If recruiter or employer: fetch candidates ATS pipeline
+      if (userObj?.role === 'recruiter' || userObj?.role === 'employer') {
+        try {
+          const res = await axios.get(`${apiUrl}/api/applications/candidate-pipeline`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const candList = res.data?.data || res.data?.candidates || [];
+          if (Array.isArray(candList)) {
+            setCandidates(candList);
+          }
+        } catch (err) {
+          console.warn('Candidate pipeline fetch error:', err.message);
+        }
+      }
+
+      // If jobseeker: fetch personal applications
+      if (userObj?.role === 'jobseeker') {
+        try {
+          const res = await axios.get(`${apiUrl}/api/applications/my`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const rawApps = res.data?.data || res.data?.applications || [];
+          if (Array.isArray(rawApps)) {
+            setApplications(rawApps.map(app => ({
+              id: app._id,
+              jobId: app.job?._id || app.job,
+              jobTitle: app.job?.title || 'Position',
+              company: app.job?.company || 'Company',
+              appliedDate: app.createdAt ? new Date(app.createdAt).toISOString().split('T')[0] : 'Today',
+              status: app.status === 'applied' ? 'Applied' : (app.status === 'screening' ? 'Screening' : (app.status === 'interviewing' ? 'Interviewing' : app.status)),
+              matchScore: app.matchScore || 85,
+              coverNote: app.coverLetter || ''
+            })));
+          }
+        } catch (err) {
+          console.warn('My applications fetch error:', err.message);
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
     fetchLiveJobs();
+    refreshUserData();
   }, []);
 
   const toggleSaveJob = async (jobId) => {
@@ -158,39 +237,50 @@ export const JobProvider = ({ children }) => {
   };
 
   const applyToJob = async (jobId, customCoverNote = '') => {
-    const job = jobs.find(j => j.id === jobId) || {};
-    const alreadyApplied = applications.some(a => a.jobId === jobId);
+    const targetJob = jobs.find(j => j.id === jobId || j._id === jobId) || {};
+    const alreadyApplied = applications.some(a => a.jobId === jobId || (targetJob._id && a.jobId === targetJob._id));
     if (alreadyApplied) {
       return { success: false, message: 'You have already applied to this position.' };
     }
 
     const token = localStorage.getItem('token');
-    if (token && !token.startsWith('demo-token') && typeof jobId === 'string' && jobId.length === 24) {
+    let backendApp = null;
+    const realJobId = targetJob._id || (typeof jobId === 'string' && jobId.length === 24 ? jobId : null);
+
+    if (token && !token.startsWith('demo-token') && realJobId) {
       try {
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-        await axios.post(`${apiUrl}/api/applications/${jobId}`, {
+        const res = await axios.post(`${apiUrl}/api/applications/${realJobId}`, {
           coverLetter: customCoverNote
         }, {
           headers: { Authorization: `Bearer ${token}` }
         });
+        if (res.data?.data || res.data?.application) {
+          backendApp = res.data?.data || res.data?.application;
+        }
       } catch (err) {
         console.warn('Backend application submission:', err.response?.data?.message || err.message);
+        return {
+          success: false,
+          message: err.response?.data?.message || 'Failed to submit application to server.'
+        };
       }
     }
 
     const newApplication = {
-      id: `app-${Date.now()}`,
-      jobId,
-      jobTitle: job.title || 'Position',
-      company: job.company || 'Company',
+      id: backendApp ? backendApp._id : `app-${Date.now()}`,
+      jobId: realJobId || jobId,
+      jobTitle: targetJob.title || 'Position',
+      company: targetJob.company || 'Company',
       appliedDate: new Date().toISOString().split('T')[0],
-      status: 'Under Review',
-      matchScore: Math.floor(Math.random() * 15) + 85,
+      status: 'Applied',
+      matchScore: backendApp?.matchScore || 88,
       coverNote: customCoverNote
     };
 
     setApplications(prev => [newApplication, ...prev]);
-    return { success: true, message: `Application submitted successfully for ${job.title || 'position'}!` };
+    showToast(`Application submitted successfully for ${targetJob.title || 'position'}!`, 'success');
+    return { success: true, message: `Application submitted successfully for ${targetJob.title || 'position'}!` };
   };
 
   const postNewJob = async (newJobData) => {
@@ -227,11 +317,19 @@ export const JobProvider = ({ children }) => {
         }
       } catch (err) {
         console.warn('Backend post job error:', err.response?.data?.message || err.message);
+        throw new Error(err.response?.data?.message || 'Failed to post job listing.');
       }
     }
 
+    const createdId = backendJob ? backendJob._id : `job-${Date.now()}`;
     const newJob = {
-      id: backendJob ? backendJob._id : `job-${Date.now()}`,
+      id: createdId,
+      _id: createdId,
+      title: payload.title,
+      company: payload.company,
+      location: `${payload.location} (${payload.workplaceType})`,
+      type: payload.jobType,
+      category: payload.category.toLowerCase(),
       postedDate: 'Just now',
       featured: false,
       salaryMin: payload.salaryMin,
@@ -241,12 +339,28 @@ export const JobProvider = ({ children }) => {
       tags: payload.skills,
       requirements: payload.requirements,
       benefits: payload.benefits,
-      ...newJobData,
-      _id: backendJob ? backendJob._id : undefined
+      description: payload.description
     };
 
     setJobs(prev => [newJob, ...prev]);
+    showToast(`Job listing "${newJob.title}" published!`, 'success');
     return { success: true, job: newJob };
+  };
+
+  const updateCandidateStage = async (candId, newStage) => {
+    setCandidates(prev => prev.map(c => (c.id === candId || c.applicationId === candId) ? { ...c, stage: newStage } : c));
+    const token = localStorage.getItem('token');
+    if (token && !token.startsWith('demo-token') && typeof candId === 'string' && candId.length === 24) {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+        await axios.patch(`${apiUrl}/api/applications/${candId}/stage`, { status: newStage }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        showToast(`Candidate stage moved to ${newStage}`, 'info');
+      } catch (err) {
+        console.warn('Failed to update stage on backend:', err.message);
+      }
+    }
   };
 
   const updateApplicationStatus = (appId, newStatus) => {
@@ -361,15 +475,6 @@ export const JobProvider = ({ children }) => {
     localStorage.setItem('jobfiesta_notifications', JSON.stringify(notifications));
   }, [notifications]);
 
-  const updateCandidateStage = (candidateId, newStage) => {
-    setCandidates(prev => prev.map(cand => {
-      if (cand.id === candidateId) {
-        return { ...cand, stage: newStage };
-      }
-      return cand;
-    }));
-    showToast(`Candidate moved to ${newStage.toUpperCase()}`, 'success');
-  };
 
   const markNotificationAsRead = (notifId) => {
     setNotifications(prev => prev.map(n => 
@@ -417,6 +522,8 @@ export const JobProvider = ({ children }) => {
       applyToJob,
       postNewJob,
       updateApplicationStatus,
+      fetchLiveJobs,
+      refreshUserData,
       sendMessage,
       rateJobseeker,
       startOrGetConversation

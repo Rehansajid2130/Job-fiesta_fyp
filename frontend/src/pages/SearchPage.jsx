@@ -19,111 +19,7 @@ import {
   Loader2
 } from 'lucide-react';
 
-const figmaMockJobs = [
-  {
-    id: 'figma-job-1',
-    title: 'Technical Support Specialist',
-    company: 'Google Inc.',
-    logo: '/assets/images/google_logo.png',
-    location: 'New Delhi, India',
-    type: 'PART-TIME',
-    category: 'tech',
-    workMode: 'On-site',
-    experience: 'Junior',
-    salary: '20,000 INR - 25,000 INR',
-    salaryMin: 20000,
-    salaryMax: 25000,
-    postedDate: '2 days ago',
-    applicantsCount: 10,
-    description: 'Provide technical assistance and troubleshooting support for enterprise infrastructure.'
-  },
-  {
-    id: 'figma-job-2',
-    title: 'Senior UI/UX Designer',
-    company: 'Apple',
-    logo: '/assets/images/applelogo_1.png',
-    location: 'Boston, USA',
-    type: 'FULL-TIME',
-    category: 'design',
-    workMode: 'On-site',
-    experience: 'Senior Level',
-    salary: '$30,000 - $55,000',
-    salaryMin: 30000,
-    salaryMax: 55000,
-    postedDate: 'Just now',
-    applicantsCount: 9,
-    description: 'Design breathtaking digital experiences and interface ecosystems for Apple products.'
-  },
-  {
-    id: 'figma-job-3',
-    title: 'Marketing Officer',
-    company: 'Intel Corp',
-    logo: '/assets/images/group_14049_1.svg',
-    location: 'Bangalore, India',
-    type: 'PART-TIME',
-    category: 'engineering',
-    workMode: 'Hybrid',
-    experience: 'Mid-Level',
-    salary: '15,000 INR - 35,000 INR',
-    salaryMin: 15000,
-    salaryMax: 35000,
-    postedDate: '3 days ago',
-    applicantsCount: 30,
-    isBookmarked: true,
-    description: 'Lead digital outreach, technical product campaigns, and regional partner engagements.'
-  },
-  {
-    id: 'figma-job-4',
-    title: 'Technical Support Specialist',
-    company: 'Google Inc.',
-    logo: '/assets/images/google_logo.png',
-    location: 'Mumbai, India',
-    type: 'PART-TIME',
-    category: 'tech',
-    workMode: 'Remote',
-    experience: 'Junior',
-    salary: '20,000 INR - 28,000 INR',
-    salaryMin: 20000,
-    salaryMax: 28000,
-    postedDate: '4 days ago',
-    applicantsCount: 15,
-    description: 'Resolve client system requests, perform diagnostics, and maintain internal services.'
-  },
-  {
-    id: 'figma-job-5',
-    title: 'Senior UI/UX Designer',
-    company: 'Apple',
-    logo: '/assets/images/applelogo_1.png',
-    location: 'New York, USA',
-    type: 'FULL-TIME',
-    category: 'design',
-    workMode: 'Remote',
-    experience: 'Senior Level',
-    salary: '$35,000 - $60,000',
-    salaryMin: 35000,
-    salaryMax: 60000,
-    postedDate: '5 days ago',
-    applicantsCount: 12,
-    description: 'Lead user experience design systems, user flows, and high fidelity interactive prototypes.'
-  },
-  {
-    id: 'figma-job-6',
-    title: 'Marketing Officer',
-    company: 'Intel Corp',
-    logo: '/assets/images/group_14049_1.svg',
-    location: 'Hyderabad, India',
-    type: 'PART-TIME',
-    category: 'ai',
-    workMode: 'Hybrid',
-    experience: 'Mid-Level',
-    salary: '18,000 INR - 32,000 INR',
-    salaryMin: 18000,
-    salaryMax: 32000,
-    postedDate: '1 week ago',
-    applicantsCount: 25,
-    description: 'Promote semiconductor developer tools and developer events across key tech hubs.'
-  }
-];
+
 
 const SearchPage = () => {
   const { jobs: contextJobs, applyToJob, toggleSaveJob, savedJobIds } = useJobs();
@@ -273,28 +169,26 @@ const SearchPage = () => {
     };
   }, [keywordInput, locationInput, filters, selectedSort, savedJobIds]);
 
-  // Combine mock Figma jobs with any user-posted context jobs (used as robust fallback)
-  const combinedJobs = [
-    ...figmaMockJobs,
-    ...(contextJobs || []).map(j => ({
-      id: j.id,
-      title: j.title,
-      company: j.company,
-      logo: j.logo || '/assets/images/google_logo.png',
-      location: j.location,
-      type: (j.type || 'Full-Time').toUpperCase(),
-      category: j.category,
-      workMode: j.location?.toLowerCase().includes('remote') ? 'Remote' : (j.location?.toLowerCase().includes('hybrid') ? 'Hybrid' : 'On-site'),
-      experience: j.experience || 'Mid-Senior',
-      salary: j.salary || '$120k - $150k',
-      salaryMin: j.salaryMin || 120000,
-      salaryMax: j.salaryMax || 150000,
-      postedDate: j.postedDate || 'Recent',
-      applicantsCount: j.applicantsCount || 28,
-      description: j.description || 'Join our innovative engineering team.',
-      isBookmarked: savedJobIds?.includes(j.id) || false
-    }))
-  ];
+  // Dynamic jobs from context (used as fallback or when live API matches)
+  const combinedJobs = (contextJobs || []).map(j => ({
+    id: j.id || j._id,
+    _id: j._id || j.id,
+    title: j.title,
+    company: j.company,
+    logo: j.logo || '/assets/images/google_logo.png',
+    location: j.location,
+    type: (j.type || 'Full-Time').toUpperCase(),
+    category: j.category,
+    workMode: j.location?.toLowerCase().includes('remote') ? 'Remote' : (j.location?.toLowerCase().includes('hybrid') ? 'Hybrid' : 'On-site'),
+    experience: j.experience || 'Mid-Senior',
+    salary: j.salary || '$120k - $150k',
+    salaryMin: j.salaryMin || 120000,
+    salaryMax: j.salaryMax || 150000,
+    postedDate: j.postedDate || 'Recent',
+    applicantsCount: j.applicantsCount || 0,
+    description: j.description || '',
+    isBookmarked: savedJobIds?.includes(j.id) || false
+  }));
 
   // Client-side filtering logic for fallback
   const filteredJobs = combinedJobs

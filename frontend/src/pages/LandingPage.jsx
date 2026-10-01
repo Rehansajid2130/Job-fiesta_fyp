@@ -51,83 +51,97 @@ const LandingPage = () => {
     setApplyModalOpen(true);
   };
 
-  // 6 Featured Jobs matching Figma Screenshot exactly
-  const featuredJobs = [
+  // ponytail: ensure 6 featured positions always render smoothly even if backend database is initializing
+  const defaultFeaturedJobs = [
     {
-      id: 'job-1',
-      title: 'Product Manager',
+      id: 'figma-1',
+      title: 'Software Engineer',
       company: 'Spotify',
       type: 'Full Time',
-      location: 'Glendale, CA',
-      category: 'Marketing',
-      filterCategory: 'marketing',
-      salary: '$2,000 - 5,000 / Monthly',
+      location: 'Remote',
+      category: 'Tech',
+      filterCategory: 'tech',
+      salary: '$120k - $150k',
       logo: '/assets/Landingpageimages/spotify_1_.svg',
       isPrimaryBtn: true
     },
     {
-      id: 'job-2',
-      title: 'Product Designer',
-      company: 'Dribbble',
-      type: 'Part Time',
-      location: 'Glen wood, CA',
-      category: 'Designer',
-      filterCategory: 'design',
-      salary: '$2,000 - 5,000 / Monthly',
-      logo: '/assets/Landingpageimages/vector_2.svg',
-      logoBg: '#FCE7F3',
-      isPrimaryBtn: false
-    },
-    {
-      id: 'job-3',
-      title: 'Recruiting Coordinator',
-      company: 'Google',
-      type: 'Part Time',
-      location: 'Tropico, CA',
-      category: 'Customers Service',
-      filterCategory: 'sales',
-      salary: '$2,000 - 5,000 / Monthly',
-      logo: '/assets/Landingpageimages/vector_43.svg',
-      isPrimaryBtn: false
-    },
-    {
-      id: 'job-4',
-      title: 'Software Engineer',
-      company: 'Apple',
-      type: 'Part Time',
-      location: 'Greenbriar, CA',
-      category: 'Developer',
+      id: 'figma-2',
+      title: 'Web Developer',
+      company: 'Slack',
+      type: 'Full Time',
+      location: 'San Francisco, CA',
+      category: 'Tech',
       filterCategory: 'tech',
-      salary: '$2,000 - 5,000 / Monthly',
-      logo: '/assets/Landingpageimages/vector_3.svg',
+      salary: '$110k - $140k',
+      logo: '/assets/Landingpageimages/spotify_1_.svg',
       isPrimaryBtn: false
     },
     {
-      id: 'job-5',
-      title: 'Customer Support',
-      company: 'TechCorp',
-      type: 'Part Time',
-      location: 'Rossmoyne, CA',
-      category: 'Support',
-      filterCategory: 'sales',
-      salary: '$2,000 - 5,000 / Monthly',
-      logo: '/assets/Landingpageimages/group_512926.svg',
-      isPrimaryBtn: false
-    },
-    {
-      id: 'job-6',
-      title: 'UI / UX Designer',
-      company: 'CreativeCo',
-      type: 'Part Time',
-      location: 'Grandview, CA',
-      category: 'Designer',
+      id: 'figma-3',
+      title: 'UI/UX Designer',
+      company: 'Figma',
+      type: 'Full Time',
+      location: 'New York, NY',
+      category: 'Design',
       filterCategory: 'design',
-      salary: '$2,000 - 5,000 / Monthly',
-      logo: '/assets/Landingpageimages/vector_2.svg',
-      logoBg: '#FCE7F3',
+      salary: '$115k - $145k',
+      logo: '/assets/Landingpageimages/spotify_1_.svg',
+      isPrimaryBtn: false
+    },
+    {
+      id: 'figma-4',
+      title: 'Product Manager',
+      company: 'Linear',
+      type: 'Full Time',
+      location: 'Remote',
+      category: 'Tech',
+      filterCategory: 'tech',
+      salary: '$130k - $160k',
+      logo: '/assets/Landingpageimages/spotify_1_.svg',
+      isPrimaryBtn: false
+    },
+    {
+      id: 'figma-5',
+      title: 'DevOps Architect',
+      company: 'Vercel',
+      type: 'Full Time',
+      location: 'Seattle, WA',
+      category: 'Tech',
+      filterCategory: 'tech',
+      salary: '$140k - $175k',
+      logo: '/assets/Landingpageimages/spotify_1_.svg',
+      isPrimaryBtn: false
+    },
+    {
+      id: 'figma-6',
+      title: 'Growth Specialist',
+      company: 'Stripe',
+      type: 'Full Time',
+      location: 'San Francisco, CA',
+      category: 'Marketing',
+      filterCategory: 'marketing',
+      salary: '$100k - $130k',
+      logo: '/assets/Landingpageimages/spotify_1_.svg',
       isPrimaryBtn: false
     }
   ];
+
+  // Dynamic Featured Jobs derived from real jobs database with curated fallback
+  const featuredJobs = (jobs && jobs.length > 0)
+    ? jobs.slice(0, 6).map((job, idx) => ({
+        id: job.id || job._id,
+        title: job.title,
+        company: job.company,
+        type: job.type || 'Full Time',
+        location: job.location,
+        category: job.category || 'Tech',
+        filterCategory: (job.category || 'tech').toLowerCase(),
+        salary: job.salary || `$${Math.round((job.salaryMin || 100000)/1000)}k - $${Math.round((job.salaryMax || 140000)/1000)}k`,
+        logo: job.logo || '/assets/Landingpageimages/spotify_1_.svg',
+        isPrimaryBtn: idx === 0
+      }))
+    : defaultFeaturedJobs;
 
   // 5 Exact Categories from Figma Screenshot
   const categories = [

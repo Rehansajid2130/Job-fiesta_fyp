@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, ArrowRight } from 'lucide-react';
+import Modal from '../common/Modal';
 
 const PrimaryRegisterStep = ({
   formData,
@@ -10,8 +11,12 @@ const PrimaryRegisterStep = ({
   onSubmit,
   onGoogleSignup
 }) => {
+  // ponytail: legal modal state for registration transparency
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
+  const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
   return (
-    <form onSubmit={onSubmit}>
+    <>
+      <form onSubmit={onSubmit}>
       {/* Full Name */}
       <div style={{ marginBottom: '20px' }}>
         <label className="figma-label">
@@ -166,14 +171,37 @@ const PrimaryRegisterStep = ({
         </div>
       </div>
 
-      {/* Terms Agreement */}
-      <p style={{ fontSize: '13px', color: '#6B7280', margin: '0 0 24px 0', lineHeight: '1.5' }}>
-        By clicking Register, you agree to the{' '}
-        <span style={{ color: '#0284C7', fontWeight: '600', cursor: 'pointer' }}>Terms and Conditions</span>
-        {' & '}
-        <span style={{ color: '#0284C7', fontWeight: '600', cursor: 'pointer' }}>Privacy Policy</span>
-        {' of JobFiesta.'}
-      </p>
+      {/* Terms Agreement (ponytail: GDPR Art. 7 compliant affirmative opt-in) */}
+      <div style={{ margin: '0 0 20px 0' }}>
+        <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', fontSize: '13px', color: '#4B5563', lineHeight: '1.5' }}>
+          <input
+            type="checkbox"
+            required
+            checked={!!formData.agreeToTerms}
+            onChange={(e) => handleChange('agreeToTerms', e.target.checked)}
+            style={{ marginTop: '3px', accentColor: '#0D473B', cursor: 'pointer', width: '16px', height: '16px' }}
+          />
+          <span>
+            I agree to the{' '}
+            <button
+              type="button"
+              onClick={() => setTermsModalOpen(true)}
+              style={{ color: '#0284C7', fontWeight: '600', background: 'none', border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline', font: 'inherit' }}
+            >
+              Terms of Service
+            </button>
+            {' & '}
+            <button
+              type="button"
+              onClick={() => setPrivacyModalOpen(true)}
+              style={{ color: '#0284C7', fontWeight: '600', background: 'none', border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline', font: 'inherit' }}
+            >
+              Privacy Policy
+            </button>
+            {' of JobFiesta.'}
+          </span>
+        </label>
+      </div>
 
       {/* Register Button */}
       <button
@@ -243,6 +271,50 @@ const PrimaryRegisterStep = ({
         </Link>
       </div>
     </form>
+
+    {/* ponytail: lightweight accessible legal modals for registration transparency */}
+    <Modal
+      isOpen={termsModalOpen}
+      onClose={() => setTermsModalOpen(false)}
+      title="JobFiesta Terms of Service"
+    >
+      <div style={{ fontSize: '13px', color: '#374151', lineHeight: '1.6', maxHeight: '60vh', overflowY: 'auto' }}>
+        <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>1. Acceptance & Eligibility</h4>
+        <p style={{ marginBottom: '12px' }}>
+          By creating an account, you confirm that you are at least 18 years old and agree to these Terms. JobFiesta acts as an independent technological venue connecting job seekers and recruiters.
+        </p>
+        <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>2. Acceptable Use</h4>
+        <p style={{ marginBottom: '12px' }}>
+          Users agree not to post fraudulent job offers, scrape user resumes, solicit upfront fees, or distribute malicious content.
+        </p>
+        <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>3. Limitation of Liability</h4>
+        <p>
+          JobFiesta is provided on an "AS IS" basis. We do not guarantee employment offers or candidate qualifications. Maximum platform liability is capped at $100.
+        </p>
+      </div>
+    </Modal>
+
+    <Modal
+      isOpen={privacyModalOpen}
+      onClose={() => setPrivacyModalOpen(false)}
+      title="JobFiesta Privacy Policy"
+    >
+      <div style={{ fontSize: '13px', color: '#374151', lineHeight: '1.6', maxHeight: '60vh', overflowY: 'auto' }}>
+        <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>1. Data Collection & Purpose</h4>
+        <p style={{ marginBottom: '12px' }}>
+          We collect your name, email, phone, and professional experience to deliver account access and transmit applications to employers you choose to apply to.
+        </p>
+        <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>2. Data Subject Rights (GDPR & CCPA)</h4>
+        <p style={{ marginBottom: '12px' }}>
+          You have the right to access, rectify, export (JSON), or permanently delete your account and personal data at any time from your Account Settings.
+        </p>
+        <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>3. Security & No Third-Party Sale</h4>
+        <p>
+          We do not sell personal data to third parties. All passwords are salted and hashed using bcrypt.
+        </p>
+      </div>
+    </Modal>
+  </>
   );
 };
 

@@ -36,16 +36,19 @@ const STAGES = [
 
 const CandidatesAtsPage = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { candidates, updateCandidateStage, showToast, startOrGetConversation } = useJobs();
+  const { candidates, updateCandidateStage, showToast, startOrGetConversation, refreshUserData } = useJobs();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
 
-  const filteredCandidates = candidates.filter(cand => 
-    cand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    cand.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    cand.skills.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
+  React.useEffect(() => {
+    if (refreshUserData) refreshUserData();
+  }, []);
+
+  const filteredCandidates = (candidates || []).filter(cand => 
+    (cand.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (cand.role || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (Array.isArray(cand.skills) && cand.skills.some(s => s && s.toLowerCase().includes(searchQuery.toLowerCase())))
   );
 
   const handleOpenDetail = (cand) => {

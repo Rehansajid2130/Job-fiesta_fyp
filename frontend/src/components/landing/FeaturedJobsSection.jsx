@@ -8,10 +8,12 @@ const FeaturedJobsSection = ({ featuredJobs, totalJobsCount, applications, onOpe
     <section id="jobs" className="container" style={{ marginTop: '40px', marginBottom: '80px' }}>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '36px' }}>
         <div>
+          {/* ponytail: fix typo in section header */}
           <h2 style={{ fontFamily: "'Martel', serif", fontSize: 'clamp(30px, 5vw, 56px)', fontWeight: '700', color: '#0C463B', margin: 0, textAlign: 'left' }}>
-            Our Features Jobs
+            Our Featured Jobs
           </h2>
-          <p style={{ fontFamily: 'Inter, sans-serif', color: '#6B7280', fontSize: '15px', marginTop: '6px' }}>
+          {/* ponytail: upgrade color from #6B7280 to #475569 for WCAG AA readability */}
+          <p style={{ fontFamily: 'Inter, sans-serif', color: '#475569', fontSize: '15px', marginTop: '6px' }}>
             Explore handpicked premier opportunities featured on JobFiesta. Click any position to view details.
           </p>
         </div>
@@ -34,11 +36,11 @@ const FeaturedJobsSection = ({ featuredJobs, totalJobsCount, applications, onOpe
         </button>
       </div>
 
-      {/* 6 Featured Cards Grid (Clickable & Responsive) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '26px' }}>
-        {featuredJobs.map((job) => {
-          const isApplied = applications?.some(a => a.jobId === job.id);
-          return (
+      {/* 6 Featured Cards Grid (Clickable & Responsive) - ponytail: auto-fill keeps cards at their natural width so single/few items never stretch across the full screen */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))', gap: '26px' }}>
+          {featuredJobs.map((job) => {
+            const isApplied = applications?.some(a => a.jobId === job.id);
+            return (
             <div 
               key={job.id} 
               onClick={() => navigate(`/job/${job.id}`)}
@@ -63,12 +65,12 @@ const FeaturedJobsSection = ({ featuredJobs, totalJobsCount, applications, onOpe
                 e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.04)';
               }}
             >
-              {/* Top Tags */}
+              {/* Top Tags - ponytail: #475569 ensures WCAG AA contrast on white */}
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
-                <span style={{ border: '1px solid #D1D5DB', borderRadius: '50px', padding: '4px 14px', fontSize: '13px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
+                <span style={{ border: '1px solid #D1D5DB', borderRadius: '50px', padding: '4px 14px', fontSize: '13px', color: '#475569', fontFamily: 'Inter, sans-serif' }}>
                   {job.type}
                 </span>
-                <span style={{ border: '1px solid #D1D5DB', borderRadius: '50px', padding: '4px 14px', fontSize: '13px', color: '#6B7280', fontFamily: 'Inter, sans-serif' }}>
+                <span style={{ border: '1px solid #D1D5DB', borderRadius: '50px', padding: '4px 14px', fontSize: '13px', color: '#475569', fontFamily: 'Inter, sans-serif' }}>
                   {job.location}
                 </span>
               </div>
@@ -95,7 +97,7 @@ const FeaturedJobsSection = ({ featuredJobs, totalJobsCount, applications, onOpe
               </div>
 
               {/* Category & Salary */}
-              <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '15px', color: '#515151', marginBottom: '24px' }}>
+              <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '15px', color: '#334155', marginBottom: '24px' }}>
                 <span style={{ fontWeight: '500' }}>{job.category}</span>
                 <span style={{ margin: '0 8px', color: '#CBD5E1' }}>|</span>
                 <span>{job.salary}</span>

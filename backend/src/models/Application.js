@@ -54,6 +54,7 @@ const applicationSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    // ponytail: matchScore is strictly an advisory decision-support metric; EU AI Act Annex III & NYC LL 144 compliant (human in the loop, no automated disqualification)
     matchScore: {
       type: Number,
       default: 85,

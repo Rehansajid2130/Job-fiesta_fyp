@@ -20,9 +20,12 @@ import {
 
 const JobSeekerDashBoardPage = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { applications, savedJobIds, jobs, startOrGetConversation, showToast } = useJobs();
+  const { applications, savedJobIds, jobs, startOrGetConversation, showToast, refreshUserData } = useJobs();
   const [activeTab, setActiveTab] = useState('applications'); // applications, saved, recommended
+
+  React.useEffect(() => {
+    if (refreshUserData) refreshUserData();
+  }, []);
 
   const savedJobs = jobs.filter(j => savedJobIds.includes(j.id));
   const recommendedJobs = jobs.slice(0, 3);

@@ -278,8 +278,37 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// ponytail: standard security headers without adding extra dependencies (KISS)
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
+// ponytail: lightweight native in-memory rate limiter for auth routes
+const authAttempts = new Map();
+const authRateLimiter = (req, res, next) => {
+  const ip = req.ip || req.socket?.remoteAddress || 'unknown';
+  const now = Date.now();
+  const windowMs = 15 * 60 * 1000;
+  const maxAttempts = 100;
+  const record = authAttempts.get(ip) || { count: 0, resetTime: now + windowMs };
+  if (now > record.resetTime) {
+    record.count = 0;
+    record.resetTime = now + windowMs;
+  }
+  record.count += 1;
+  authAttempts.set(ip, record);
+  if (record.count > maxAttempts) {
+    return res.status(429).json({ success: false, message: 'Too many authentication attempts. Please try again later.' });
+  }
+  next();
+};
+
 // API Routes
-app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/auth', authRateLimiter, require('./routes/authRoutes'));
 app.use('/api/jobs', require('./routes/jobRoutes'));
 app.use('/api/companies', require('./routes/companyRoutes'));
 app.use('/api/applications', require('./routes/applicationRoutes'));

@@ -21,18 +21,44 @@ import {
 const RecruiterDashBoardPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { jobs, applications, updateApplicationStatus, candidates, startOrGetConversation, showToast } = useJobs();
+  const { jobs, applications, updateApplicationStatus, candidates, updateCandidateStage, startOrGetConversation, showToast, refreshUserData, fetchLiveJobs } = useJobs();
   const [filterStatus, setFilterStatus] = useState('all');
 
-  const recruiterJobs = jobs.filter(j => j.company.toLowerCase().includes('nexus') || j.company.toLowerCase().includes(user?.company?.toLowerCase() || ''));
-  const displayJobs = recruiterJobs.length > 0 ? recruiterJobs : jobs.slice(0, 3);
+  React.useEffect(() => {
+    if (fetchLiveJobs) fetchLiveJobs();
+    if (refreshUserData) refreshUserData();
+  }, []);
+
+  const recruiterJobs = jobs.filter(j => 
+    j.company?.toLowerCase().includes('nexus') || 
+    (user?.company && j.company?.toLowerCase().includes(user.company.toLowerCase())) ||
+    j.postedBy === user?.id
+  );
+  const displayJobs = recruiterJobs.length > 0 ? recruiterJobs : jobs;
+
+  const displayCandidates = candidates.length > 0
+    ? candidates
+    : applications.map(app => ({
+        id: app.id,
+        applicationId: app.id,
+        name: app.candidateName || 'Applicant',
+        email: app.email || '',
+        avatar: app.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces',
+        role: app.jobTitle || 'Applicant',
+        matchScore: app.matchScore || 85,
+        stage: app.status || 'applied'
+      }));
 
   const filteredApplications = filterStatus === 'all' 
-    ? applications 
-    : applications.filter(a => a.status === filterStatus);
+    ? displayCandidates 
+    : displayCandidates.filter(a => (a.stage || a.status || '').toLowerCase() === filterStatus.toLowerCase());
 
   const handleStatusChange = (appId, newStatus) => {
-    updateApplicationStatus(appId, newStatus);
+    if (updateCandidateStage) {
+      updateCandidateStage(appId, newStatus);
+    } else {
+      updateApplicationStatus(appId, newStatus);
+    }
   };
 
   const handleMessageApplicant = (applicant, candInfo) => {
@@ -215,112 +241,115 @@ const RecruiterDashBoardPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredApplications.map((app, index) => {
-                  const cand = candidates?.find(c => c.id === app.candidateId || c.role === app.jobTitle) || 
-                               candidates?.[index % (candidates?.length || 1)] || null;
-                  const candidateName = cand?.name || app.candidateName || (index === 0 ? 'Furqan Zeeshan' : index === 1 ? 'Rehan Sajjid' : 'Hassan Raza');
-                  const candidateEmail = cand?.email || (index === 0 ? 'furqan@jobfiesta.com' : index === 1 ? 'rehansajid.prof@gmail.com' : 'hassan.raza@example.com');
-                  const candidateAvatar = cand?.avatar || (index === 0 
-                    ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces' 
-                    : 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&h=120&fit=crop&crop=faces');
+                {filteredApplications.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" style={{ padding: '36px 24px', textAlign: 'center', color: '#64748B' }}>
+                      No candidates currently in this stage. When job seekers apply to your postings, their profiles will appear here.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredApplications.map((cand) => {
+                    const candId = cand.applicationId || cand.id;
+                    const candStage = cand.stage || cand.status || 'applied';
 
-                  return (
-                    <tr key={app.id} style={{ borderBottom: '1px solid #F1F5F9', fontSize: '0.92rem' }}>
-                      <td style={{ padding: '18px 24px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <img 
-                            src={candidateAvatar} 
-                            alt={candidateName} 
-                            style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover' }}
-                          />
-                          <div>
-                            <div style={{ fontWeight: '700', color: '#0F172A' }}>{candidateName}</div>
-                            <div style={{ fontSize: '0.8rem', color: '#64748B' }}>{candidateEmail}</div>
+                    return (
+                      <tr key={candId} style={{ borderBottom: '1px solid #F1F5F9', fontSize: '0.92rem' }}>
+                        <td style={{ padding: '18px 24px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <img 
+                              src={cand.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces'} 
+                              alt={cand.name} 
+                              style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover' }}
+                            />
+                            <div>
+                              <div style={{ fontWeight: '700', color: '#0F172A' }}>{cand.name}</div>
+                              <div style={{ fontSize: '0.8rem', color: '#64748B' }}>{cand.email}</div>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td style={{ padding: '18px 20px', fontWeight: '600', color: '#334155' }}>
-                        {app.jobTitle}
-                      </td>
-                      <td style={{ padding: '18px 20px' }}>
-                        <span style={{
-                          display: 'inline-flex',
-                          padding: '4px 8px',
-                          borderRadius: '6px',
-                          backgroundColor: '#ECFDF5',
-                          color: '#065F46',
-                          fontWeight: '700',
-                          fontSize: '0.85rem'
-                        }}>
-                          {app.matchScore}% Match
-                        </span>
-                      </td>
-                      <td style={{ padding: '18px 20px' }}>
-                        <Badge 
-                          variant={
-                            app.status === 'Interview Scheduled' ? 'success' :
-                            app.status === 'Shortlisted' ? 'primary' :
-                            app.status === 'Rejected' ? 'danger' : 'warning'
-                          }
-                        >
-                          {app.status}
-                        </Badge>
-                      </td>
-                      <td style={{ padding: '18px 20px' }}>
-                        <select
-                          value={app.status}
-                          onChange={(e) => handleStatusChange(app.id, e.target.value)}
-                          style={{
-                            padding: '6px 10px',
-                            borderRadius: '6px',
-                            border: '1px solid #CBD5E1',
-                            fontSize: '0.85rem',
-                            backgroundColor: '#FFFFFF',
-                            color: '#0F172A',
-                            outline: 'none',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          <option value="Under Review">Under Review</option>
-                          <option value="Shortlisted">Shortlisted</option>
-                          <option value="Interview Scheduled">Interview Scheduled</option>
-                          <option value="Offer Extended">Offer Extended</option>
-                          <option value="Rejected">Rejected</option>
-                        </select>
-                      </td>
-                      <td style={{ padding: '18px 24px', textAlign: 'right' }}>
-                        <button
-                          type="button"
-                          onClick={() => handleMessageApplicant(app, cand || { name: candidateName, role: app.jobTitle, avatar: candidateAvatar, email: candidateEmail })}
-                          style={{
+                        </td>
+                        <td style={{ padding: '18px 20px', fontWeight: '600', color: '#334155' }}>
+                          {cand.role || cand.jobTitle || 'Applicant'}
+                        </td>
+                        <td style={{ padding: '18px 20px' }}>
+                          <span style={{
                             display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            padding: '7px 14px',
+                            padding: '4px 8px',
                             borderRadius: '6px',
-                            backgroundColor: '#EBF8F4',
-                            color: '#0C463B',
+                            backgroundColor: '#ECFDF5',
+                            color: '#065F46',
                             fontWeight: '700',
-                            fontSize: '0.85rem',
-                            border: 'none',
-                            cursor: 'pointer',
-                            transition: 'all 0.15s ease'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = '#0C463B';
-                            e.currentTarget.style.color = '#FFFFFF';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = '#EBF8F4';
-                            e.currentTarget.style.color = '#0C463B';
-                          }}
-                        >
-                          <MessageSquare size={14} /> Message
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
+                            fontSize: '0.85rem'
+                          }}>
+                            {cand.matchScore || 85}% Match
+                          </span>
+                        </td>
+                        <td style={{ padding: '18px 20px' }}>
+                          <Badge 
+                            variant={
+                              candStage === 'interviewing' || candStage === 'Interview Scheduled' ? 'success' :
+                              candStage === 'screening' || candStage === 'Shortlisted' ? 'primary' :
+                              candStage === 'rejected' ? 'danger' : 'warning'
+                            }
+                          >
+                            {candStage}
+                          </Badge>
+                        </td>
+                        <td style={{ padding: '18px 20px' }}>
+                          <select
+                            value={candStage}
+                            onChange={(e) => handleStatusChange(candId, e.target.value)}
+                            style={{
+                              padding: '6px 10px',
+                              borderRadius: '6px',
+                              border: '1px solid #CBD5E1',
+                              fontSize: '0.85rem',
+                              backgroundColor: '#FFFFFF',
+                              color: '#0F172A',
+                              outline: 'none',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <option value="applied">Applied / Under Review</option>
+                            <option value="screening">Screening</option>
+                            <option value="interviewing">Interviewing</option>
+                            <option value="offered">Offered</option>
+                            <option value="rejected">Archived / Rejected</option>
+                          </select>
+                        </td>
+                        <td style={{ padding: '18px 24px', textAlign: 'right' }}>
+                          <button
+                            type="button"
+                            onClick={() => handleMessageApplicant(cand, cand)}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              padding: '7px 14px',
+                              borderRadius: '6px',
+                              backgroundColor: '#EBF8F4',
+                              color: '#0C463B',
+                              fontWeight: '700',
+                              fontSize: '0.85rem',
+                              border: 'none',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = '#0C463B';
+                              e.currentTarget.style.color = '#FFFFFF';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = '#EBF8F4';
+                              e.currentTarget.style.color = '#0C463B';
+                            }}
+                          >
+                            <MessageSquare size={14} /> Message
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>

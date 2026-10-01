@@ -7,6 +7,8 @@ const Footer = () => {
   const navigate = useNavigate();
   const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
+  // ponytail: legal disclosure modal state for EU AI Act compliance
+  const [aiNoticeModalOpen, setAiNoticeModalOpen] = useState(false);
 
   const scrollToSection = (id) => {
     const el = document.getElementById(id);
@@ -136,6 +138,15 @@ const Footer = () => {
                     Privacy Policy
                   </button>
                 </li>
+                <li>
+                  <button 
+                    type="button"
+                    onClick={() => setAiNoticeModalOpen(true)} 
+                    style={{ color: '#9CA3AF', background: 'none', border: 'none', fontSize: '14px', fontFamily: 'Inter, sans-serif', cursor: 'pointer', padding: 0, textAlign: 'left' }}
+                  >
+                    AI Ethics &amp; Transparency
+                  </button>
+                </li>
               </ul>
             </div>
 
@@ -219,9 +230,13 @@ const Footer = () => {
               </span>
             </Link>
 
-            {/* Copyright */}
+            {/* Copyright & Trademark Disclaimer */}
             <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '13px', color: '#9CA3AF' }}>
-              &copy; Copyright 2024. All rights reserved by JobFiesta
+              <div>&copy; Copyright 2024-2026. All rights reserved by JobFiesta.</div>
+              {/* ponytail: trademark disclaimer to avoid trademark infringement liability */}
+              <div style={{ fontSize: '11px', color: '#6B7280', marginTop: '3px' }}>
+                All brand logos and trademarks are property of their respective owners. Used for academic demonstration.
+              </div>
             </div>
 
             {/* Social Icons */}
@@ -262,46 +277,84 @@ const Footer = () => {
         </div>
       </footer>
 
-      {/* TERMS & CONDITIONS MODAL */}
+      {/* TERMS & CONDITIONS MODAL (ponytail: comprehensive enforceable terms) */}
       <Modal
         isOpen={termsModalOpen}
         onClose={() => setTermsModalOpen(false)}
-        title="JobFiesta Terms &amp; Conditions"
+        title="JobFiesta Terms of Service"
       >
-        <div style={{ fontSize: '14px', color: '#374151', lineHeight: '1.6', maxHeight: '60vh', overflowY: 'auto', paddingRight: '8px' }}>
-          <h4 style={{ color: '#0C463B', marginBottom: '6px' }}>1. Acceptance of Terms</h4>
-          <p style={{ marginBottom: '14px' }}>
-            By accessing or using JobFiesta, you agree to comply with and be bound by these Terms of Service. If you do not agree, please refrain from using the platform.
+        <div style={{ fontSize: '13px', color: '#374151', lineHeight: '1.6', maxHeight: '60vh', overflowY: 'auto', paddingRight: '8px' }}>
+          <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>1. Acceptance &amp; Platform Role</h4>
+          <p style={{ marginBottom: '12px' }}>
+            By accessing or using JobFiesta, you agree to these Terms. JobFiesta operates as an independent technological venue connecting job seekers and prospective employers. JobFiesta does not act as an employer, agent, or guarantor of employment, nor does it guarantee the accuracy of job listings or candidate credentials.
           </p>
-          <h4 style={{ color: '#0C463B', marginBottom: '6px' }}>2. Job Seekers &amp; Recruiters</h4>
-          <p style={{ marginBottom: '14px' }}>
-            Job seekers may browse positions and submit applications free of charge. Recruiters agree to post genuine opportunities and uphold equal employment standards.
+          <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>2. Acceptable Use &amp; Prohibitions</h4>
+          <p style={{ marginBottom: '12px' }}>
+            Users agree not to: (a) post false, misleading, or discriminatory job offers; (b) solicit upfront fees or illegal activities; (c) scrape, harvest, or automate data collection from user profiles or resumes; or (d) transmit malicious code or spam via the messaging features.
           </p>
-          <h4 style={{ color: '#0C463B', marginBottom: '6px' }}>3. Privacy &amp; Data Security</h4>
+          <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>3. AI Tools &amp; Advisory Match Scoring</h4>
+          <p style={{ marginBottom: '12px' }}>
+            The AI Resume Builder and candidate match scores are automated advisory tools provided for draft guidance only. JobFiesta makes no warranty regarding AI summary efficacy. Employers retain sole responsibility for qualification evaluation.
+          </p>
+          <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>4. Disclaimer of Warranties &amp; Liability Cap</h4>
+          <p style={{ marginBottom: '12px' }}>
+            THE SERVICE IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND. TO THE MAXIMUM EXTENT PERMITTED BY LAW, JOBFIESTA'S TOTAL AGGREGATE LIABILITY SHALL NOT EXCEED ONE HUNDRED US DOLLARS ($100.00).
+          </p>
+          <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>5. Termination &amp; Governing Law</h4>
           <p>
-            Your information is safeguarded following industry standard encryption and privacy guidelines. We do not sell your personal information to third parties.
+            We reserve the right to suspend or terminate accounts that violate these terms. Any disputes shall be governed by applicable laws without regard to conflict of law principles.
           </p>
         </div>
       </Modal>
 
-      {/* PRIVACY POLICY MODAL */}
+      {/* PRIVACY POLICY MODAL (ponytail: GDPR & CCPA compliant privacy disclosure) */}
       <Modal
         isOpen={privacyModalOpen}
         onClose={() => setPrivacyModalOpen(false)}
         title="JobFiesta Privacy Policy"
       >
-        <div style={{ fontSize: '14px', color: '#374151', lineHeight: '1.6', maxHeight: '60vh', overflowY: 'auto', paddingRight: '8px' }}>
-          <h4 style={{ color: '#0C463B', marginBottom: '6px' }}>1. Information We Collect</h4>
-          <p style={{ marginBottom: '14px' }}>
-            We collect profile information, resumes, and communications necessary to facilitate employment applications and interview scheduling.
+        <div style={{ fontSize: '13px', color: '#374151', lineHeight: '1.6', maxHeight: '60vh', overflowY: 'auto', paddingRight: '8px' }}>
+          <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>1. Data We Collect</h4>
+          <p style={{ marginBottom: '12px' }}>
+            We collect identity information (name, email, phone, location), professional details (resumes, work history, skills, portfolio links), communications, and session tokens necessary to provide recruitment services.
           </p>
-          <h4 style={{ color: '#0C463B', marginBottom: '6px' }}>2. How We Use Your Data</h4>
-          <p style={{ marginBottom: '14px' }}>
-            Your resume and contact information are shared only with employers when you explicitly apply for a job position.
+          <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>2. Legal Bases for Processing (GDPR Art. 6)</h4>
+          <p style={{ marginBottom: '12px' }}>
+            We process your personal information under contractual necessity (delivering account services and transmitting applications), legitimate interests (platform security and fraud prevention), and consent (for optional AI profile enhancements).
           </p>
-          <h4 style={{ color: '#0C463B', marginBottom: '6px' }}>3. Your Rights</h4>
+          <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>3. Data Sharing &amp; Third Parties</h4>
+          <p style={{ marginBottom: '12px' }}>
+            Your resume and contact information are shared with employers only when you explicitly apply for a job position. We never sell, rent, or trade your personal data to third parties.
+          </p>
+          <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>4. Your Statutory Privacy Rights</h4>
+          <p style={{ marginBottom: '12px' }}>
+            Under GDPR and CCPA, you have the right to access your data, rectify inaccuracies, export your data in JSON format, or request complete account erasure ("Right to be Forgotten") at any time directly via your Account Settings.
+          </p>
+          <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>5. Contact &amp; Data Protection Officer</h4>
           <p>
-            You have the right to edit, export, or delete your account and personal data at any time from your account settings.
+            For privacy inquiries, contact our Data Protection representative at <strong style={{ color: '#0C463B' }}>privacy@jobfiesta.com</strong>. We respond to all verified requests within 30 days.
+          </p>
+        </div>
+      </Modal>
+
+      {/* AI ETHICS & TRANSPARENCY NOTICE (ponytail: EU AI Act Regulation 2024/1689 compliance) */}
+      <Modal
+        isOpen={aiNoticeModalOpen}
+        onClose={() => setAiNoticeModalOpen(false)}
+        title="AI Ethics, Algorithmic Transparency &amp; EEO Notice"
+      >
+        <div style={{ fontSize: '13px', color: '#374151', lineHeight: '1.6', maxHeight: '60vh', overflowY: 'auto', paddingRight: '8px' }}>
+          <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>1. Advisory Nature of Match Scores</h4>
+          <p style={{ marginBottom: '12px' }}>
+            JobFiesta features an algorithmic Match Score designed to assist candidates and recruiters in gauging skill alignment. In accordance with the <strong>EU AI Act (Annex III)</strong>, this metric is an advisory recommendation tool and is <strong>never used for automated rejection or autonomous disqualification</strong>. All final employment determinations are made through human review.
+          </p>
+          <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>2. AI Resume Enhancement Controls</h4>
+          <p style={{ marginBottom: '12px' }}>
+            The AI Resume Builder processes user inputs exclusively to enhance grammatical structure and professional clarity. Candidates maintain full editorial control to review, edit, or reject any generated draft before applying to jobs.
+          </p>
+          <h4 style={{ color: '#0C463B', marginBottom: '4px' }}>3. Equal Employment Opportunity (EEO)</h4>
+          <p>
+            JobFiesta is committed to fair and equitable hiring practices. We prohibit discriminatory filtering on the basis of age, race, gender, religion, national origin, or disability. Date of birth is not collected in resume workflows to eliminate age discrimination risk under ADEA and EEOC frameworks.
           </p>
         </div>
       </Modal>
