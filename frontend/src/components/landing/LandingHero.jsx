@@ -102,8 +102,19 @@ const LandingHero = ({ keyword, setKeyword, onSearchSubmit, onQuickSearch }) => 
               fontSize: 'clamp(16px, 2.5vw, 22px)', 
               fontWeight: '600', 
               cursor: 'pointer',
-              transition: 'opacity 0.2s ease',
+              boxShadow: '0 2px 10px rgba(12, 70, 59, 0.2)',
+              transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1)',
               flexShrink: 0
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#08342c';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(12, 70, 59, 0.32)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#0C463B';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 10px rgba(12, 70, 59, 0.2)';
             }}
           >
             Search
@@ -120,14 +131,27 @@ const LandingHero = ({ keyword, setKeyword, onSearchSubmit, onQuickSearch }) => 
               onClick={() => onQuickSearch(chip)}
               style={{
                 fontSize: '12px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                border: '1px solid rgba(12, 70, 59, 0.15)',
+                backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                border: '1px solid rgba(12, 70, 59, 0.18)',
                 borderRadius: '20px',
-                padding: '3px 12px',
+                padding: '4px 14px',
                 color: '#0C463B',
                 cursor: 'pointer',
                 fontFamily: 'Inter, sans-serif',
-                transition: 'background-color 0.15s ease'
+                boxShadow: '0 1px 4px rgba(0, 0, 0, 0.03)',
+                transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#F2FFF2';
+                e.currentTarget.style.borderColor = '#0C463B';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(12, 70, 59, 0.12)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.85)';
+                e.currentTarget.style.borderColor = 'rgba(12, 70, 59, 0.18)';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 1px 4px rgba(0, 0, 0, 0.03)';
               }}
             >
               {chip}

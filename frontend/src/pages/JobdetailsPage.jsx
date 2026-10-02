@@ -84,7 +84,17 @@ const JobdetailsPage = () => {
         <div className="container" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', color: '#64748B' }}>
           <button 
             onClick={() => navigate(-1)} 
-            style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#0C463B', fontWeight: '600', cursor: 'pointer' }}
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '4px', 
+              color: '#0C463B', 
+              fontWeight: '600', 
+              cursor: 'pointer',
+              transition: 'transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateX(-3px)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateX(0)'}
           >
             <ArrowLeft size={16} /> Back
           </button>
@@ -323,10 +333,24 @@ const JobdetailsPage = () => {
                     borderRadius: '10px',
                     backgroundColor: '#0C463B',
                     color: '#FFFFFF',
+                    border: '1px solid #0C463B',
                     fontWeight: '700',
                     fontSize: '0.98rem',
-                    boxShadow: 'var(--shadow-md)',
-                    transition: 'var(--transition)'
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 14px rgba(12, 70, 59, 0.22)',
+                    transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#08342c';
+                    e.currentTarget.style.borderColor = '#08342c';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(12, 70, 59, 0.32)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#0C463B';
+                    e.currentTarget.style.borderColor = '#0C463B';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 70, 59, 0.22)';
                   }}
                 >
                   Apply Now

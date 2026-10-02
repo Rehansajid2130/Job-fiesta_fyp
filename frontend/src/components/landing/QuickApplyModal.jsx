@@ -55,10 +55,17 @@ const QuickApplyModal = ({
       {selectedJob && (
         <div>
           {applySuccess ? (
-            <div style={{ padding: '24px', textAlign: 'center', color: '#0C463B' }}>
-              <div style={{ fontSize: '48px', marginBottom: '12px' }}>✓</div>
-              <h3 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '8px' }}>Application Submitted!</h3>
-              <p style={{ color: '#6B7280', fontSize: '14px' }}>{applySuccess}</p>
+            <div style={{ padding: '32px 24px', textAlign: 'center', color: '#0C463B' }}>
+              <div style={{ marginBottom: '16px' }}>
+                <span className="t-success-check">
+                  <svg width="56" height="56" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="22" fill="#EBF8F4" stroke="#0C463B" strokeWidth="2.5" />
+                    <path d="M14 24L21 31L34 17" stroke="#0C463B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+              </div>
+              <h3 style={{ fontSize: '20px', fontWeight: '700', color: '#0C463B', marginBottom: '8px' }}>Application Submitted!</h3>
+              <p style={{ color: '#64748B', fontSize: '14px' }}>{applySuccess}</p>
             </div>
           ) : (
             <form onSubmit={handleApplySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -168,7 +175,19 @@ const QuickApplyModal = ({
                     backgroundColor: '#FFFFFF',
                     color: '#4B5563',
                     fontWeight: '600',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                    transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#F8FAFC';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#FFFFFF';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.04)';
                   }}
                 >
                   Cancel
@@ -178,11 +197,25 @@ const QuickApplyModal = ({
                   style={{
                     padding: '10px 24px',
                     borderRadius: '50px',
-                    border: 'none',
+                    border: '1px solid #0C463B',
                     backgroundColor: '#0C463B',
                     color: '#FFFFFF',
                     fontWeight: '600',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(12, 70, 59, 0.18)',
+                    transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#08342c';
+                    e.currentTarget.style.borderColor = '#08342c';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 6px 18px rgba(12, 70, 59, 0.28)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#0C463B';
+                    e.currentTarget.style.borderColor = '#0C463B';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(12, 70, 59, 0.18)';
                   }}
                 >
                   Confirm &amp; Submit Application

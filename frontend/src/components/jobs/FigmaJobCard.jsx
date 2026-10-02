@@ -35,18 +35,17 @@ const FigmaJobCard = ({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
+        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
         fontFamily: 'Inter, sans-serif'
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-4px)';
         e.currentTarget.style.boxShadow = '0 12px 30px rgba(0, 0, 0, 0.08)';
-        e.currentTarget.style.borderColor = '#0C463B';
+        // ponytail: removed dark/black hover border as requested
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = 'translateY(0)';
         e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.04)';
-        e.currentTarget.style.borderColor = '#ECECEC';
       }}
     >
       <div>
@@ -139,20 +138,23 @@ const FigmaJobCard = ({
 
         {/* Applicants Avatar Pile */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '22px' }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div className="t-avatar-group" style={{ display: 'flex', alignItems: 'center' }}>
             <img
               src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&h=60&fit=crop"
               alt="Applicant"
+              className="t-avatar"
               style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid #FFFFFF', objectFit: 'cover' }}
             />
             <img
               src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop"
               alt="Applicant"
+              className="t-avatar"
               style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid #FFFFFF', marginLeft: '-8px', objectFit: 'cover' }}
             />
             <img
               src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&h=60&fit=crop"
               alt="Applicant"
+              className="t-avatar"
               style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid #FFFFFF', marginLeft: '-8px', objectFit: 'cover' }}
             />
           </div>
@@ -177,15 +179,20 @@ const FigmaJobCard = ({
             fontWeight: '600',
             cursor: 'pointer',
             textAlign: 'center',
-            transition: 'all 0.15s ease'
+            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
+            transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = '#0D473B';
             e.currentTarget.style.color = '#FFFFFF';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = '0 6px 16px rgba(13, 71, 59, 0.22)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = '#FFFFFF';
             e.currentTarget.style.color = '#0D473B';
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.03)';
           }}
         >
           View details
@@ -216,18 +223,28 @@ const FigmaJobCard = ({
             style={{
               backgroundColor: '#0D473B',
               color: '#FFFFFF',
-              border: 'none',
+              border: '1px solid #0D473B',
               borderRadius: '50px',
               padding: '8px 16px',
               fontSize: '13.5px',
               fontWeight: '600',
               cursor: 'pointer',
               textAlign: 'center',
-              boxShadow: 'none',
-              transition: 'background-color 0.15s ease'
+              boxShadow: '0 2px 8px rgba(13, 71, 59, 0.18)',
+              transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#092F27'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0D473B'}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#08342c';
+              e.currentTarget.style.borderColor = '#08342c';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 6px 18px rgba(13, 71, 59, 0.28)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#0D473B';
+              e.currentTarget.style.borderColor = '#0D473B';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(13, 71, 59, 0.18)';
+            }}
           >
             Apply now
           </button>

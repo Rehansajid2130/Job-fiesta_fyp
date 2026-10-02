@@ -132,42 +132,44 @@ const JobFilterSidebar = ({
           />
         </button>
 
-        {openSections.salary && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '10px' }}>
-            <input
-              type="number"
-              placeholder="Min"
-              value={filters.minSalary || ''}
-              onChange={(e) => setFilters(prev => ({ ...prev, minSalary: e.target.value ? Number(e.target.value) : 0 }))}
-              style={{
-                width: '100%',
-                padding: '9px 12px',
-                borderRadius: '8px',
-                border: '1px solid #E5E7EB',
-                fontSize: '13px',
-                color: '#111827',
-                outline: 'none',
-                backgroundColor: '#FFFFFF'
-              }}
-            />
-            <input
-              type="number"
-              placeholder="Max"
-              value={filters.maxSalary || ''}
-              onChange={(e) => setFilters(prev => ({ ...prev, maxSalary: e.target.value ? Number(e.target.value) : 0 }))}
-              style={{
-                width: '100%',
-                padding: '9px 12px',
-                borderRadius: '8px',
-                border: '1px solid #E5E7EB',
-                fontSize: '13px',
-                color: '#111827',
-                outline: 'none',
-                backgroundColor: '#FFFFFF'
-              }}
-            />
+        <div className="t-acc-panel" data-open={openSections.salary ? "true" : "false"}>
+          <div className="t-acc-panel-inner">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', paddingTop: '10px' }}>
+              <input
+                type="number"
+                placeholder="Min"
+                value={filters.minSalary || ''}
+                onChange={(e) => setFilters(prev => ({ ...prev, minSalary: e.target.value ? Number(e.target.value) : 0 }))}
+                style={{
+                  width: '100%',
+                  padding: '9px 12px',
+                  borderRadius: '8px',
+                  border: '1px solid #E5E7EB',
+                  fontSize: '13px',
+                  color: '#111827',
+                  outline: 'none',
+                  backgroundColor: '#FFFFFF'
+                }}
+              />
+              <input
+                type="number"
+                placeholder="Max"
+                value={filters.maxSalary || ''}
+                onChange={(e) => setFilters(prev => ({ ...prev, maxSalary: e.target.value ? Number(e.target.value) : 0 }))}
+                style={{
+                  width: '100%',
+                  padding: '9px 12px',
+                  borderRadius: '8px',
+                  border: '1px solid #E5E7EB',
+                  fontSize: '13px',
+                  color: '#111827',
+                  outline: 'none',
+                  backgroundColor: '#FFFFFF'
+                }}
+              />
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
       <div style={{ height: '1px', backgroundColor: '#EAEAEA', margin: '14px 0' }} />
@@ -200,46 +202,48 @@ const JobFilterSidebar = ({
           />
         </button>
 
-        {openSections.jobType && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px' }}>
-            {[
-              { id: 'all', label: 'All', count: 2567 },
-              { id: 'Full-Time', label: 'Full-Time', count: 450 },
-              { id: 'Part-Time', label: 'Part-Time', count: 145 },
-              { id: 'Internship', label: 'Internship', count: 85 },
-              { id: 'Contract', label: 'Contract', count: 12 }
-            ].map(item => {
-              const isChecked = filters.type === item.id || (item.id === 'all' && (!filters.type || filters.type === 'all'));
-              return (
-                <label 
-                  key={item.id} 
-                  style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '10px', 
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    color: isChecked ? '#0D473B' : '#4B5563',
-                    fontWeight: isChecked ? '600' : '400'
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={isChecked}
-                    onChange={() => handleJobTypeChange(item.id)}
-                    style={{
-                      width: '16px',
-                      height: '16px',
-                      accentColor: '#0D473B',
-                      cursor: 'pointer'
+        <div className="t-acc-panel" data-open={openSections.jobType ? "true" : "false"}>
+          <div className="t-acc-panel-inner">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '10px' }}>
+              {[
+                { id: 'all', label: 'All', count: 2567 },
+                { id: 'Full-Time', label: 'Full-Time', count: 450 },
+                { id: 'Part-Time', label: 'Part-Time', count: 145 },
+                { id: 'Internship', label: 'Internship', count: 85 },
+                { id: 'Contract', label: 'Contract', count: 12 }
+              ].map(item => {
+                const isChecked = filters.type === item.id || (item.id === 'all' && (!filters.type || filters.type === 'all'));
+                return (
+                  <label 
+                    key={item.id} 
+                    style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '10px', 
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      color: isChecked ? '#0D473B' : '#4B5563',
+                      fontWeight: isChecked ? '600' : '400'
                     }}
-                  />
-                  <span>{item.label} ({item.count})</span>
-                </label>
-              );
-            })}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => handleJobTypeChange(item.id)}
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        accentColor: '#0D473B',
+                        cursor: 'pointer'
+                      }}
+                    />
+                    <span>{item.label} ({item.count})</span>
+                  </label>
+                );
+              })}
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
       <div style={{ height: '1px', backgroundColor: '#EAEAEA', margin: '14px 0' }} />
@@ -272,44 +276,46 @@ const JobFilterSidebar = ({
           />
         </button>
 
-        {openSections.workMode && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px' }}>
-            {[
-              { id: 'on-site', label: 'On-Site', count: '' },
-              { id: 'remote', label: 'Remote', count: '180' },
-              { id: 'hybrid', label: 'Hybrid', count: '200' }
-            ].map(item => {
-              const isChecked = filters.workMode === item.id;
-              return (
-                <label 
-                  key={item.id} 
-                  style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '10px', 
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    color: isChecked ? '#0D473B' : '#4B5563',
-                    fontWeight: isChecked ? '600' : '400'
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={isChecked}
-                    onChange={() => handleWorkModeChange(item.id)}
-                    style={{
-                      width: '16px',
-                      height: '16px',
-                      accentColor: '#0D473B',
-                      cursor: 'pointer'
+        <div className="t-acc-panel" data-open={openSections.workMode ? "true" : "false"}>
+          <div className="t-acc-panel-inner">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '10px' }}>
+              {[
+                { id: 'on-site', label: 'On-Site', count: '' },
+                { id: 'remote', label: 'Remote', count: '180' },
+                { id: 'hybrid', label: 'Hybrid', count: '200' }
+              ].map(item => {
+                const isChecked = filters.workMode === item.id;
+                return (
+                  <label 
+                    key={item.id} 
+                    style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '10px', 
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      color: isChecked ? '#0D473B' : '#4B5563',
+                      fontWeight: isChecked ? '600' : '400'
                     }}
-                  />
-                  <span>{item.label} {item.count ? `(${item.count})` : ''}</span>
-                </label>
-              );
-            })}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => handleWorkModeChange(item.id)}
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        accentColor: '#0D473B',
+                        cursor: 'pointer'
+                      }}
+                    />
+                    <span>{item.label} {item.count ? `(${item.count})` : ''}</span>
+                  </label>
+                );
+              })}
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
       <div style={{ height: '1px', backgroundColor: '#EAEAEA', margin: '14px 0' }} />
@@ -342,47 +348,49 @@ const JobFilterSidebar = ({
           />
         </button>
 
-        {openSections.experience && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px' }}>
-            {[
-              { id: 'entry', label: 'Fresher/Entry-Level', count: 265 },
-              { id: 'junior', label: 'Junior', count: 21 },
-              { id: 'mid', label: 'Mid-Level', count: 212 },
-              { id: 'senior', label: 'Senior', count: 12 },
-              { id: 'lead', label: 'Lead/Managerial', count: 24 },
-              { id: 'executive', label: 'Director/Executive', count: 10 }
-            ].map(item => {
-              const isChecked = filters.experience === item.id;
-              return (
-                <label 
-                  key={item.id} 
-                  style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '10px', 
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    color: isChecked ? '#0D473B' : '#4B5563',
-                    fontWeight: isChecked ? '600' : '400'
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={isChecked}
-                    onChange={() => handleExperienceChange(item.id)}
-                    style={{
-                      width: '16px',
-                      height: '16px',
-                      accentColor: '#0D473B',
-                      cursor: 'pointer'
+        <div className="t-acc-panel" data-open={openSections.experience ? "true" : "false"}>
+          <div className="t-acc-panel-inner">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '10px' }}>
+              {[
+                { id: 'entry', label: 'Fresher/Entry-Level', count: 265 },
+                { id: 'junior', label: 'Junior', count: 21 },
+                { id: 'mid', label: 'Mid-Level', count: 212 },
+                { id: 'senior', label: 'Senior', count: 12 },
+                { id: 'lead', label: 'Lead/Managerial', count: 24 },
+                { id: 'executive', label: 'Director/Executive', count: 10 }
+              ].map(item => {
+                const isChecked = filters.experience === item.id;
+                return (
+                  <label 
+                    key={item.id} 
+                    style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '10px', 
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      color: isChecked ? '#0D473B' : '#4B5563',
+                      fontWeight: isChecked ? '600' : '400'
                     }}
-                  />
-                  <span>{item.label} ({item.count})</span>
-                </label>
-              );
-            })}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => handleExperienceChange(item.id)}
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        accentColor: '#0D473B',
+                        cursor: 'pointer'
+                      }}
+                    />
+                    <span>{item.label} ({item.count})</span>
+                  </label>
+                );
+              })}
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
       <div style={{ height: '1px', backgroundColor: '#EAEAEA', margin: '14px 0' }} />

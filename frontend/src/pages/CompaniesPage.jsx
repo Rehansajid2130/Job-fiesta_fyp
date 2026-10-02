@@ -111,26 +111,50 @@ const CompaniesPage = () => {
               </div>
 
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                {industries.map(ind => (
-                  <button
-                    key={ind.id}
-                    type="button"
-                    onClick={() => setSelectedIndustry(ind.id)}
-                    style={{
-                      padding: '8px 14px',
-                      borderRadius: '8px',
-                      fontSize: '0.84rem',
-                      fontWeight: selectedIndustry === ind.id ? '700' : '500',
-                      border: selectedIndustry === ind.id ? '1px solid #0C463B' : '1px solid #E2E8F0',
-                      backgroundColor: selectedIndustry === ind.id ? '#EBF8F4' : '#FFFFFF',
-                      color: selectedIndustry === ind.id ? '#0C463B' : '#475569',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease'
-                    }}
-                  >
-                    {ind.name}
-                  </button>
-                ))}
+                {industries.map(ind => {
+                  const isSelected = selectedIndustry === ind.id;
+                  return (
+                    <button
+                      key={ind.id}
+                      type="button"
+                      onClick={() => setSelectedIndustry(ind.id)}
+                      aria-pressed={isSelected}
+                      style={{
+                        padding: '8px 16px',
+                        borderRadius: '8px',
+                        fontSize: '0.86rem',
+                        fontWeight: isSelected ? '700' : '500',
+                        border: '1px solid',
+                        borderColor: isSelected ? '#0C463B' : '#E2E8F0',
+                        backgroundColor: isSelected ? '#EBF8F4' : '#FFFFFF',
+                        color: isSelected ? '#0C463B' : '#475569',
+                        cursor: 'pointer',
+                        boxShadow: isSelected 
+                          ? '0 2px 8px rgba(12, 70, 59, 0.12)' 
+                          : '0 1px 3px rgba(0, 0, 0, 0.03)',
+                        transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isSelected) {
+                          e.currentTarget.style.backgroundColor = '#F8FAF9';
+                          e.currentTarget.style.borderColor = '#CBD5E1';
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.06)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isSelected) {
+                          e.currentTarget.style.backgroundColor = '#FFFFFF';
+                          e.currentTarget.style.borderColor = '#E2E8F0';
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.03)';
+                        }
+                      }}
+                    >
+                      {ind.name}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>

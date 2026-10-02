@@ -271,7 +271,16 @@ const Navbar = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease'
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                    transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.04)';
                   }}
                 >
                   <Bell size={18} />
@@ -582,20 +591,25 @@ const Navbar = () => {
                       fontSize: '0.9rem',
                       fontWeight: '600',
                       color: '#0C463B',
-                      padding: '8px 16px',
+                      padding: '8px 18px',
                       borderRadius: '50px',
                       border: '1px solid #E2E8F0',
                       backgroundColor: '#FFFFFF',
                       textDecoration: 'none',
-                      transition: 'all 0.2s ease'
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                      transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.borderColor = '#0C463B';
                       e.currentTarget.style.backgroundColor = '#F2FFF2';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(12, 70, 59, 0.12)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.borderColor = '#E2E8F0';
                       e.currentTarget.style.backgroundColor = '#FFFFFF';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.04)';
                     }}
                   >
                     Log In
@@ -609,13 +623,25 @@ const Navbar = () => {
                       padding: '9px 20px',
                       backgroundColor: '#0C463B',
                       color: '#FFFFFF',
+                      border: '1px solid #0C463B',
                       borderRadius: '50px',
                       textDecoration: 'none',
-                      transition: 'all 0.2s ease',
-                      display: 'inline-block'
+                      display: 'inline-block',
+                      boxShadow: '0 2px 8px rgba(12, 70, 59, 0.2)',
+                      transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#08342c'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0C463B'}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#08342c';
+                      e.currentTarget.style.borderColor = '#08342c';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 18px rgba(12, 70, 59, 0.3)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#0C463B';
+                      e.currentTarget.style.borderColor = '#0C463B';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(12, 70, 59, 0.2)';
+                    }}
                   >
                     Sign Up
                   </Link>

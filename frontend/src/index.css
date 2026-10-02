@@ -67,6 +67,33 @@
   --toast-blur: 2px;
   --toast-scale: 0.97;
   --toast-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* ── transitions-dev: Avatar group hover motion tokens (11) ─── */
+  --avatar-dur: 280ms;
+  --avatar-ease-in: cubic-bezier(0.22, 1, 0.36, 1);
+  --avatar-ease-out: cubic-bezier(0.34, 3.85, 0.64, 1);
+
+  /* ── transitions-dev: Skeleton loader motion tokens (14) ────── */
+  --pulse-dur: 1400ms;
+  --reveal-dur: 340ms;
+  --reveal-blur: 3px;
+  --reveal-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── transitions-dev: Accordion motion tokens (21) ──────────── */
+  --acc-expand: 260ms;
+  --acc-collapse: 220ms;
+  --acc-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* ── transitions-dev: Success check motion tokens (10) ──────── */
+  --check-opacity-dur: 400ms;
+  --check-rotate-dur: 450ms;
+  --check-bob-dur: 450ms;
+  --check-path-dur: 450ms;
+
+  /* ── transitions-dev: Error shake motion tokens (12) ────────── */
+  --shake-distance: 6px;
+  --shake-overshoot: 3px;
+  --shake-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -251,6 +278,142 @@
   .t-icon-swap .t-icon { transition: none !important; }
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   transitions-dev: 11-avatar-group-hover
+   Fans out avatar cluster with distance-falloff and bouncy return
+   ══════════════════════════════════════════════════════════════════ */
+.t-avatar-group {
+  display: inline-flex;
+  align-items: center;
+}
+.t-avatar {
+  transform-origin: center;
+  transition: transform var(--avatar-dur) var(--avatar-ease-in), z-index 0.1s ease;
+  will-change: transform;
+}
+.t-avatar:hover {
+  transform: translateY(-3px) scale(1.15) !important;
+  z-index: 10 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18) !important;
+}
+.t-avatar-group:hover .t-avatar:not(:hover) {
+  transform: translateX(2px);
+  transition-timing-function: var(--avatar-ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-avatar, .t-avatar-group:hover .t-avatar { transition: none !important; transform: none !important; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   transitions-dev: 14-skeleton-reveal
+   Cross-fades pulsing placeholder cards into live content
+   ══════════════════════════════════════════════════════════════════ */
+.t-skel-card {
+  background-color: #FFFFFF;
+  border-radius: 16px;
+  border: 1px solid #ECECEC;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+.t-skel-shimmer-bar {
+  background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
+  background-size: 200% 100%;
+  animation: t-skel-pulse var(--pulse-dur) ease-in-out infinite;
+  border-radius: 6px;
+}
+@keyframes t-skel-pulse {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-skel-shimmer-bar { animation: none !important; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   transitions-dev: 21-accordion
+   Height animation via grid-template-rows: 0fr ↔ 1fr
+   ══════════════════════════════════════════════════════════════════ */
+.t-acc-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--acc-collapse) var(--acc-ease);
+}
+.t-acc-panel[data-open="true"] {
+  grid-template-rows: 1fr;
+  transition: grid-template-rows var(--acc-expand) var(--acc-ease);
+}
+.t-acc-panel-inner {
+  overflow: hidden;
+  opacity: 0;
+  filter: blur(2px);
+  transition:
+    opacity var(--acc-collapse) var(--acc-ease),
+    filter var(--acc-collapse) var(--acc-ease);
+}
+.t-acc-panel[data-open="true"] .t-acc-panel-inner {
+  opacity: 1;
+  filter: blur(0);
+  transition:
+    opacity var(--acc-expand) var(--acc-ease),
+    filter var(--acc-expand) var(--acc-ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-acc-panel, .t-acc-panel-inner { transition: none !important; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   transitions-dev: 10-success-check
+   Fade + rotate + Y-bob + stroke-draw on action completion
+   ══════════════════════════════════════════════════════════════════ */
+.t-success-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center;
+  will-change: transform, opacity, filter;
+  animation:
+    t-check-fade   var(--check-opacity-dur) cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    t-check-rotate var(--check-rotate-dur)  cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    t-check-bob    var(--check-bob-dur)     cubic-bezier(0.34, 1.35, 0.64, 1) forwards;
+}
+.t-success-check svg {
+  display: block;
+  overflow: visible;
+}
+@keyframes t-check-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes t-check-rotate {
+  from { transform: rotate(35deg); }
+  to   { transform: rotate(0deg); }
+}
+@keyframes t-check-bob {
+  from { transform: translateY(10px) scale(0.88); }
+  to   { transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-success-check { animation: none !important; opacity: 1; transform: none !important; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   transitions-dev: 12-error-state-shake
+   Multi-segment keyframe with overshoot shake on invalid state
+   ══════════════════════════════════════════════════════════════════ */
+.t-shake-error {
+  animation: t-input-shake 280ms linear;
+  will-change: transform;
+}
+@keyframes t-input-shake {
+  0%     { transform: translateX(0); }
+  25%    { transform: translateX(calc(var(--shake-distance) * -1)); }
+  50%    { transform: translateX(var(--shake-distance)); }
+  75%    { transform: translateX(calc(var(--shake-overshoot) * -1)); }
+  100%   { transform: translateX(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-shake-error { animation: none !important; transform: none !important; }
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -309,12 +472,129 @@ a {
   text-decoration: none;
 }
 
+/* ponytail: Standard button styling with signature viscous cubic-bezier transition */
 button {
   font-family: inherit;
   cursor: pointer;
   border: none;
   outline: none;
   background: none;
+  transition: 
+    background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), 
+    color 280ms cubic-bezier(0.4, 0, 0.2, 1), 
+    border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), 
+    box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), 
+    transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.97) !important;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+/* Universal button design classes matching the short card feel & fluid color absorption */
+.btn-primary,
+button.btn-primary {
+  background-color: var(--primary);
+  color: #FFFFFF;
+  border: 1px solid var(--primary);
+  border-radius: 50px;
+  padding: 10px 22px;
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(12, 70, 59, 0.15);
+  cursor: pointer;
+  transition: 
+    background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), 
+    color 280ms cubic-bezier(0.4, 0, 0.2, 1), 
+    border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), 
+    box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), 
+    transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary:hover:not(:disabled),
+button.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(12, 70, 59, 0.28);
+}
+
+.btn-secondary,
+button.btn-secondary {
+  background-color: #FFFFFF;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+  border-radius: 50px;
+  padding: 10px 22px;
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: 
+    background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), 
+    color 280ms cubic-bezier(0.4, 0, 0.2, 1), 
+    border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), 
+    box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), 
+    transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-secondary:hover:not(:disabled),
+button.btn-secondary:hover:not(:disabled) {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(12, 70, 59, 0.22);
+}
+
+.btn-chip {
+  background-color: #FFFFFF;
+  color: #1E293B;
+  border: 1px solid #ECECEC;
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: 
+    background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), 
+    color 280ms cubic-bezier(0.4, 0, 0.2, 1), 
+    border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), 
+    box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), 
+    transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-chip:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.07);
+}
+
+.btn-chip.is-active,
+.btn-chip[aria-pressed="true"] {
+  background-color: var(--primary) !important;
+  color: #FFFFFF !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 4px 14px rgba(12, 70, 59, 0.22) !important;
+  font-weight: 600;
 }
 
 /* ponytail: Global standard input styling ensuring email, text, and password fields are styled consistently everywhere */

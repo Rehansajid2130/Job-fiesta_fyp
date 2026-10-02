@@ -200,18 +200,21 @@ const Loginpage = () => {
 
             {/* Error Message if any */}
             {errorMsg && (
-              <div style={{
-                backgroundColor: '#FEF2F2',
-                border: '1px solid #FCA5A5',
-                borderRadius: '8px',
-                padding: '10px 14px',
-                color: '#B91C1C',
-                fontSize: '13px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                marginBottom: '16px'
-              }}>
+              <div 
+                className="t-shake-error"
+                style={{
+                  backgroundColor: '#FEF2F2',
+                  border: '1px solid #FCA5A5',
+                  borderRadius: '8px',
+                  padding: '10px 14px',
+                  color: '#B91C1C',
+                  fontSize: '13px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  marginBottom: '16px'
+                }}
+              >
                 <AlertCircle size={16} />
                 <span>{errorMsg}</span>
               </div>

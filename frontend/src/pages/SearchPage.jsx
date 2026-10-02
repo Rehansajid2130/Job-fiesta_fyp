@@ -16,7 +16,14 @@ import {
   Send, 
   Briefcase,
   ChevronDown,
-  Loader2
+  Loader2,
+  Code,
+  Palette,
+  TrendingUp,
+  Cpu,
+  DollarSign,
+  Users,
+  Wrench
 } from 'lucide-react';
 
 
@@ -107,6 +114,30 @@ const SearchPage = () => {
     setLocationInput('');
     setSelectedSort('popular');
     setSearchParams(new URLSearchParams());
+  };
+
+  // ponytail: Category chips configured as short job cards for quick access
+  const searchCategories = [
+    { id: 'all', name: 'All Jobs', icon: Briefcase },
+    { id: 'tech', name: 'Software & Tech', icon: Code },
+    { id: 'design', name: 'UI / UX Design', icon: Palette },
+    { id: 'marketing', name: 'Marketing', icon: TrendingUp },
+    { id: 'ai', name: 'AI & Data Science', icon: Cpu },
+    { id: 'finance', name: 'Finance & Banking', icon: DollarSign },
+    { id: 'engineering', name: 'Engineering', icon: Wrench },
+    { id: 'sales', name: 'Sales & Support', icon: Users }
+  ];
+
+  const handleCategorySelect = (catId) => {
+    const nextCategory = (filters.category === catId && catId !== 'all') ? 'all' : catId;
+    setFilters(prev => ({ ...prev, category: nextCategory }));
+    const newParams = new URLSearchParams(searchParams);
+    if (nextCategory && nextCategory !== 'all') {
+      newParams.set('category', nextCategory);
+    } else {
+      newParams.delete('category');
+    }
+    setSearchParams(newParams);
   };
 
   // Fetch live jobs from backend API whenever search/filter criteria change
@@ -359,21 +390,115 @@ const SearchPage = () => {
               style={{
                 backgroundColor: '#0D473B',
                 color: '#FFFFFF',
-                border: 'none',
+                border: '1px solid #0D473B',
                 borderRadius: '9999px',
                 padding: '11px 28px',
                 fontSize: '14px',
                 fontWeight: '600',
                 cursor: 'pointer',
-                transition: 'background-color 0.15s ease',
-                boxShadow: 'none'
+                boxShadow: '0 2px 8px rgba(13, 71, 59, 0.18)',
+                transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1)'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#092F27'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0D473B'}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#08342c';
+                e.currentTarget.style.borderColor = '#08342c';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 18px rgba(13, 71, 59, 0.28)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#0D473B';
+                e.currentTarget.style.borderColor = '#0D473B';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(13, 71, 59, 0.18)';
+              }}
             >
               Search
             </button>
           </form>
+
+          {/* Quick Category Search - Short Job Card Style with Smooth Viscous Color Transition */}
+          <div 
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+              gap: '10px',
+              marginTop: '20px',
+              maxWidth: '960px',
+              marginLeft: 'auto',
+              marginRight: 'auto'
+            }}
+            role="toolbar"
+            aria-label="Filter jobs by category"
+          >
+            {searchCategories.map((cat) => {
+              const IconComp = cat.icon;
+              const isSelected = (filters.category === cat.id) || (cat.id === 'all' && (!filters.category || filters.category === 'all'));
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => handleCategorySelect(cat.id)}
+                  aria-pressed={isSelected}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '8px 16px',
+                    backgroundColor: isSelected ? '#EBF8F4' : '#FFFFFF',
+                    color: isSelected ? '#0C463B' : '#475569',
+                    border: '1px solid',
+                    borderColor: isSelected ? '#0C463B' : '#E2E8F0',
+                    borderRadius: '8px',
+                    boxShadow: isSelected 
+                      ? '0 2px 8px rgba(12, 70, 59, 0.12)' 
+                      : '0 1px 3px rgba(0, 0, 0, 0.03)',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    fontWeight: isSelected ? '700' : '500',
+                    fontFamily: 'Inter, sans-serif',
+                    /* ponytail: smooth viscous easing so departing button gradually drains color while new button absorbs mint tint */
+                    transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
+                    flexShrink: 0,
+                    userSelect: 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.backgroundColor = '#F8FAF9';
+                      e.currentTarget.style.borderColor = '#CBD5E1';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.06)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.backgroundColor = '#FFFFFF';
+                      e.currentTarget.style.borderColor = '#E2E8F0';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.03)';
+                    }
+                  }}
+                >
+                  <span style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '6px',
+                    backgroundColor: isSelected ? 'rgba(12, 70, 59, 0.12)' : '#F1F5F9',
+                    color: isSelected ? '#0C463B' : '#64748B',
+                    transition: 'background-color 320ms cubic-bezier(0.4, 0, 0.2, 1), color 320ms cubic-bezier(0.4, 0, 0.2, 1)',
+                    flexShrink: 0
+                  }}>
+                    <IconComp size={14} />
+                  </span>
+                  <span>{cat.name}</span>
+                </button>
+              );
+            })}
+          </div>
 
         </div>
       </section>
@@ -402,7 +527,17 @@ const SearchPage = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                marginBottom: '16px'
+                marginBottom: '16px',
+                cursor: 'pointer',
+                transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.07)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.04)';
               }}
             >
               <SlidersHorizontal size={18} />
@@ -538,21 +673,33 @@ const SearchPage = () => {
                 </div>
               </div>
 
-              {isLiveLoading && (
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '24px 0',
-                  gap: '8px',
-                  color: '#0D473B'
-                }}>
-                  <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />
-                  <span style={{ fontSize: '13.5px', fontWeight: '500' }}>Updating jobs...</span>
+              {isLiveLoading ? (
+                <div className="search-jobs-grid" style={{ marginBottom: '24px' }}>
+                  {[1, 2, 3, 4].map((n) => (
+                    <div key={n} className="t-skel-card">
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px' }}>
+                        <div className="t-skel-shimmer-bar" style={{ width: '58%', height: '20px' }} />
+                        <div className="t-skel-shimmer-bar" style={{ width: '22px', height: '22px', borderRadius: '4px' }} />
+                      </div>
+                      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                        <div className="t-skel-shimmer-bar" style={{ width: '65px', height: '20px', borderRadius: '4px' }} />
+                        <div className="t-skel-shimmer-bar" style={{ width: '120px', height: '20px', borderRadius: '4px' }} />
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+                        <div className="t-skel-shimmer-bar" style={{ width: '42px', height: '42px', borderRadius: '50%' }} />
+                        <div style={{ flex: 1 }}>
+                          <div className="t-skel-shimmer-bar" style={{ width: '100px', height: '14px', marginBottom: '6px' }} />
+                          <div className="t-skel-shimmer-bar" style={{ width: '70px', height: '12px' }} />
+                        </div>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: 'auto' }}>
+                        <div className="t-skel-shimmer-bar" style={{ height: '36px', borderRadius: '50px' }} />
+                        <div className="t-skel-shimmer-bar" style={{ height: '36px', borderRadius: '50px' }} />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              )}
-
-              {displayedJobs.length === 0 && !isLiveLoading ? (
+              ) : displayedJobs.length === 0 ? (
                 <div style={{
                   backgroundColor: '#FFFFFF',
                   borderRadius: '16px',
@@ -574,11 +721,25 @@ const SearchPage = () => {
                       padding: '10px 24px',
                       backgroundColor: '#0D473B',
                       color: '#FFFFFF',
-                      border: 'none',
+                      border: '1px solid #0D473B',
                       borderRadius: '9999px',
                       fontWeight: '600',
                       fontSize: '13px',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 8px rgba(13, 71, 59, 0.18)',
+                      transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#08342c';
+                      e.currentTarget.style.borderColor = '#08342c';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 18px rgba(13, 71, 59, 0.28)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#0D473B';
+                      e.currentTarget.style.borderColor = '#0D473B';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(13, 71, 59, 0.18)';
                     }}
                   >
                     Reset All Filters
@@ -768,7 +929,19 @@ const SearchPage = () => {
                       color: '#4B5563',
                       fontWeight: '600',
                       fontSize: '13px',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                      transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#F8FAFC';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#FFFFFF';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.04)';
                     }}
                   >
                     Cancel
@@ -778,7 +951,7 @@ const SearchPage = () => {
                     style={{
                       padding: '10px 24px',
                       borderRadius: '9999px',
-                      border: 'none',
+                      border: '1px solid #0D473B',
                       backgroundColor: '#0D473B',
                       color: '#FFFFFF',
                       fontWeight: '600',
@@ -786,7 +959,21 @@ const SearchPage = () => {
                       cursor: 'pointer',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '8px'
+                      gap: '8px',
+                      boxShadow: '0 2px 8px rgba(13, 71, 59, 0.18)',
+                      transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#08342c';
+                      e.currentTarget.style.borderColor = '#08342c';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 18px rgba(13, 71, 59, 0.28)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#0D473B';
+                      e.currentTarget.style.borderColor = '#0D473B';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(13, 71, 59, 0.18)';
                     }}
                   >
                     <Send size={15} />

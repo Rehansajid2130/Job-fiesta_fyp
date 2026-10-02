@@ -130,14 +130,27 @@ const FeaturedJobsSection = ({ featuredJobs, totalJobsCount, applications, onOpe
                     width: '100%',
                     backgroundColor: '#0C463B',
                     color: '#FFFFFF',
-                    border: 'none',
+                    border: '1px solid #0C463B',
                     borderRadius: '50px',
                     padding: '12px 0',
                     fontFamily: 'Inter, sans-serif',
                     fontSize: '16px',
                     fontWeight: '600',
                     cursor: 'pointer',
-                    transition: 'opacity 0.2s ease'
+                    boxShadow: '0 2px 8px rgba(12, 70, 59, 0.18)',
+                    transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#08342c';
+                    e.currentTarget.style.borderColor = '#08342c';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 6px 18px rgba(12, 70, 59, 0.28)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#0C463B';
+                    e.currentTarget.style.borderColor = '#0C463B';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(12, 70, 59, 0.18)';
                   }}
                 >
                   Apply Now
@@ -156,7 +169,20 @@ const FeaturedJobsSection = ({ featuredJobs, totalJobsCount, applications, onOpe
                     fontSize: '16px',
                     fontWeight: '600',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease'
+                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
+                    transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#0C463B';
+                    e.currentTarget.style.color = '#FFFFFF';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 6px 18px rgba(12, 70, 59, 0.22)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#FFFFFF';
+                    e.currentTarget.style.color = '#0C463B';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.03)';
                   }}
                 >
                   Apply Now
