@@ -54,22 +54,22 @@ const LandingHero = ({ keyword, setKeyword, onSearchSubmit, onQuickSearch }) => 
           style={{ 
             display: 'flex', 
             alignItems: 'center', 
-            backgroundColor: '#F2FFF2', 
-            borderRadius: '50px', 
-            boxShadow: '0 8px 30px rgba(0, 0, 0, 0.08)',
+            backgroundColor: '#FFFFFF', 
+            borderRadius: '9999px', 
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)',
             width: '100%',
-            maxWidth: '660px',
-            minHeight: '62px',
-            height: 'auto',
-            padding: '6px 8px 6px clamp(14px, 3vw, 26px)',
-            border: '1px solid rgba(12, 70, 59, 0.12)'
+            maxWidth: '560px',
+            height: '52px',
+            padding: '4px 5px 4px 18px',
+            border: '1px solid #E2E8F0',
+            boxSizing: 'border-box'
           }}
         >
           {/* Magnifying Glass Icon */}
           <img 
             src="/assets/Landingpageimages/interface__search_magnifying_glass.svg" 
             alt="Search" 
-            style={{ width: '22px', height: '22px', marginRight: '12px', opacity: 0.7, flexShrink: 0 }}
+            style={{ width: '18px', height: '18px', marginRight: '10px', opacity: 0.6, flexShrink: 0 }}
           />
           {/* Input */}
           <input 
@@ -83,7 +83,7 @@ const LandingHero = ({ keyword, setKeyword, onSearchSubmit, onQuickSearch }) => 
               background: 'transparent', 
               outline: 'none',
               fontFamily: 'Inter, sans-serif',
-              fontSize: 'clamp(15px, 2.4vw, 20px)', 
+              fontSize: '14.5px', 
               color: '#1E293B',
               minWidth: '60px'
             }}
@@ -93,28 +93,28 @@ const LandingHero = ({ keyword, setKeyword, onSearchSubmit, onQuickSearch }) => 
             type="submit" 
             style={{ 
               backgroundColor: '#0C463B', 
-              color: '#F2FFF2', 
+              color: '#FFFFFF', 
               border: 'none', 
-              borderRadius: '50px', 
-              height: 'clamp(48px, 6vw, 60px)', 
-              padding: '0 clamp(18px, 3vw, 36px)', 
+              borderRadius: '9999px', 
+              height: '42px', 
+              padding: '0 22px', 
               fontFamily: 'Inter, sans-serif',
-              fontSize: 'clamp(16px, 2.5vw, 22px)', 
+              fontSize: '14px', 
               fontWeight: '600', 
               cursor: 'pointer',
-              boxShadow: '0 2px 10px rgba(12, 70, 59, 0.2)',
+              boxShadow: '0 2px 6px rgba(12, 70, 59, 0.18)',
               transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1)',
               flexShrink: 0
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = '#08342c';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(12, 70, 59, 0.32)';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(12, 70, 59, 0.28)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = '#0C463B';
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 10px rgba(12, 70, 59, 0.2)';
+              e.currentTarget.style.boxShadow = '0 2px 6px rgba(12, 70, 59, 0.18)';
             }}
           >
             Search
@@ -123,7 +123,7 @@ const LandingHero = ({ keyword, setKeyword, onSearchSubmit, onQuickSearch }) => 
 
         {/* Quick Clickable Suggestions */}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '12px' }}>
-          <span style={{ fontSize: '13px', color: '#64748B', fontFamily: 'Inter, sans-serif' }}>Popular:</span>
+          <span style={{ fontSize: '13px', color: '#64748B', fontFamily: 'Inter, sans-serif', alignSelf: 'center' }}>Popular:</span>
           {['Product Manager', 'Software Engineer', 'Product Designer', 'Customer Support'].map((chip) => (
             <button
               key={chip}
@@ -131,27 +131,30 @@ const LandingHero = ({ keyword, setKeyword, onSearchSubmit, onQuickSearch }) => 
               onClick={() => onQuickSearch(chip)}
               style={{
                 fontSize: '12px',
-                backgroundColor: 'rgba(255, 255, 255, 0.85)',
-                border: '1px solid rgba(12, 70, 59, 0.18)',
-                borderRadius: '20px',
-                padding: '4px 14px',
-                color: '#0C463B',
+                fontWeight: '500',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E2E8F0',
+                borderRadius: '8px',
+                padding: '4px 12px',
+                color: '#475569',
                 cursor: 'pointer',
                 fontFamily: 'Inter, sans-serif',
-                boxShadow: '0 1px 4px rgba(0, 0, 0, 0.03)',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)',
                 transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#F2FFF2';
+                e.currentTarget.style.backgroundColor = '#EBF8F4';
+                e.currentTarget.style.color = '#0C463B';
                 e.currentTarget.style.borderColor = '#0C463B';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(12, 70, 59, 0.12)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 2px 6px rgba(12, 70, 59, 0.1)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.85)';
-                e.currentTarget.style.borderColor = 'rgba(12, 70, 59, 0.18)';
+                e.currentTarget.style.backgroundColor = '#FFFFFF';
+                e.currentTarget.style.color = '#475569';
+                e.currentTarget.style.borderColor = '#E2E8F0';
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 1px 4px rgba(0, 0, 0, 0.03)';
+                e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.02)';
               }}
             >
               {chip}
