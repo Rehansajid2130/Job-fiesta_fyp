@@ -592,24 +592,24 @@ const Navbar = () => {
                       fontWeight: '600',
                       color: '#0C463B',
                       padding: '8px 18px',
-                      borderRadius: '50px',
-                      border: '1px solid #E2E8F0',
-                      backgroundColor: '#FFFFFF',
+                      borderRadius: '8px',
+                      border: '1px solid #0C463B',
+                      backgroundColor: '#EBF8F4',
                       textDecoration: 'none',
-                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                      boxShadow: '0 1px 3px rgba(12, 70, 59, 0.08)',
                       transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = '#0C463B';
-                      e.currentTarget.style.backgroundColor = '#F2FFF2';
+                      e.currentTarget.style.backgroundColor = '#0C463B';
+                      e.currentTarget.style.color = '#FFFFFF';
                       e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(12, 70, 59, 0.12)';
+                      e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 70, 59, 0.22)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = '#E2E8F0';
-                      e.currentTarget.style.backgroundColor = '#FFFFFF';
+                      e.currentTarget.style.backgroundColor = '#EBF8F4';
+                      e.currentTarget.style.color = '#0C463B';
                       e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.04)';
+                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(12, 70, 59, 0.08)';
                     }}
                   >
                     Log In

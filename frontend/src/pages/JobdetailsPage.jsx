@@ -404,11 +404,26 @@ const JobdetailsPage = () => {
                   width: '100%',
                   padding: '9px',
                   borderRadius: '8px',
+                  border: '1px solid #0C463B',
                   backgroundColor: '#EBF8F4',
                   color: '#0C463B',
                   fontWeight: '700',
                   fontSize: '0.84rem',
-                  textDecoration: 'none'
+                  textDecoration: 'none',
+                  boxShadow: '0 1px 3px rgba(12, 70, 59, 0.08)',
+                  transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#0C463B';
+                  e.currentTarget.style.color = '#FFFFFF';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 70, 59, 0.22)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#EBF8F4';
+                  e.currentTarget.style.color = '#0C463B';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(12, 70, 59, 0.08)';
                 }}
               >
                 View Full Company Profile →
@@ -487,10 +502,26 @@ const JobdetailsPage = () => {
                 style={{
                   padding: '10px 18px',
                   borderRadius: '8px',
-                  border: '1px solid #CBD5E1',
-                  color: '#475569',
+                  border: '1px solid #0C463B',
+                  backgroundColor: '#EBF8F4',
+                  color: '#0C463B',
                   fontWeight: '600',
-                  fontSize: '0.9rem'
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 1px 3px rgba(12, 70, 59, 0.08)',
+                  transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#0C463B';
+                  e.currentTarget.style.color = '#FFFFFF';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 70, 59, 0.22)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#EBF8F4';
+                  e.currentTarget.style.color = '#0C463B';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(12, 70, 59, 0.08)';
                 }}
               >
                 Cancel

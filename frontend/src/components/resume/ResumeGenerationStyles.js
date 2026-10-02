@@ -217,8 +217,19 @@ export const Button = styled.button`
   }
   
   &.secondary {
-    background: #E9191D;
-    color: #FFFFFF;
+    background: #EBF8F4;
+    color: #0C463B;
+    border: 1px solid #0C463B;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(12, 70, 59, 0.08);
+    transition: background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+    &:hover {
+      background: #0C463B;
+      color: #FFFFFF;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(12, 70, 59, 0.22);
+    }
   }
 `;
 

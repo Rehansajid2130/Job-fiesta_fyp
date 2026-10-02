@@ -170,29 +170,29 @@ const FigmaJobCard = ({
           type="button"
           onClick={() => navigate(`/job/${job.id}`)}
           style={{
-            backgroundColor: '#FFFFFF',
-            color: '#0D473B',
-            border: '1.5px solid #0D473B',
-            borderRadius: '50px',
+            backgroundColor: '#EBF8F4',
+            color: '#0C463B',
+            border: '1px solid #0C463B',
+            borderRadius: '8px',
             padding: '8px 16px',
             fontSize: '13.5px',
             fontWeight: '600',
             cursor: 'pointer',
             textAlign: 'center',
-            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
+            boxShadow: '0 1px 3px rgba(12, 70, 59, 0.08)',
             transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#0D473B';
+            e.currentTarget.style.backgroundColor = '#0C463B';
             e.currentTarget.style.color = '#FFFFFF';
             e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 6px 16px rgba(13, 71, 59, 0.22)';
+            e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 70, 59, 0.22)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#FFFFFF';
-            e.currentTarget.style.color = '#0D473B';
+            e.currentTarget.style.backgroundColor = '#EBF8F4';
+            e.currentTarget.style.color = '#0C463B';
             e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.03)';
+            e.currentTarget.style.boxShadow = '0 1px 3px rgba(12, 70, 59, 0.08)';
           }}
         >
           View details

@@ -532,10 +532,10 @@ button.btn-primary:hover:not(:disabled) {
 
 .btn-secondary,
 button.btn-secondary {
-  background-color: #FFFFFF;
+  background-color: #EBF8F4;
   color: var(--primary);
-  border: 1.5px solid var(--primary);
-  border-radius: 50px;
+  border: 1px solid var(--primary);
+  border-radius: 8px;
   padding: 10px 22px;
   font-weight: 600;
   font-size: 14px;
@@ -543,7 +543,7 @@ button.btn-secondary {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px rgba(12, 70, 59, 0.08);
   cursor: pointer;
   transition: 
     background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), 
@@ -559,7 +559,7 @@ button.btn-secondary:hover:not(:disabled) {
   border-color: var(--primary);
   color: #FFFFFF;
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(12, 70, 59, 0.22);
+  box-shadow: 0 4px 14px rgba(12, 70, 59, 0.22);
 }
 
 .btn-chip {

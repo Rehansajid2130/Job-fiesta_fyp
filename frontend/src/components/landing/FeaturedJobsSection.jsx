@@ -160,16 +160,16 @@ const FeaturedJobsSection = ({ featuredJobs, totalJobsCount, applications, onOpe
                   onClick={(e) => onOpenApply(job, e)}
                   style={{
                     width: '100%',
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: '#EBF8F4',
                     color: '#0C463B',
-                    border: '1.5px solid #0C463B',
-                    borderRadius: '50px',
+                    border: '1px solid #0C463B',
+                    borderRadius: '8px',
                     padding: '12px 0',
                     fontFamily: 'Inter, sans-serif',
                     fontSize: '16px',
                     fontWeight: '600',
                     cursor: 'pointer',
-                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
+                    boxShadow: '0 1px 3px rgba(12, 70, 59, 0.08)',
                     transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
                   }}
                   onMouseEnter={(e) => {
@@ -179,10 +179,10 @@ const FeaturedJobsSection = ({ featuredJobs, totalJobsCount, applications, onOpe
                     e.currentTarget.style.boxShadow = '0 6px 18px rgba(12, 70, 59, 0.22)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#FFFFFF';
+                    e.currentTarget.style.backgroundColor = '#EBF8F4';
                     e.currentTarget.style.color = '#0C463B';
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.03)';
+                    e.currentTarget.style.boxShadow = '0 1px 3px rgba(12, 70, 59, 0.08)';
                   }}
                 >
                   Apply Now
