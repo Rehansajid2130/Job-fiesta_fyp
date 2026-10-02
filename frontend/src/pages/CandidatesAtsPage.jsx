@@ -36,14 +36,24 @@ const STAGES = [
 
 const CandidatesAtsPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { candidates, updateCandidateStage, showToast, startOrGetConversation, refreshUserData } = useJobs();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
 
   React.useEffect(() => {
+    if (!user) {
+      navigate('/login', { replace: true });
+      return;
+    }
+    if (user.userType !== 'recruiter') {
+      if (showToast) showToast('Access restricted: Candidate ATS pipeline is only accessible to recruiters', 'warning');
+      navigate('/jobseeker-dashboard', { replace: true });
+      return;
+    }
     if (refreshUserData) refreshUserData();
-  }, []);
+  }, [user, navigate]);
 
   const filteredCandidates = (candidates || []).filter(cand => 
     (cand.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||

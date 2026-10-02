@@ -25,9 +25,18 @@ const RecruiterDashBoardPage = () => {
   const [filterStatus, setFilterStatus] = useState('all');
 
   React.useEffect(() => {
+    if (!user) {
+      navigate('/login', { replace: true });
+      return;
+    }
+    if (user.userType === 'jobseeker') {
+      if (showToast) showToast('Redirecting to your Candidate Dashboard', 'info');
+      navigate('/jobseeker-dashboard', { replace: true });
+      return;
+    }
     if (fetchLiveJobs) fetchLiveJobs();
     if (refreshUserData) refreshUserData();
-  }, []);
+  }, [user, navigate]);
 
   const recruiterJobs = jobs.filter(j => 
     j.company?.toLowerCase().includes('nexus') || 

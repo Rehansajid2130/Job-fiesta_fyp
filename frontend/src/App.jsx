@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext.jsx';
+import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { JobProvider } from './context/JobContext.jsx';
 import { SocketProvider } from './context/SocketContext.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
@@ -28,6 +28,18 @@ import SalaryInsightsPage from './pages/SalaryInsightsPage.jsx';
 import SystemStatusPage from './pages/SystemStatusPage.jsx';
 import Toast from './components/common/Toast.jsx';
 
+// Route protection component to restrict views according to user roles
+const RoleRoute = ({ children, allowedRole }) => {
+  const { user } = useAuth();
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  if (allowedRole && user.userType !== allowedRole) {
+    return <Navigate to={user.userType === 'recruiter' ? '/recruiter-dashboard' : '/jobseeker-dashboard'} replace />;
+  }
+  return children;
+};
+
 function App() {
   return (
     <ErrorBoundary>
@@ -51,8 +63,8 @@ function App() {
               <Route path="/salaries" element={<SalaryInsightsPage />} />
               <Route path="/salary-insights" element={<Navigate to="/salaries" replace />} />
 
-              {/* Candidate ATS Pipeline */}
-              <Route path="/candidates" element={<CandidatesAtsPage />} />
+              {/* Candidate ATS Pipeline (Recruiters Only) */}
+              <Route path="/candidates" element={<RoleRoute allowedRole="recruiter"><CandidatesAtsPage /></RoleRoute>} />
               <Route path="/ats" element={<Navigate to="/candidates" replace />} />
 
               {/* Public Profiles */}
@@ -77,12 +89,12 @@ function App() {
               <Route path="/register-recruiter" element={<RegistrationForjobseekerPage />} />
               <Route path="/signup" element={<RegistrationForjobseekerPage />} />
 
-              {/* Dashboards */}
-              <Route path="/jobseeker-dashboard" element={<JobSeekerDashBoardPage />} />
-              <Route path="/recruiter-dashboard" element={<RecruiterDashBoardPage />} />
+              {/* Dashboards (Strict Role-Based Access) */}
+              <Route path="/jobseeker-dashboard" element={<RoleRoute allowedRole="jobseeker"><JobSeekerDashBoardPage /></RoleRoute>} />
+              <Route path="/recruiter-dashboard" element={<RoleRoute allowedRole="recruiter"><RecruiterDashBoardPage /></RoleRoute>} />
 
-              {/* Job Posting */}
-              <Route path="/post-job" element={<PostJobPage />} />
+              {/* Job Posting (Recruiters Only) */}
+              <Route path="/post-job" element={<RoleRoute allowedRole="recruiter"><PostJobPage /></RoleRoute>} />
 
               {/* Chat & Messaging */}
               <Route path="/chat" element={<ChatMainPage />} />

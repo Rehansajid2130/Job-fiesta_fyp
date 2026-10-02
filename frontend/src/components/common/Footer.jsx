@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Modal from './Modal';
+import { useAuth } from '../../context/AuthContext';
 
 // ponytail: reusable Figma-accurate footer shared across LandingPage, SearchPage, and all subpages
 const Footer = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isRecruiter = user?.userType === 'recruiter';
   const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
   // ponytail: legal disclosure modal state for EU AI Act compliance
@@ -57,22 +60,45 @@ const Footer = () => {
                     Salary Insights
                   </Link>
                 </li>
-                <li>
-                  <Link 
-                    to="/candidates" 
-                    style={{ color: '#9CA3AF', fontSize: '14px', fontFamily: 'Inter, sans-serif', textDecoration: 'none' }}
-                  >
-                    Candidates (ATS)
-                  </Link>
-                </li>
-                <li>
-                  <Link 
-                    to="/profile/furqan12" 
-                    style={{ color: '#9CA3AF', fontSize: '14px', fontFamily: 'Inter, sans-serif', textDecoration: 'none' }}
-                  >
-                    Public Portfolio Profile
-                  </Link>
-                </li>
+                {isRecruiter ? (
+                  <li>
+                    <Link 
+                      to="/candidates" 
+                      style={{ color: '#9CA3AF', fontSize: '14px', fontFamily: 'Inter, sans-serif', textDecoration: 'none' }}
+                    >
+                      Candidates (ATS)
+                    </Link>
+                  </li>
+                ) : (
+                  <li>
+                    <Link 
+                      to="/resume-builder" 
+                      style={{ color: '#9CA3AF', fontSize: '14px', fontFamily: 'Inter, sans-serif', textDecoration: 'none' }}
+                    >
+                      AI Resume Builder
+                    </Link>
+                  </li>
+                )}
+                {user && (
+                  <li>
+                    <Link 
+                      to={isRecruiter ? '/recruiter-dashboard' : '/jobseeker-dashboard'} 
+                      style={{ color: '#9CA3AF', fontSize: '14px', fontFamily: 'Inter, sans-serif', textDecoration: 'none' }}
+                    >
+                      {isRecruiter ? 'Recruiter Dashboard' : 'Candidate Dashboard'}
+                    </Link>
+                  </li>
+                )}
+                {!isRecruiter && (
+                  <li>
+                    <Link 
+                      to="/profile/furqan12" 
+                      style={{ color: '#9CA3AF', fontSize: '14px', fontFamily: 'Inter, sans-serif', textDecoration: 'none' }}
+                    >
+                      Public Portfolio Profile
+                    </Link>
+                  </li>
+                )}
                 <li>
                   <Link 
                     to="/notifications" 
@@ -189,22 +215,64 @@ const Footer = () => {
                 Quick Links
               </h4>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <li>
-                  <Link 
-                    to="/post-job" 
-                    style={{ color: '#9CA3AF', fontSize: '14px', fontFamily: 'Inter, sans-serif', textDecoration: 'none' }}
-                  >
-                    Post a Job
-                  </Link>
-                </li>
-                <li>
-                  <Link 
-                    to="/login" 
-                    style={{ color: '#9CA3AF', fontSize: '14px', fontFamily: 'Inter, sans-serif', textDecoration: 'none' }}
-                  >
-                    Employer Sign In
-                  </Link>
-                </li>
+                {isRecruiter ? (
+                  <>
+                    <li>
+                      <Link 
+                        to="/post-job" 
+                        style={{ color: '#9CA3AF', fontSize: '14px', fontFamily: 'Inter, sans-serif', textDecoration: 'none' }}
+                      >
+                        Post a Job
+                      </Link>
+                    </li>
+                    <li>
+                      <Link 
+                        to="/recruiter-dashboard" 
+                        style={{ color: '#9CA3AF', fontSize: '14px', fontFamily: 'Inter, sans-serif', textDecoration: 'none' }}
+                      >
+                        Recruiter Dashboard
+                      </Link>
+                    </li>
+                  </>
+                ) : user ? (
+                  <>
+                    <li>
+                      <Link 
+                        to="/jobseeker-dashboard" 
+                        style={{ color: '#9CA3AF', fontSize: '14px', fontFamily: 'Inter, sans-serif', textDecoration: 'none' }}
+                      >
+                        My Applications
+                      </Link>
+                    </li>
+                    <li>
+                      <Link 
+                        to="/resume-builder" 
+                        style={{ color: '#9CA3AF', fontSize: '14px', fontFamily: 'Inter, sans-serif', textDecoration: 'none' }}
+                      >
+                        AI Resume Builder
+                      </Link>
+                    </li>
+                  </>
+                ) : (
+                  <>
+                    <li>
+                      <Link 
+                        to="/register-recruiter" 
+                        style={{ color: '#9CA3AF', fontSize: '14px', fontFamily: 'Inter, sans-serif', textDecoration: 'none' }}
+                      >
+                        Post a Job (Employers)
+                      </Link>
+                    </li>
+                    <li>
+                      <Link 
+                        to="/login" 
+                        style={{ color: '#9CA3AF', fontSize: '14px', fontFamily: 'Inter, sans-serif', textDecoration: 'none' }}
+                      >
+                        Sign In
+                      </Link>
+                    </li>
+                  </>
+                )}
               </ul>
             </div>
 

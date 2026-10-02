@@ -20,12 +20,22 @@ import {
 
 const JobSeekerDashBoardPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { applications, savedJobIds, jobs, startOrGetConversation, showToast, refreshUserData } = useJobs();
   const [activeTab, setActiveTab] = useState('applications'); // applications, saved, recommended
 
   React.useEffect(() => {
+    if (!user) {
+      navigate('/login', { replace: true });
+      return;
+    }
+    if (user.userType === 'recruiter') {
+      if (showToast) showToast('Redirecting to your Recruiter Dashboard', 'info');
+      navigate('/recruiter-dashboard', { replace: true });
+      return;
+    }
     if (refreshUserData) refreshUserData();
-  }, []);
+  }, [user, navigate]);
 
   const savedJobs = jobs.filter(j => savedJobIds.includes(j.id));
   const recommendedJobs = jobs.slice(0, 3);

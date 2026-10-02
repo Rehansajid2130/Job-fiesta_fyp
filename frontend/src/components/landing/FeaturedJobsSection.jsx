@@ -1,8 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const FeaturedJobsSection = ({ featuredJobs, totalJobsCount, applications, onOpenApply }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isRecruiter = user?.userType === 'recruiter';
 
   return (
     <section id="jobs" className="container" style={{ marginTop: '40px', marginBottom: '80px' }}>
@@ -104,7 +107,43 @@ const FeaturedJobsSection = ({ featuredJobs, totalJobsCount, applications, onOpe
               </div>
 
               {/* Apply Button / Applied Status */}
-              {isApplied ? (
+              {isRecruiter ? (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/job/${job.id}`);
+                  }}
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#EBF8F4',
+                    color: '#0C463B',
+                    border: '1px solid #0C463B',
+                    borderRadius: '8px',
+                    padding: '12px 0',
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '15px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    boxShadow: '0 1px 3px rgba(12, 70, 59, 0.08)',
+                    transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#0C463B';
+                    e.currentTarget.style.color = '#FFFFFF';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 6px 18px rgba(12, 70, 59, 0.22)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#EBF8F4';
+                    e.currentTarget.style.color = '#0C463B';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 1px 3px rgba(12, 70, 59, 0.08)';
+                  }}
+                >
+                  View Position →
+                </button>
+              ) : isApplied ? (
                 <button
                   disabled
                   onClick={(e) => e.stopPropagation()}

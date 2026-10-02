@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Bookmark } from 'lucide-react';
 import IconSwap from '../common/IconSwap';
+import { useAuth } from '../../context/AuthContext';
 
 const FigmaJobCard = ({ 
   job, 
@@ -11,6 +12,8 @@ const FigmaJobCard = ({
   onToggleBookmark 
 }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isRecruiter = user?.userType === 'recruiter';
   const [bookmarked, setBookmarked] = useState(isBookmarked);
 
   const handleBookmarkClick = (e) => {
@@ -198,7 +201,39 @@ const FigmaJobCard = ({
           View details
         </button>
 
-        {isApplied ? (
+        {isRecruiter ? (
+          <button
+            type="button"
+            onClick={() => navigate('/candidates')}
+            style={{
+              backgroundColor: '#0D473B',
+              color: '#FFFFFF',
+              border: '1px solid #0D473B',
+              borderRadius: '50px',
+              padding: '8px 16px',
+              fontSize: '13.5px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              textAlign: 'center',
+              boxShadow: '0 2px 8px rgba(13, 71, 59, 0.18)',
+              transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#08342c';
+              e.currentTarget.style.borderColor = '#08342c';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 6px 18px rgba(13, 71, 59, 0.28)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#0D473B';
+              e.currentTarget.style.borderColor = '#0D473B';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(13, 71, 59, 0.18)';
+            }}
+          >
+            Manage ATS
+          </button>
+        ) : isApplied ? (
           <button
             type="button"
             disabled

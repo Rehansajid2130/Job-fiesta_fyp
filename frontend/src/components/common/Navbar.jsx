@@ -14,6 +14,7 @@ import {
   Building2,
   TrendingUp,
   Users2,
+  Briefcase,
   CheckCheck
 } from 'lucide-react';
 import IconSwap from './IconSwap';
@@ -204,49 +205,72 @@ const Navbar = () => {
                 Salaries
               </Link>
 
-              {isRecruiter && (
+              {isRecruiter ? (
+                <>
+                  <Link 
+                    to="/candidates" 
+                    style={{
+                      fontSize: '0.92rem',
+                      fontWeight: isActive('/candidates') ? '700' : '500',
+                      color: isActive('/candidates') ? '#0C463B' : '#475569',
+                      textDecoration: 'none',
+                      transition: 'color 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#0C463B'}
+                    onMouseLeave={(e) => {
+                      if (!isActive('/candidates')) e.currentTarget.style.color = '#475569';
+                    }}
+                  >
+                    <Users2 size={15} />
+                    Candidates
+                  </Link>
+
+                  <Link 
+                    to="/post-job" 
+                    style={{
+                      fontSize: '0.92rem',
+                      fontWeight: isActive('/post-job') ? '700' : '500',
+                      color: isActive('/post-job') ? '#0C463B' : '#475569',
+                      textDecoration: 'none',
+                      transition: 'color 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#0C463B'}
+                    onMouseLeave={(e) => {
+                      if (!isActive('/post-job')) e.currentTarget.style.color = '#475569';
+                    }}
+                  >
+                    <Briefcase size={15} />
+                    Post a Job
+                  </Link>
+                </>
+              ) : (
                 <Link 
-                  to="/candidates" 
+                  to="/resume-builder" 
                   style={{
                     fontSize: '0.92rem',
-                    fontWeight: isActive('/candidates') ? '700' : '500',
-                    color: isActive('/candidates') ? '#0C463B' : '#475569',
+                    fontWeight: isActive('/resume-builder') ? '700' : '500',
+                    color: isActive('/resume-builder') ? '#0C463B' : '#475569',
                     textDecoration: 'none',
                     transition: 'color 0.2s ease',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '4px'
+                    gap: '5px'
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.color = '#0C463B'}
                   onMouseLeave={(e) => {
-                    if (!isActive('/candidates')) e.currentTarget.style.color = '#475569';
+                    if (!isActive('/resume-builder')) e.currentTarget.style.color = '#475569';
                   }}
                 >
-                  <Users2 size={15} />
-                  Candidates
+                  <FileText size={15} />
+                  AI Resume
                 </Link>
               )}
-
-              <Link 
-                to="/resume-builder" 
-                style={{
-                  fontSize: '0.92rem',
-                  fontWeight: isActive('/resume-builder') ? '700' : '500',
-                  color: isActive('/resume-builder') ? '#0C463B' : '#475569',
-                  textDecoration: 'none',
-                  transition: 'color 0.2s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.color = '#0C463B'}
-                onMouseLeave={(e) => {
-                  if (!isActive('/resume-builder')) e.currentTarget.style.color = '#475569';
-                }}
-              >
-                <FileText size={15} />
-                AI Resume
-              </Link>
             </div>
 
             {/* Right Navigation: Role Indicator, Browse Jobs, Notifications & Auth Buttons */}
@@ -475,7 +499,9 @@ const Navbar = () => {
                   >
                     <div style={{ padding: '8px 16px', borderBottom: '1px solid #F1F5F9' }}>
                       <div style={{ fontWeight: '700', fontSize: '0.92rem', color: '#0F172A' }}>{user.name}</div>
-                      <div style={{ fontSize: '0.78rem', color: '#64748B' }}>{user.email}</div>
+                      <div style={{ fontSize: '0.78rem', color: '#64748B' }}>
+                        {user.email} • <span style={{ fontWeight: '600', color: '#0C463B', textTransform: 'capitalize' }}>{user.userType || 'jobseeker'}</span>
+                      </div>
                     </div>
                     <Link
                       to={isRecruiter ? '/recruiter-dashboard' : '/jobseeker-dashboard'}
@@ -491,40 +517,80 @@ const Navbar = () => {
                       }}
                     >
                       <LayoutDashboard size={16} />
-                      Dashboard
+                      {isRecruiter ? 'Recruiter Dashboard' : 'Candidate Dashboard'}
                     </Link>
-                    <Link
-                      to="/chat"
-                      onClick={() => setProfileDropdownOpen(false)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        padding: '10px 16px',
-                        fontSize: '0.88rem',
-                        color: '#334155',
-                        textDecoration: 'none'
-                      }}
-                    >
-                      <MessageSquare size={16} />
-                      Messages
-                    </Link>
-                    <Link
-                      to="/profile/furqan12"
-                      onClick={() => setProfileDropdownOpen(false)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        padding: '10px 16px',
-                        fontSize: '0.88rem',
-                        color: '#334155',
-                        textDecoration: 'none'
-                      }}
-                    >
-                      <User size={16} />
-                      Public Profile
-                    </Link>
+
+                    {isRecruiter ? (
+                      <>
+                        <Link
+                          to="/candidates"
+                          onClick={() => setProfileDropdownOpen(false)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '10px 16px',
+                            fontSize: '0.88rem',
+                            color: '#334155',
+                            textDecoration: 'none'
+                          }}
+                        >
+                          <Users2 size={16} />
+                          Candidate ATS
+                        </Link>
+                        <Link
+                          to="/post-job"
+                          onClick={() => setProfileDropdownOpen(false)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '10px 16px',
+                            fontSize: '0.88rem',
+                            color: '#334155',
+                            textDecoration: 'none'
+                          }}
+                        >
+                          <Briefcase size={16} />
+                          Post a Job
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        <Link
+                          to="/resume-builder"
+                          onClick={() => setProfileDropdownOpen(false)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '10px 16px',
+                            fontSize: '0.88rem',
+                            color: '#334155',
+                            textDecoration: 'none'
+                          }}
+                        >
+                          <FileText size={16} />
+                          AI Resume Builder
+                        </Link>
+                        <Link
+                          to="/profile/furqan12"
+                          onClick={() => setProfileDropdownOpen(false)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '10px 16px',
+                            fontSize: '0.88rem',
+                            color: '#334155',
+                            textDecoration: 'none'
+                          }}
+                        >
+                          <User size={16} />
+                          Public Profile
+                        </Link>
+                      </>
+                    )}
                     <Link
                       to="/notifications"
                       onClick={() => setProfileDropdownOpen(false)}
@@ -723,22 +789,32 @@ const Navbar = () => {
           >
             Salaries
           </Link>
-          {isRecruiter && (
+          {isRecruiter ? (
+            <>
+              <Link 
+                to="/candidates" 
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ fontSize: '1rem', fontWeight: isActive('/candidates') ? '700' : '500', color: isActive('/candidates') ? '#0C463B' : '#334155', textDecoration: 'none' }}
+              >
+                Candidates (ATS)
+              </Link>
+              <Link 
+                to="/post-job" 
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ fontSize: '1rem', fontWeight: isActive('/post-job') ? '700' : '500', color: isActive('/post-job') ? '#0C463B' : '#334155', textDecoration: 'none' }}
+              >
+                Post a Job
+              </Link>
+            </>
+          ) : (
             <Link 
-              to="/candidates" 
+              to="/resume-builder" 
               onClick={() => setMobileMenuOpen(false)}
-              style={{ fontSize: '1rem', fontWeight: isActive('/candidates') ? '700' : '500', color: isActive('/candidates') ? '#0C463B' : '#334155', textDecoration: 'none' }}
+              style={{ fontSize: '1rem', fontWeight: isActive('/resume-builder') ? '700' : '500', color: isActive('/resume-builder') ? '#0C463B' : '#334155', textDecoration: 'none' }}
             >
-              Candidates (ATS)
+              AI Resume Builder
             </Link>
           )}
-          <Link 
-            to="/resume-builder" 
-            onClick={() => setMobileMenuOpen(false)}
-            style={{ fontSize: '1rem', fontWeight: isActive('/resume-builder') ? '700' : '500', color: isActive('/resume-builder') ? '#0C463B' : '#334155', textDecoration: 'none' }}
-          >
-            AI Resume Builder
-          </Link>
 
           <hr style={{ border: 'none', borderTop: '1px solid #F1F5F9', margin: '4px 0' }} />
 

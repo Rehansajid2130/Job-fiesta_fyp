@@ -6,6 +6,7 @@ import Badge from '../components/common/Badge';
 import Modal from '../components/common/Modal';
 import IconSwap from '../components/common/IconSwap';
 import { useJobs } from '../context/JobContext';
+import { useAuth } from '../context/AuthContext';
 import { 
   MapPin, 
   DollarSign, 
@@ -23,6 +24,8 @@ import {
 const JobdetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isRecruiter = user?.userType === 'recruiter';
   const { jobs, savedJobIds, toggleSaveJob, applyToJob, applications } = useJobs();
 
   const [applyModalOpen, setApplyModalOpen] = useState(false);
@@ -301,74 +304,133 @@ const JobdetailsPage = () => {
               boxShadow: 'var(--shadow-sm)',
               textAlign: 'center'
             }}>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#0F172A', marginBottom: '8px' }}>
-                Interested in this role?
-              </h3>
-              <p style={{ fontSize: '0.88rem', color: '#64748B', marginBottom: '20px' }}>
-                Submit your application directly through Job Fiesta. Your resume is automatically matched against key requirements.
-              </p>
+              {isRecruiter ? (
+                <>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#0F172A', marginBottom: '8px' }}>
+                    Employer Requisition View
+                  </h3>
+                  <p style={{ fontSize: '0.88rem', color: '#64748B', marginBottom: '20px' }}>
+                    You are viewing this listing in recruiter mode. Candidates can apply directly, and incoming profiles sync straight to your ATS pipeline.
+                  </p>
 
-              {isApplied ? (
-                <div style={{
-                  padding: '14px',
-                  borderRadius: '10px',
-                  backgroundColor: '#ECFDF5',
-                  color: '#065F46',
-                  fontWeight: '700',
-                  fontSize: '0.95rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px'
-                }}>
-                  <CheckCircle2 size={18} />
-                  Application Submitted
-                </div>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/candidates')}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: '10px',
+                      backgroundColor: '#0C463B',
+                      color: '#FFFFFF',
+                      border: '1px solid #0C463B',
+                      fontWeight: '700',
+                      fontSize: '0.98rem',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 14px rgba(12, 70, 59, 0.22)',
+                      transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#08342c';
+                      e.currentTarget.style.borderColor = '#08342c';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 8px 24px rgba(12, 70, 59, 0.32)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#0C463B';
+                      e.currentTarget.style.borderColor = '#0C463B';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 70, 59, 0.22)';
+                    }}
+                  >
+                    Open Candidate ATS Pipeline
+                  </button>
+
+                  <Link
+                    to="/recruiter-dashboard"
+                    style={{
+                      display: 'block',
+                      marginTop: '16px',
+                      fontSize: '0.85rem',
+                      color: '#0C463B',
+                      fontWeight: '600',
+                      textDecoration: 'none'
+                    }}
+                  >
+                    ← Back to Recruiter Dashboard
+                  </Link>
+                </>
               ) : (
-                <button
-                  onClick={() => setApplyModalOpen(true)}
-                  style={{
-                    width: '100%',
-                    padding: '14px',
-                    borderRadius: '10px',
-                    backgroundColor: '#0C463B',
-                    color: '#FFFFFF',
-                    border: '1px solid #0C463B',
-                    fontWeight: '700',
-                    fontSize: '0.98rem',
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 14px rgba(12, 70, 59, 0.22)',
-                    transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#08342c';
-                    e.currentTarget.style.borderColor = '#08342c';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(12, 70, 59, 0.32)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#0C463B';
-                    e.currentTarget.style.borderColor = '#0C463B';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 70, 59, 0.22)';
-                  }}
-                >
-                  Apply Now
-                </button>
-              )}
+                <>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#0F172A', marginBottom: '8px' }}>
+                    Interested in this role?
+                  </h3>
+                  <p style={{ fontSize: '0.88rem', color: '#64748B', marginBottom: '20px' }}>
+                    Submit your application directly through Job Fiesta. Your resume is automatically matched against key requirements.
+                  </p>
 
-              <Link
-                to="/resume-builder"
-                style={{
-                  display: 'block',
-                  marginTop: '16px',
-                  fontSize: '0.85rem',
-                  color: '#0C463B',
-                  fontWeight: '600'
-                }}
-              >
-                ✨ Optimize Resume Before Applying
-              </Link>
+                  {isApplied ? (
+                    <div style={{
+                      padding: '14px',
+                      borderRadius: '10px',
+                      backgroundColor: '#ECFDF5',
+                      color: '#065F46',
+                      fontWeight: '700',
+                      fontSize: '0.95rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}>
+                      <CheckCircle2 size={18} />
+                      Application Submitted
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setApplyModalOpen(true)}
+                      style={{
+                        width: '100%',
+                        padding: '14px',
+                        borderRadius: '10px',
+                        backgroundColor: '#0C463B',
+                        color: '#FFFFFF',
+                        border: '1px solid #0C463B',
+                        fontWeight: '700',
+                        fontSize: '0.98rem',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 14px rgba(12, 70, 59, 0.22)',
+                        transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#08342c';
+                        e.currentTarget.style.borderColor = '#08342c';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 8px 24px rgba(12, 70, 59, 0.32)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#0C463B';
+                        e.currentTarget.style.borderColor = '#0C463B';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 70, 59, 0.22)';
+                      }}
+                    >
+                      Apply Now
+                    </button>
+                  )}
+
+                  <Link
+                    to="/resume-builder"
+                    style={{
+                      display: 'block',
+                      marginTop: '16px',
+                      fontSize: '0.85rem',
+                      color: '#0C463B',
+                      fontWeight: '600'
+                    }}
+                  >
+                    ✨ Optimize Resume Before Applying
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Company Info Card */}

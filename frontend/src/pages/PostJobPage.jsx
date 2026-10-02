@@ -9,8 +9,19 @@ import { Briefcase, Building, MapPin, DollarSign, CheckCircle2, ArrowRight, Aler
 
 const PostJobPage = () => {
   const navigate = useNavigate();
-  const { postNewJob } = useJobs();
+  const { postNewJob, showToast } = useJobs();
   const { user } = useAuth();
+
+  React.useEffect(() => {
+    if (!user) {
+      navigate('/login', { replace: true });
+      return;
+    }
+    if (user.userType !== 'recruiter') {
+      if (showToast) showToast('Access restricted: Only recruiters can post jobs', 'warning');
+      navigate('/jobseeker-dashboard', { replace: true });
+    }
+  }, [user, navigate]);
 
   const [formData, setFormData] = useState({
     title: '',
