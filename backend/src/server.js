@@ -278,6 +278,20 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Development seeding endpoint for quick environment setup
+app.post('/api/seed', async (req, res) => {
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(403).json({ success: false, message: 'Seeding disabled in production' });
+  }
+  try {
+    const seedDatabase = require('./seedHelper');
+    await seedDatabase();
+    res.json({ success: true, message: 'Database reseeded successfully with full demo datasets' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 // ponytail: standard security headers without adding extra dependencies (KISS)
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');

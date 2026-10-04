@@ -276,6 +276,41 @@ const Navbar = () => {
             {/* Right Navigation: Role Indicator, Browse Jobs, Notifications & Auth Buttons */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
 
+              {/* Messages Link */}
+              {user && (
+                <Link
+                  to="/chat"
+                  aria-label="Messages"
+                  title="Messages"
+                  style={{
+                    position: 'relative',
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '10px',
+                    border: '1px solid #E2E8F0',
+                    backgroundColor: location.pathname.startsWith('/chat') ? '#F1F5F9' : '#FFFFFF',
+                    color: location.pathname.startsWith('/chat') ? '#0C463B' : '#334155',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                    textDecoration: 'none',
+                    transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.04)';
+                  }}
+                >
+                  <MessageSquare size={18} />
+                </Link>
+              )}
+
               {/* Notifications Badge & Dropdown */}
               <div style={{ position: 'relative' }} ref={notifDropdownRef}>
                 <button
@@ -591,6 +626,22 @@ const Navbar = () => {
                         </Link>
                       </>
                     )}
+                    <Link
+                      to="/chat"
+                      onClick={() => setProfileDropdownOpen(false)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '10px 16px',
+                        fontSize: '0.88rem',
+                        color: '#334155',
+                        textDecoration: 'none'
+                      }}
+                    >
+                      <MessageSquare size={16} />
+                      Messages
+                    </Link>
                     <Link
                       to="/notifications"
                       onClick={() => setProfileDropdownOpen(false)}

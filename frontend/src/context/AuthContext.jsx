@@ -39,15 +39,21 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password, roleHint = 'jobseeker') => {
     try {
-      // If backend API URL is available, attempt real request
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-      const res = await axios.post(`${apiUrl}/api/auth/login`, { email, password }, { timeout: 3000 });
+      const res = await axios.post(`${apiUrl}/api/auth/login`, {
+        email,
+        emailOrUsername: email,
+        username: email,
+        password
+      }, { timeout: 3500 });
+
       if (res.data?.token) {
         setToken(res.data.token);
         localStorage.setItem('token', res.data.token);
         const rawUser = res.data.user || {};
         const userData = {
           ...rawUser,
+          id: rawUser.id || rawUser._id,
           userType: rawUser.role === 'employer' ? 'recruiter' : (rawUser.role || roleHint),
           name: rawUser.fullName || rawUser.name || email.split('@')[0],
         };
@@ -56,8 +62,9 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (err) {
       console.warn('Backend server response:', err.response?.data?.message || err.message);
-      // If server explicitly responded with an error (e.g. 401 Invalid credentials), return it to the UI
-      if (err.response?.data?.message) {
+      // If server explicitly responded with an error, check if this was a custom user attempt or demo fallback
+      const isDemoAttempt = ['jobseeker@jobfiesta.com', 'recruiter@jobfiesta.com', 'jobseeker', 'recruiter', 'furqan@jobfiesta.com', 'suzana@nexusinnovations.io'].includes(email.toLowerCase());
+      if (err.response?.data?.message && !isDemoAttempt) {
         return { success: false, message: err.response.data.message };
       }
     }

@@ -47,6 +47,18 @@ const seedDatabase = async () => {
         bio: 'Crafting responsive, high-performance web applications with modern React, TypeScript, and micro-interaction design systems.',
       },
       {
+        fullName: 'Jobseeker Demo',
+        username: 'jobseeker',
+        email: 'jobseeker@jobfiesta.com',
+        password: 'password123',
+        role: 'jobseeker',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces',
+        headline: 'Full Stack React Engineer & Candidate Demo',
+        location: 'San Francisco, CA',
+        skills: ['React', 'TypeScript', 'Node.js', 'Vite', 'TailwindCSS'],
+        bio: 'Demo candidate account for exploring the Job Fiesta platform features.',
+      },
+      {
         fullName: 'Rehan Sajjid',
         username: 'rehansajid',
         email: 'rehansajid.prof@gmail.com',
@@ -70,6 +82,17 @@ const seedDatabase = async () => {
         location: 'San Francisco, CA',
       },
       {
+        fullName: 'Recruiter Demo',
+        username: 'recruiter',
+        email: 'recruiter@jobfiesta.com',
+        password: 'password123',
+        role: 'recruiter',
+        company: 'Nexus Innovations',
+        avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&h=120&fit=crop&crop=faces',
+        headline: 'Talent Acquisition Partner & Recruiter Demo',
+        location: 'San Francisco, CA',
+      },
+      {
         fullName: 'Hassan Raza',
         username: 'hassan',
         email: 'hassan@cognitivedynamics.ai',
@@ -82,7 +105,7 @@ const seedDatabase = async () => {
       },
     ]);
 
-    const [furqanUser, rehanUser, suzanaUser, hassanUser] = users;
+    const [furqanUser, jobseekerDemoUser, rehanUser, suzanaUser, recruiterDemoUser, hassanUser] = users;
 
     // 2. Create Verified Companies
     console.log('[Seed] Creating enterprise companies...');

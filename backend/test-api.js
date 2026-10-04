@@ -99,6 +99,36 @@ async function runTests() {
     authToken = res.body.token;
   });
 
+  await assert('POST /api/auth/login — Jobseeker username authentication (furqan12)', async () => {
+    const res = await request('POST', '/api/auth/login', {
+      emailOrUsername: 'furqan12',
+      password: 'password123',
+    });
+    if (res.status !== 200 || !res.body.token || res.body.user.role !== 'jobseeker') {
+      throw new Error(`Username login failed with status ${res.status}: ${JSON.stringify(res.body)}`);
+    }
+  });
+
+  await assert('POST /api/auth/login — Case-insensitive demo jobseeker login (jobseeker@jobfiesta.com)', async () => {
+    const res = await request('POST', '/api/auth/login', {
+      email: 'JobSeeker@JobFiesta.com',
+      password: 'password123',
+    });
+    if (res.status !== 200 || !res.body.token || res.body.user.role !== 'jobseeker') {
+      throw new Error(`Demo login failed with status ${res.status}: ${JSON.stringify(res.body)}`);
+    }
+  });
+
+  await assert('POST /api/auth/login — Demo recruiter login (recruiter@jobfiesta.com)', async () => {
+    const res = await request('POST', '/api/auth/login', {
+      email: 'recruiter@jobfiesta.com',
+      password: 'password123',
+    });
+    if (res.status !== 200 || !res.body.token || res.body.user.role !== 'recruiter') {
+      throw new Error(`Demo recruiter login failed with status ${res.status}: ${JSON.stringify(res.body)}`);
+    }
+  });
+
   // 3. Companies Directory & Search
   await assert('GET /api/companies — Retrieve all verified companies', async () => {
     const res = await request('GET', '/api/companies');
