@@ -24,6 +24,7 @@ const Navbar = () => {
   const { 
     notifications, 
     unreadNotificationsCount, 
+    unreadMessagesCount = 0,
     markNotificationAsRead, 
     markAllNotificationsAsRead 
   } = useJobs();
@@ -57,6 +58,8 @@ const Navbar = () => {
   const isRecruiter = user?.userType === 'recruiter';
   const isActive = (path) => location.pathname === path;
 
+  const isAuthPage = ['/login', '/register', '/register-jobseeker', '/register-recruiter', '/signup'].includes(location.pathname);
+
   const handleCategoriesClick = (e) => {
     if (location.pathname === '/') {
       e.preventDefault();
@@ -68,6 +71,96 @@ const Navbar = () => {
       navigate('/#categories');
     }
   };
+
+  if (isAuthPage) {
+    return (
+      <nav style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 1000,
+        backgroundColor: '#FFFFFF',
+        borderBottom: '1px solid #F1F5F9',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)'
+      }}>
+        <div className="container" style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          height: '76px'
+        }}>
+          {/* Brand Logo Matching Everywhere */}
+          <Link 
+            to="/" 
+            style={{ 
+              textDecoration: 'none', 
+              display: 'inline-flex', 
+              alignItems: 'baseline', 
+              gap: '4px' 
+            }}
+          >
+            <span style={{ 
+              fontFamily: "'League Script', cursive", 
+              fontSize: 'clamp(34px, 5vw, 42px)', 
+              fontWeight: 'bold', 
+              color: '#000000', 
+              lineHeight: 1 
+            }}>
+              Job fiesta
+            </span>
+          </Link>
+
+          {/* Clean minimal auth navigation */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {location.pathname === '/login' ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '0.88rem', color: '#64748B' }}>
+                  Don't have an account?
+                </span>
+                <Link 
+                  to="/register"
+                  style={{
+                    fontSize: '0.88rem',
+                    fontWeight: '700',
+                    color: '#0C463B',
+                    padding: '8px 18px',
+                    borderRadius: '8px',
+                    border: '1px solid #0C463B',
+                    backgroundColor: '#EBF8F4',
+                    textDecoration: 'none',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  Sign Up
+                </Link>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '0.88rem', color: '#64748B' }}>
+                  Already have an account?
+                </span>
+                <Link 
+                  to="/login"
+                  style={{
+                    fontSize: '0.88rem',
+                    fontWeight: '700',
+                    color: '#0C463B',
+                    padding: '8px 18px',
+                    borderRadius: '8px',
+                    border: '1px solid #0C463B',
+                    backgroundColor: '#EBF8F4',
+                    textDecoration: 'none',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  Log In
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav style={{
@@ -205,7 +298,7 @@ const Navbar = () => {
                 Salaries
               </Link>
 
-              {isRecruiter ? (
+              {user && (isRecruiter ? (
                 <>
                   <Link 
                     to="/candidates" 
@@ -270,7 +363,7 @@ const Navbar = () => {
                   <FileText size={15} />
                   AI Resume
                 </Link>
-              )}
+              ))}
             </div>
 
             {/* Right Navigation: Role Indicator, Browse Jobs, Notifications & Auth Buttons */}
@@ -295,24 +388,37 @@ const Navbar = () => {
                     justifyContent: 'center',
                     cursor: 'pointer',
                     boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
-                    textDecoration: 'none',
-                    transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.04)';
+                    textDecoration: 'none'
                   }}
                 >
                   <MessageSquare size={18} />
+                  {unreadMessagesCount > 0 && (
+                    <span style={{
+                      position: 'absolute',
+                      top: '-3px',
+                      right: '-3px',
+                      backgroundColor: '#10B981',
+                      color: '#FFFFFF',
+                      fontSize: '10px',
+                      fontWeight: '800',
+                      borderRadius: '9999px',
+                      minWidth: '16px',
+                      height: '16px',
+                      padding: '0 4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: '2px solid #FFFFFF'
+                    }}>
+                      {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                    </span>
+                  )}
                 </Link>
               )}
 
               {/* Notifications Badge & Dropdown */}
-              <div style={{ position: 'relative' }} ref={notifDropdownRef}>
+              {user && (
+                <div style={{ position: 'relative' }} ref={notifDropdownRef}>
                 <button
                   type="button"
                   onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
@@ -330,16 +436,7 @@ const Navbar = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
-                    transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.04)';
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)'
                   }}
                 >
                   <Bell size={18} />
@@ -487,6 +584,7 @@ const Navbar = () => {
                   </Link>
                 </div>
               </div>
+            )}
 
               {/* User Profile or Guest Auth Buttons */}
               {user ? (
@@ -626,22 +724,7 @@ const Navbar = () => {
                         </Link>
                       </>
                     )}
-                    <Link
-                      to="/chat"
-                      onClick={() => setProfileDropdownOpen(false)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        padding: '10px 16px',
-                        fontSize: '0.88rem',
-                        color: '#334155',
-                        textDecoration: 'none'
-                      }}
-                    >
-                      <MessageSquare size={16} />
-                      Messages
-                    </Link>
+
                     <Link
                       to="/notifications"
                       onClick={() => setProfileDropdownOpen(false)}
@@ -712,21 +795,7 @@ const Navbar = () => {
                       borderRadius: '8px',
                       border: '1px solid #0C463B',
                       backgroundColor: '#EBF8F4',
-                      textDecoration: 'none',
-                      boxShadow: '0 1px 3px rgba(12, 70, 59, 0.08)',
-                      transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#0C463B';
-                      e.currentTarget.style.color = '#FFFFFF';
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 70, 59, 0.22)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#EBF8F4';
-                      e.currentTarget.style.color = '#0C463B';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(12, 70, 59, 0.08)';
+                      textDecoration: 'none'
                     }}
                   >
                     Log In
@@ -741,23 +810,9 @@ const Navbar = () => {
                       backgroundColor: '#0C463B',
                       color: '#FFFFFF',
                       border: '1px solid #0C463B',
-                      borderRadius: '50px',
+                      borderRadius: '8px',
                       textDecoration: 'none',
-                      display: 'inline-block',
-                      boxShadow: '0 2px 8px rgba(12, 70, 59, 0.2)',
-                      transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#08342c';
-                      e.currentTarget.style.borderColor = '#08342c';
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 6px 18px rgba(12, 70, 59, 0.3)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#0C463B';
-                      e.currentTarget.style.borderColor = '#0C463B';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(12, 70, 59, 0.2)';
+                      display: 'inline-block'
                     }}
                   >
                     Sign Up
@@ -840,7 +895,7 @@ const Navbar = () => {
           >
             Salaries
           </Link>
-          {isRecruiter ? (
+          {user && (isRecruiter ? (
             <>
               <Link 
                 to="/candidates" 
@@ -865,7 +920,7 @@ const Navbar = () => {
             >
               AI Resume Builder
             </Link>
-          )}
+          ))}
 
           <hr style={{ border: 'none', borderTop: '1px solid #F1F5F9', margin: '4px 0' }} />
 
@@ -905,7 +960,7 @@ const Navbar = () => {
                   flex: 1,
                   textAlign: 'center',
                   padding: '10px',
-                  borderRadius: '50px',
+                  borderRadius: '8px',
                   border: '1px solid #E2E8F0',
                   color: '#0C463B',
                   fontWeight: '600',
@@ -921,7 +976,7 @@ const Navbar = () => {
                   flex: 1,
                   textAlign: 'center',
                   padding: '10px',
-                  borderRadius: '50px',
+                  borderRadius: '8px',
                   backgroundColor: '#0C463B',
                   color: '#FFFFFF',
                   fontWeight: '700',

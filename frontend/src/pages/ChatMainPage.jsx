@@ -10,7 +10,14 @@ import ChatRatingModal from '../components/chat/ChatRatingModal';
 const ChatMainPage = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { conversations, sendMessage, rateJobseeker, startOrGetConversation } = useJobs();
+  const { 
+    conversations, 
+    sendMessage, 
+    rateJobseeker, 
+    startOrGetConversation, 
+    markConversationAsRead, 
+    fetchConversationMessages 
+  } = useJobs();
   const location = useLocation();
   const [searchParams] = useSearchParams();
 
@@ -34,6 +41,7 @@ const ChatMainPage = () => {
       const match = conversations.find(c => c.id === paramConvId);
       if (match) {
         setActiveConvId(match.id);
+        markConversationAsRead?.(match.id);
         return;
       }
     }
@@ -43,6 +51,7 @@ const ChatMainPage = () => {
         const convId = startOrGetConversation(stateCandidate);
         if (convId) {
           setActiveConvId(convId);
+          markConversationAsRead?.(convId);
         }
       }
       return;
@@ -60,10 +69,19 @@ const ChatMainPage = () => {
         const convId = startOrGetConversation(candidateInfo);
         if (convId) {
           setActiveConvId(convId);
+          markConversationAsRead?.(convId);
         }
       }
     }
-  }, [location.state, searchParams, conversations, startOrGetConversation]);
+  }, [location.state, searchParams, conversations, startOrGetConversation, markConversationAsRead]);
+
+  // Mark as read and fetch messages from server whenever active conversation changes
+  useEffect(() => {
+    if (activeConvId) {
+      if (markConversationAsRead) markConversationAsRead(activeConvId);
+      if (fetchConversationMessages) fetchConversationMessages(activeConvId);
+    }
+  }, [activeConvId, markConversationAsRead, fetchConversationMessages]);
 
   // Rating Modal state (for recruiter rating flow)
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
@@ -97,11 +115,7 @@ const ChatMainPage = () => {
     setTimeout(() => {
       const autoReplyRole = senderRole === 'jobseeker' ? 'recruiter' : 'jobseeker';
       let autoReplyText = "Thank you for reaching out! Let me review this and get back to you shortly.";
-      if (activeConv?.participantName === 'Suzana Colin') {
-        autoReplyText = "Excellent! I will send over the detailed job description and next interview steps.";
-      } else if (activeConv?.participantName === 'Hassan') {
-        autoReplyText = "Sounds good! Let's sync up on the details tomorrow.";
-      } else if (activeConv?.participantName) {
+      if (activeConv?.participantName) {
         autoReplyText = `Hi! Thanks for your message regarding the ${activeConv.participantRole || 'role'}. I'm reviewing everything and will follow up with you promptly.`;
       }
       sendMessage(activeConvId, autoReplyText, autoReplyRole);
@@ -136,6 +150,7 @@ const ChatMainPage = () => {
         setSearchQuery={setSearchQuery}
         user={user}
         logout={logout}
+        markConversationAsRead={markConversationAsRead}
       />
 
       {/* 2. RIGHT MAIN AREA: Empty State (Image 1) OR Active Chat (Image 2) */}
@@ -151,13 +166,7 @@ const ChatMainPage = () => {
         }}
       >
         {!activeConv ? (
-          <ChatEmptyState
-            onNewMessage={() => {
-              if (conversations.length > 0) {
-                setActiveConvId(conversations[0].id);
-              }
-            }}
-          />
+          <ChatEmptyState />
         ) : (
           <ChatActiveArea
             activeConv={activeConv}

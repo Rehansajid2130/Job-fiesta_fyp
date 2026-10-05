@@ -13,46 +13,30 @@ const JobContext = createContext();
 
 export const useJobs = () => useContext(JobContext);
 
+// Security & Privacy: Purge any legacy database collections from localStorage
+try {
+  [
+    'jobfiesta_jobs',
+    'jobfiesta_applications',
+    'jobfiesta_candidates',
+    'jobfiesta_conversations',
+    'jobfiesta_notifications',
+    'jobfiesta_companies',
+    'jobfiesta_saved_jobs'
+  ].forEach(k => localStorage.removeItem(k));
+} catch (e) {}
+
 export const JobProvider = ({ children }) => {
-  const [jobs, setJobs] = useState(() => {
-    try {
-      const saved = localStorage.getItem('jobfiesta_jobs');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return parsed.filter(j => j.id && !j.id.startsWith('job-') && !j.id.startsWith('figma-'));
-      }
-    } catch (e) {}
-    return [];
-  });
+  // Pure in-memory state: loaded from and synchronized with secure backend API
+  const [jobs, setJobs] = useState(initialJobs);
+  const [companies, setCompanies] = useState(initialCompanies);
+  const [candidates, setCandidates] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [savedJobIds, setSavedJobIds] = useState([]);
+  const [conversations, setConversations] = useState([]);
 
-  const [companies, setCompanies] = useState(() => {
-    const saved = localStorage.getItem('jobfiesta_companies');
-    return saved ? JSON.parse(saved) : initialCompanies;
-  });
-
-  const [candidates, setCandidates] = useState(() => {
-    try {
-      const saved = localStorage.getItem('jobfiesta_candidates');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return parsed.filter(c => c.id && !c.id.startsWith('cand-'));
-      }
-    } catch (e) {}
-    return [];
-  });
-
-  const [notifications, setNotifications] = useState(() => {
-    try {
-      const saved = localStorage.getItem('jobfiesta_notifications');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return parsed.filter(n => n.id && !n.id.startsWith('notif-'));
-      }
-    } catch (e) {}
-    return [];
-  });
-
-  // Global toast state for transitions-dev 22-toast
+  // Global toast state for user feedback
   const [toast, setToast] = useState({ open: false, message: '', type: 'success' });
 
   const showToast = (message, type = 'success') => {
@@ -61,43 +45,6 @@ export const JobProvider = ({ children }) => {
       setToast(prev => ({ ...prev, open: false }));
     }, 3800);
   };
-
-  const [applications, setApplications] = useState(() => {
-    try {
-      const saved = localStorage.getItem('jobfiesta_applications');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return parsed.filter(a => a.id && !a.id.startsWith('app-1') && !a.id.startsWith('app-2') && !a.id.startsWith('app-3'));
-      }
-    } catch (e) {}
-    return [];
-  });
-
-  const [savedJobIds, setSavedJobIds] = useState(() => {
-    try {
-      const saved = localStorage.getItem('jobfiesta_saved_jobs');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return parsed.filter(id => !id.startsWith('job-'));
-      }
-    } catch (e) {}
-    return [];
-  });
-
-  const [conversations, setConversations] = useState(() => {
-    const saved = localStorage.getItem('jobfiesta_conversations');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.some(c => c.id === 'conv-suzana')) {
-          return parsed;
-        }
-      } catch (e) {
-        // fallback
-      }
-    }
-    return initialConversations;
-  });
 
   const [searchFilters, setSearchFilters] = useState({
     keyword: '',
@@ -108,32 +55,12 @@ export const JobProvider = ({ children }) => {
     minSalary: 0
   });
 
-  useEffect(() => {
-    localStorage.setItem('jobfiesta_jobs', JSON.stringify(jobs));
-  }, [jobs]);
-
-  useEffect(() => {
-    localStorage.setItem('jobfiesta_applications', JSON.stringify(applications));
-  }, [applications]);
-
-  useEffect(() => {
-    localStorage.setItem('jobfiesta_candidates', JSON.stringify(candidates));
-  }, [candidates]);
-
-  useEffect(() => {
-    localStorage.setItem('jobfiesta_saved_jobs', JSON.stringify(savedJobIds));
-  }, [savedJobIds]);
-
-  useEffect(() => {
-    localStorage.setItem('jobfiesta_conversations', JSON.stringify(conversations));
-  }, [conversations]);
-
   // Sync jobs from backend API
   const fetchLiveJobs = async () => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
       const res = await axios.get(`${apiUrl}/api/jobs`, { timeout: 3500 });
-      if (res.data?.jobs) {
+      if (res.data?.jobs && Array.isArray(res.data.jobs)) {
         const mappedJobs = res.data.jobs.map((job) => ({
           id: job._id,
           _id: job._id,
@@ -154,7 +81,11 @@ export const JobProvider = ({ children }) => {
           requirements: job.requirements || [],
           benefits: job.benefits || ['Flexible work hours', 'Health insurance'],
         }));
-        setJobs(mappedJobs);
+        setJobs(prev => {
+          const backendKeys = new Set(mappedJobs.map(j => `${j.title.toLowerCase()}::${j.company.toLowerCase()}`));
+          const remainingInitial = initialJobs.filter(j => !backendKeys.has(`${j.title.toLowerCase()}::${j.company.toLowerCase()}`));
+          return [...mappedJobs, ...remainingInitial];
+        });
       }
     } catch (err) {
       console.info('Backend API unavailable or error fetching jobs:', err.message);
@@ -210,12 +141,51 @@ export const JobProvider = ({ children }) => {
           console.warn('My applications fetch error:', err.message);
         }
       }
+      // Fetch live conversations for current authenticated user
+      fetchConversations();
+    }
+  };
+
+  const fetchConversations = async () => {
+    const token = localStorage.getItem('token');
+    if (!token || token.startsWith('demo-token')) return;
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const res = await axios.get(`${apiUrl}/api/conversations`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const convList = res.data?.data || [];
+      if (Array.isArray(convList) && convList.length > 0) {
+        setConversations(convList);
+      }
+    } catch (err) {
+      console.warn('Backend conversations fetch error:', err.message);
+    }
+  };
+
+  const fetchConversationMessages = async (convId) => {
+    const token = localStorage.getItem('token');
+    if (!token || token.startsWith('demo-token') || !convId || convId.length !== 24) return;
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const res = await axios.get(`${apiUrl}/api/conversations/${convId}/messages`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const msgs = res.data?.data || [];
+      if (Array.isArray(msgs)) {
+        setConversations(prev => prev.map(c => 
+          (c.id === convId || c._id === convId) ? { ...c, messages: msgs } : c
+        ));
+      }
+    } catch (err) {
+      console.warn('Backend conversation messages fetch error:', err.message);
     }
   };
 
   useEffect(() => {
     fetchLiveJobs();
     refreshUserData();
+    fetchConversations();
   }, []);
 
   const toggleSaveJob = async (jobId) => {
@@ -237,13 +207,35 @@ export const JobProvider = ({ children }) => {
   };
 
   const applyToJob = async (jobId, customCoverNote = '') => {
+    // 1. Guard against unauthenticated application submission
+    const savedUser = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+    let currentUser = null;
+    try {
+      if (savedUser) currentUser = JSON.parse(savedUser);
+    } catch (e) {}
+
+    if (!currentUser || !token) {
+      return { 
+        success: false, 
+        requireLogin: true, 
+        message: 'Please log in to apply for this job.' 
+      };
+    }
+
+    if (currentUser.userType === 'recruiter') {
+      return {
+        success: false,
+        message: 'Recruiter accounts cannot apply to jobs.'
+      };
+    }
+
     const targetJob = jobs.find(j => j.id === jobId || j._id === jobId) || {};
     const alreadyApplied = applications.some(a => a.jobId === jobId || (targetJob._id && a.jobId === targetJob._id));
     if (alreadyApplied) {
       return { success: false, message: 'You have already applied to this position.' };
     }
 
-    const token = localStorage.getItem('token');
     let backendApp = null;
     const realJobId = targetJob._id || (typeof jobId === 'string' && jobId.length === 24 ? jobId : null);
 
@@ -279,6 +271,39 @@ export const JobProvider = ({ children }) => {
     };
 
     setApplications(prev => [newApplication, ...prev]);
+
+    // Automatically initiate chat for this job application so job seeker and recruiter can chat
+    const jobConvId = `conv-job-${realJobId || jobId}`;
+    setConversations(prev => {
+      const exists = prev.find(c => c.id === jobConvId || c.jobId === (realJobId || jobId));
+      if (exists) return prev;
+      const initialChatMsg = customCoverNote
+        ? `Application submitted for ${targetJob.title || 'the role'}. Note: "${customCoverNote}"`
+        : `Hi! I have submitted my application for the ${targetJob.title || 'position'} at ${targetJob.company || 'your company'}. Looking forward to discussing this opportunity!`;
+      const newChat = {
+        id: jobConvId,
+        jobId: realJobId || jobId,
+        participantName: targetJob.company || 'Hiring Team',
+        participantRole: `${targetJob.title || 'Position'} • Recruiter`,
+        participantAvatar: targetJob.logo || 'https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=100&h=100&fit=crop&crop=faces',
+        company: targetJob.company || 'Company',
+        date: 'Today',
+        lastMessage: initialChatMsg,
+        unread: false,
+        unreadCount: 0,
+        messages: [
+          {
+            id: Date.now(),
+            sender: 'jobseeker',
+            text: initialChatMsg,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }
+        ],
+        rated: false
+      };
+      return [newChat, ...prev];
+    });
+
     showToast(`Application submitted successfully for ${targetJob.title || 'position'}!`, 'success');
     return { success: true, message: `Application submitted successfully for ${targetJob.title || 'position'}!` };
   };
@@ -369,27 +394,64 @@ export const JobProvider = ({ children }) => {
     ));
   };
 
-  const sendMessage = (conversationId, text, sender = 'jobseeker') => {
+  const sendMessage = async (conversationId, text, sender = 'jobseeker') => {
+    const newMessage = {
+      id: Date.now(),
+      sender,
+      text,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    // If message is from someone else, mark unread
+    const currentUserRole = localStorage.getItem('userType') || 'jobseeker';
+    const isIncoming = sender !== currentUserRole && sender !== 'user';
+
     setConversations(prev => prev.map(conv => {
-      if (conv.id === conversationId) {
-        const newMessage = {
-          id: Date.now(),
-          sender,
-          text,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
+      if (conv.id === conversationId || conv._id === conversationId) {
         return {
           ...conv,
-          messages: [...conv.messages, newMessage]
+          lastMessage: text,
+          date: 'Just now',
+          unread: isIncoming ? true : conv.unread,
+          unreadCount: isIncoming ? (conv.unreadCount || 0) + 1 : (conv.unreadCount || 0),
+          messages: [...(conv.messages || []), newMessage]
+        };
+      }
+      return conv;
+    }));
+
+    // Secure live persistence to backend MongoDB
+    const token = localStorage.getItem('token');
+    if (token && !token.startsWith('demo-token') && typeof conversationId === 'string' && conversationId.length === 24) {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+        await axios.post(`${apiUrl}/api/conversations/messages`, {
+          conversationId,
+          content: text
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (err) {
+        console.warn('Backend message save error:', err.message);
+      }
+    }
+  };
+
+  const markConversationAsRead = (conversationId) => {
+    setConversations(prev => prev.map(conv => {
+      if (conv.id === conversationId || conv._id === conversationId) {
+        return {
+          ...conv,
+          unread: false,
+          unreadCount: 0
         };
       }
       return conv;
     }));
   };
 
-  const rateJobseeker = (conversationId, rating, reviewText) => {
+  const rateJobseeker = async (conversationId, rating, reviewText) => {
     setConversations(prev => prev.map(conv => {
-      if (conv.id === conversationId) {
+      if (conv.id === conversationId || conv._id === conversationId) {
         return {
           ...conv,
           rated: true,
@@ -399,6 +461,22 @@ export const JobProvider = ({ children }) => {
       }
       return conv;
     }));
+
+    // Secure live persistence to backend MongoDB
+    const token = localStorage.getItem('token');
+    if (token && !token.startsWith('demo-token') && typeof conversationId === 'string' && conversationId.length === 24) {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+        await axios.post(`${apiUrl}/api/conversations/${conversationId}/rate`, {
+          rating,
+          reviewText
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (err) {
+        console.warn('Backend rate candidate error:', err.message);
+      }
+    }
   };
 
   const startOrGetConversation = (candidateInfo) => {
@@ -410,10 +488,10 @@ export const JobProvider = ({ children }) => {
     const candAvatar = candidateInfo.avatar || candidateInfo.participantAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces';
     const companyName = candidateInfo.company || 'Nexus Innovations';
 
-    // 1. Search for existing conversation
+    // 1. Search for existing conversation in memory
     let existing = null;
     if (candId) {
-      existing = conversations.find(c => c.candidateId === candId || c.id === `conv-${candId}`);
+      existing = conversations.find(c => c.candidateId === candId || c.id === `conv-${candId}` || c.participantId === candId);
     }
     if (!existing && candName) {
       existing = conversations.find(c => 
@@ -422,10 +500,10 @@ export const JobProvider = ({ children }) => {
     }
 
     if (existing) {
-      return existing.id;
+      return existing.id || existing._id;
     }
 
-    // 2. First time opening chat with this candidate! Create new conversation
+    // 2. First time opening chat with this candidate! Create new conversation in memory
     const newConvId = `conv-${candId || Date.now()}`;
     const initialText = candidateInfo.initialMessage || 
       `Hi ${candName || 'there'}, thank you for applying for the ${candRole} role. We've reviewed your profile and would love to connect with you!`;
@@ -450,30 +528,9 @@ export const JobProvider = ({ children }) => {
       rated: false
     };
 
-    setConversations(prev => {
-      const updated = [newConv, ...prev];
-      try {
-        localStorage.setItem('jobfiesta_conversations', JSON.stringify(updated));
-      } catch (e) {
-        // ignore
-      }
-      return updated;
-    });
-
+    setConversations(prev => [newConv, ...prev]);
     return newConvId;
   };
-
-  useEffect(() => {
-    localStorage.setItem('jobfiesta_companies', JSON.stringify(companies));
-  }, [companies]);
-
-  useEffect(() => {
-    localStorage.setItem('jobfiesta_candidates', JSON.stringify(candidates));
-  }, [candidates]);
-
-  useEffect(() => {
-    localStorage.setItem('jobfiesta_notifications', JSON.stringify(notifications));
-  }, [notifications]);
 
 
   const markNotificationAsRead = (notifId) => {
@@ -499,6 +556,7 @@ export const JobProvider = ({ children }) => {
   };
 
   const unreadNotificationsCount = notifications.filter(n => n.unread).length;
+  const unreadMessagesCount = conversations.reduce((sum, c) => sum + (c.unreadCount || (c.unread ? 1 : 0)), 0);
 
   return (
     <JobContext.Provider value={{
@@ -516,6 +574,8 @@ export const JobProvider = ({ children }) => {
       applications,
       savedJobIds,
       conversations,
+      unreadMessagesCount,
+      markConversationAsRead,
       searchFilters,
       setSearchFilters,
       toggleSaveJob,
@@ -524,6 +584,8 @@ export const JobProvider = ({ children }) => {
       updateApplicationStatus,
       fetchLiveJobs,
       refreshUserData,
+      fetchConversations,
+      fetchConversationMessages,
       sendMessage,
       rateJobseeker,
       startOrGetConversation

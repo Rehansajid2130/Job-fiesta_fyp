@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/common/Navbar';
 import { useAuth } from '../context/AuthContext';
@@ -11,7 +11,14 @@ import QuestionsStepThree from '../components/registration/QuestionsStepThree';
 
 const RegistrationPage = () => {
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register, user } = useAuth();
+
+  // If already authenticated, redirect to role dashboard
+  useEffect(() => {
+    if (user) {
+      navigate(user.userType === 'recruiter' ? '/recruiter-dashboard' : '/jobseeker-dashboard', { replace: true });
+    }
+  }, [user, navigate]);
 
   // Step state: 
   // 'primary' (Name, Email, Password, Mobile, Role selector)

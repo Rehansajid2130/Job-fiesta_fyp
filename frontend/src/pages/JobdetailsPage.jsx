@@ -54,9 +54,19 @@ const JobdetailsPage = () => {
   const isSaved = savedJobIds.includes(job.id);
   const isApplied = applications.some(a => a.jobId === job.id);
 
-  const handleApply = (e) => {
+  const handleApply = async (e) => {
     e.preventDefault();
-    const result = applyToJob(job.id, coverNote);
+    if (!user) {
+      setApplyModalOpen(false);
+      navigate('/login', { 
+        state: { 
+          from: `/job/${job.id}`,
+          message: 'Please log in to your account to apply for this job.' 
+        } 
+      });
+      return;
+    }
+    const result = await applyToJob(job.id, coverNote);
     if (result.success) {
       setSuccessMessage(result.message);
       setTimeout(() => {
@@ -64,7 +74,17 @@ const JobdetailsPage = () => {
         setApplyModalOpen(false);
       }, 1500);
     } else {
-      alert(result.message);
+      if (result.requireLogin) {
+        setApplyModalOpen(false);
+        navigate('/login', { 
+          state: { 
+            from: `/job/${job.id}`,
+            message: result.message 
+          } 
+        });
+      } else {
+        alert(result.message);
+      }
     }
   };
 
@@ -371,7 +391,7 @@ const JobdetailsPage = () => {
                   {isApplied ? (
                     <div style={{
                       padding: '14px',
-                      borderRadius: '10px',
+                      borderRadius: '8px',
                       backgroundColor: '#ECFDF5',
                       color: '#065F46',
                       fontWeight: '700',
@@ -386,31 +406,28 @@ const JobdetailsPage = () => {
                     </div>
                   ) : (
                     <button
-                      onClick={() => setApplyModalOpen(true)}
+                      onClick={() => {
+                        if (!user) {
+                          navigate('/login', { 
+                            state: { 
+                              from: `/job/${job.id}`,
+                              message: 'Please log in to your account to apply for this job.' 
+                            } 
+                          });
+                          return;
+                        }
+                        setApplyModalOpen(true);
+                      }}
                       style={{
                         width: '100%',
                         padding: '14px',
-                        borderRadius: '10px',
+                        borderRadius: '8px',
                         backgroundColor: '#0C463B',
                         color: '#FFFFFF',
                         border: '1px solid #0C463B',
                         fontWeight: '700',
                         fontSize: '0.98rem',
-                        cursor: 'pointer',
-                        boxShadow: '0 4px 14px rgba(12, 70, 59, 0.22)',
-                        transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1)'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#08342c';
-                        e.currentTarget.style.borderColor = '#08342c';
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = '0 8px 24px rgba(12, 70, 59, 0.32)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#0C463B';
-                        e.currentTarget.style.borderColor = '#0C463B';
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 70, 59, 0.22)';
+                        cursor: 'pointer'
                       }}
                     >
                       Apply Now
@@ -471,21 +488,7 @@ const JobdetailsPage = () => {
                   color: '#0C463B',
                   fontWeight: '700',
                   fontSize: '0.84rem',
-                  textDecoration: 'none',
-                  boxShadow: '0 1px 3px rgba(12, 70, 59, 0.08)',
-                  transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#0C463B';
-                  e.currentTarget.style.color = '#FFFFFF';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 70, 59, 0.22)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#EBF8F4';
-                  e.currentTarget.style.color = '#0C463B';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(12, 70, 59, 0.08)';
+                  textDecoration: 'none'
                 }}
               >
                 View Full Company Profile →
@@ -532,7 +535,7 @@ const JobdetailsPage = () => {
               alignItems: 'center',
               justifyContent: 'space-between'
             }}>
-              <span>Resume: <strong>Alice_Johnson_CV.pdf</strong></span>
+              <span>Resume: <strong>{user?.name ? `${user.name.replace(/\s+/g, '_')}_CV.pdf` : 'Candidate_CV.pdf'}</strong></span>
               <Badge variant="success">ATS Ready</Badge>
             </div>
 
@@ -569,21 +572,7 @@ const JobdetailsPage = () => {
                   color: '#0C463B',
                   fontWeight: '600',
                   fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  boxShadow: '0 1px 3px rgba(12, 70, 59, 0.08)',
-                  transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#0C463B';
-                  e.currentTarget.style.color = '#FFFFFF';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 70, 59, 0.22)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#EBF8F4';
-                  e.currentTarget.style.color = '#0C463B';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(12, 70, 59, 0.08)';
+                  cursor: 'pointer'
                 }}
               >
                 Cancel

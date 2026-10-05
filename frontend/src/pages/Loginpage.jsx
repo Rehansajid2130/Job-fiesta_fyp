@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import Navbar from '../components/common/Navbar';
 import { useAuth } from '../context/AuthContext';
-import { Check, X, AlertCircle, Mail } from 'lucide-react';
+import { Check, X, AlertCircle, Mail, Info } from 'lucide-react';
 
 const Loginpage = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const location = useLocation();
+  const { login, user } = useAuth();
 
   const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -14,6 +15,14 @@ const Loginpage = () => {
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
+  // If already authenticated, redirect to destination or dashboard
+  useEffect(() => {
+    if (user) {
+      const target = location.state?.from || (user.userType === 'recruiter' ? '/recruiter-dashboard' : '/jobseeker-dashboard');
+      navigate(target, { replace: true });
+    }
+  }, [user, navigate, location.state]);
 
   // Forgot Password Modal State
   const [forgotModalOpen, setForgotModalOpen] = useState(false);
@@ -57,11 +66,11 @@ const Loginpage = () => {
       if (res?.success) {
         setLoginSuccess(true);
         setTimeout(() => {
-          if (res.user?.userType === 'recruiter' || res.user?.role === 'employer' || activeRole === 'recruiter') {
-            navigate('/recruiter-dashboard');
-          } else {
-            navigate('/jobseeker-dashboard');
-          }
+          const defaultDash = (res.user?.userType === 'recruiter' || res.user?.role === 'employer' || activeRole === 'recruiter') 
+            ? '/recruiter-dashboard' 
+            : '/jobseeker-dashboard';
+          const destination = location.state?.from || defaultDash;
+          navigate(destination);
         }, 800);
       } else {
         setErrorMsg(res?.message || 'Invalid email or password.');
@@ -77,7 +86,9 @@ const Loginpage = () => {
     setTimeout(async () => {
       await login(`${provider.toLowerCase()}.user@jobfiesta.io`, 'SocialAuth123', activeRole);
       setLoading(false);
-      navigate(activeRole === 'recruiter' ? '/recruiter-dashboard' : '/jobseeker-dashboard');
+      const defaultDash = activeRole === 'recruiter' ? '/recruiter-dashboard' : '/jobseeker-dashboard';
+      const destination = location.state?.from || defaultDash;
+      navigate(destination);
     }, 600);
   };
 
@@ -136,6 +147,26 @@ const Loginpage = () => {
             Welcome back! Select the below login methods.
           </p>
         </div>
+
+        {/* Info Banner when redirected from Apply or Protected Action */}
+        {location.state?.message && (
+          <div style={{
+            margin: '0 12px 22px 12px',
+            padding: '14px 18px',
+            backgroundColor: '#EFF6FF',
+            border: '1px solid #BFDBFE',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            color: '#1E40AF',
+            fontSize: '14.5px',
+            fontWeight: '500'
+          }}>
+            <Info size={20} color="#2563EB" style={{ flexShrink: 0 }} />
+            <span>{location.state.message}</span>
+          </div>
+        )}
 
         {/* Main Card Container */}
         <div style={{
@@ -349,23 +380,23 @@ const Loginpage = () => {
                   width: '100%',
                   height: '50px',
                   borderRadius: '8px',
-                  backgroundColor: '#0D473B',
+                  backgroundColor: '#0C463B',
                   color: '#FFFFFF',
                   fontSize: '16px',
                   fontWeight: '700',
-                  border: 'none',
+                  border: '1px solid #0C463B',
                   cursor: loading ? 'not-allowed' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   transition: 'background-color 0.15s ease, transform 0.1s ease',
-                  boxShadow: '0 4px 12px rgba(13, 71, 59, 0.15)'
+                  boxShadow: '0 4px 12px rgba(12, 70, 59, 0.15)'
                 }}
                 onMouseEnter={(e) => {
-                  if (!loading) e.currentTarget.style.backgroundColor = '#08332A';
+                  if (!loading) e.currentTarget.style.backgroundColor = '#08342c';
                 }}
                 onMouseLeave={(e) => {
-                  if (!loading) e.currentTarget.style.backgroundColor = '#0D473B';
+                  if (!loading) e.currentTarget.style.backgroundColor = '#0C463B';
                 }}
               >
                 {loading ? 'Logging in...' : 'Login'}
@@ -413,16 +444,7 @@ const Loginpage = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.02)',
-                  transition: 'transform 0.15s ease, box-shadow 0.15s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.06)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.02)';
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.02)'
                 }}
               >
                 <svg width="22" height="22" viewBox="0 0 24 24">
@@ -460,16 +482,7 @@ const Loginpage = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.02)',
-                  transition: 'transform 0.15s ease, box-shadow 0.15s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.06)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.02)';
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.02)'
                 }}
               >
                 <img
@@ -634,21 +647,7 @@ const Loginpage = () => {
                       color: '#0C463B',
                       fontSize: '13px',
                       fontWeight: '600',
-                      cursor: 'pointer',
-                      boxShadow: '0 1px 3px rgba(12, 70, 59, 0.08)',
-                      transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#0C463B';
-                      e.currentTarget.style.color = '#FFFFFF';
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 70, 59, 0.22)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#EBF8F4';
-                      e.currentTarget.style.color = '#0C463B';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(12, 70, 59, 0.08)';
+                      cursor: 'pointer'
                     }}
                   >
                     Cancel

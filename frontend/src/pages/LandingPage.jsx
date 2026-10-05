@@ -47,6 +47,15 @@ const LandingPage = () => {
 
   const handleOpenApply = (job, e) => {
     if (e) e.stopPropagation();
+    if (!user) {
+      navigate('/login', { 
+        state: { 
+          from: `/job/${job.id}`,
+          message: 'Please log in to your account to apply for this job.' 
+        } 
+      });
+      return;
+    }
     setSelectedJob(job);
     setApplyModalOpen(true);
   };

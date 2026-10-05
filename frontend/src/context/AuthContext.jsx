@@ -9,21 +9,32 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
-      try { return JSON.parse(savedUser); } catch (e) { return null; }
+      try {
+        const parsed = JSON.parse(savedUser);
+        // Clear old default demo mock user so guest users start unauthenticated
+        if (parsed?.id === 'usr-1' && parsed?.email === 'alice.jobseeker@example.com' && (!localStorage.getItem('token') || localStorage.getItem('token') === 'demo-token')) {
+          localStorage.removeItem('user');
+          localStorage.removeItem('token');
+          localStorage.removeItem('userType');
+          localStorage.removeItem('userId');
+          return null;
+        }
+        return parsed;
+      } catch (e) {
+        return null;
+      }
     }
-    // Default logged in as demo Job Seeker for instant access
-    return {
-      id: 'usr-1',
-      name: 'Alice Johnson',
-      email: 'alice.jobseeker@example.com',
-      userType: 'jobseeker',
-      title: 'Senior Frontend Developer',
-      location: 'San Francisco, CA',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&crop=faces'
-    };
+    return null;
   });
 
-  const [token, setToken] = useState(() => localStorage.getItem('token') || 'demo-token');
+  const [token, setToken] = useState(() => {
+    const savedToken = localStorage.getItem('token');
+    if (!savedToken || savedToken === 'demo-token') {
+      localStorage.removeItem('token');
+      return null;
+    }
+    return savedToken;
+  });
 
   useEffect(() => {
     if (user) {
@@ -123,10 +134,19 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('userType');
-    localStorage.removeItem('userId');
+    [
+      'token',
+      'user',
+      'userType',
+      'userId',
+      'jobfiesta_jobs',
+      'jobfiesta_applications',
+      'jobfiesta_candidates',
+      'jobfiesta_conversations',
+      'jobfiesta_notifications',
+      'jobfiesta_companies',
+      'jobfiesta_saved_jobs'
+    ].forEach((k) => localStorage.removeItem(k));
   };
 
   const switchRole = async (newRole) => {

@@ -40,6 +40,15 @@ const RoleRoute = ({ children, allowedRole }) => {
   return children;
 };
 
+// General route protection for authenticated users of any role
+const ProtectedRoute = ({ children }) => {
+  const { user } = useAuth();
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
 function App() {
   return (
     <ErrorBoundary>
@@ -71,15 +80,15 @@ function App() {
               <Route path="/profile/:username" element={<PublicProfilePage />} />
               <Route path="/profile" element={<Navigate to="/profile/furqan12" replace />} />
 
-              {/* Notification Center */}
-              <Route path="/notifications" element={<NotificationsPage />} />
+              {/* Notification Center (Protected) */}
+              <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
               
-              {/* Job Details */}
+              {/* Job Details (Public to view, login required to apply) */}
               <Route path="/job/:id" element={<JobdetailsPage />} />
               <Route path="/job-details" element={<JobdetailsPage />} />
 
-              {/* Resume Builder */}
-              <Route path="/resume-builder" element={<ResumeBuilderPage />} />
+              {/* Resume Builder (Job Seekers Only) */}
+              <Route path="/resume-builder" element={<RoleRoute allowedRole="jobseeker"><ResumeBuilderPage /></RoleRoute>} />
               <Route path="/resume" element={<Navigate to="/resume-builder" replace />} />
 
               {/* Authentication */}
@@ -96,15 +105,15 @@ function App() {
               {/* Job Posting (Recruiters Only) */}
               <Route path="/post-job" element={<RoleRoute allowedRole="recruiter"><PostJobPage /></RoleRoute>} />
 
-              {/* Chat & Messaging */}
-              <Route path="/chat" element={<ChatMainPage />} />
+              {/* Chat & Messaging (Protected) */}
+              <Route path="/chat" element={<ProtectedRoute><ChatMainPage /></ProtectedRoute>} />
               <Route path="/chat-main" element={<Navigate to="/chat" replace />} />
               <Route path="/messages" element={<Navigate to="/chat" replace />} />
               <Route path="/chat-interface1" element={<Navigate to="/chat" replace />} />
               <Route path="/chat-interface2" element={<Navigate to="/chat" replace />} />
 
-              {/* Account Settings */}
-              <Route path="/account-settings" element={<AccountsettingsPage />} />
+              {/* Account Settings (Protected) */}
+              <Route path="/account-settings" element={<ProtectedRoute><AccountsettingsPage /></ProtectedRoute>} />
 
               {/* System Diagnostics & Testing Suite */}
               <Route path="/system-status" element={<SystemStatusPage />} />

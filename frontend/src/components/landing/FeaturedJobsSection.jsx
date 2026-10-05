@@ -56,16 +56,7 @@ const FeaturedJobsSection = ({ featuredJobs, totalJobsCount, applications, onOpe
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                cursor: 'pointer',
-                transition: 'transform 0.2s ease, box-shadow 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.boxShadow = '0 12px 30px rgba(0, 0, 0, 0.08)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.04)';
+                cursor: 'pointer'
               }}
             >
               {/* Top Tags - ponytail: #475569 ensures WCAG AA contrast on white */}
@@ -124,21 +115,7 @@ const FeaturedJobsSection = ({ featuredJobs, totalJobsCount, applications, onOpe
                     fontFamily: 'Inter, sans-serif',
                     fontSize: '15px',
                     fontWeight: '600',
-                    cursor: 'pointer',
-                    boxShadow: '0 1px 3px rgba(12, 70, 59, 0.08)',
-                    transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#0C463B';
-                    e.currentTarget.style.color = '#FFFFFF';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 6px 18px rgba(12, 70, 59, 0.22)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#EBF8F4';
-                    e.currentTarget.style.color = '#0C463B';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 1px 3px rgba(12, 70, 59, 0.08)';
+                    cursor: 'pointer'
                   }}
                 >
                   View Position →
@@ -170,26 +147,12 @@ const FeaturedJobsSection = ({ featuredJobs, totalJobsCount, applications, onOpe
                     backgroundColor: '#0C463B',
                     color: '#FFFFFF',
                     border: '1px solid #0C463B',
-                    borderRadius: '50px',
+                    borderRadius: '8px',
                     padding: '12px 0',
                     fontFamily: 'Inter, sans-serif',
                     fontSize: '16px',
                     fontWeight: '600',
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 8px rgba(12, 70, 59, 0.18)',
-                    transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#08342c';
-                    e.currentTarget.style.borderColor = '#08342c';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 6px 18px rgba(12, 70, 59, 0.28)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#0C463B';
-                    e.currentTarget.style.borderColor = '#0C463B';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(12, 70, 59, 0.18)';
+                    cursor: 'pointer'
                   }}
                 >
                   Apply Now
@@ -207,21 +170,7 @@ const FeaturedJobsSection = ({ featuredJobs, totalJobsCount, applications, onOpe
                     fontFamily: 'Inter, sans-serif',
                     fontSize: '16px',
                     fontWeight: '600',
-                    cursor: 'pointer',
-                    boxShadow: '0 1px 3px rgba(12, 70, 59, 0.08)',
-                    transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#0C463B';
-                    e.currentTarget.style.color = '#FFFFFF';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 6px 18px rgba(12, 70, 59, 0.22)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#EBF8F4';
-                    e.currentTarget.style.color = '#0C463B';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 1px 3px rgba(12, 70, 59, 0.08)';
+                    cursor: 'pointer'
                   }}
                 >
                   Apply Now

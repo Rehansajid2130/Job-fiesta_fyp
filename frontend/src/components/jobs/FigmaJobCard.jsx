@@ -38,17 +38,7 @@ const FigmaJobCard = ({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
         fontFamily: 'Inter, sans-serif'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-4px)';
-        e.currentTarget.style.boxShadow = '0 12px 30px rgba(0, 0, 0, 0.08)';
-        // ponytail: removed dark/black hover border as requested
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.04)';
       }}
     >
       <div>
@@ -181,21 +171,7 @@ const FigmaJobCard = ({
             fontSize: '13.5px',
             fontWeight: '600',
             cursor: 'pointer',
-            textAlign: 'center',
-            boxShadow: '0 1px 3px rgba(12, 70, 59, 0.08)',
-            transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#0C463B';
-            e.currentTarget.style.color = '#FFFFFF';
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 70, 59, 0.22)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#EBF8F4';
-            e.currentTarget.style.color = '#0C463B';
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 1px 3px rgba(12, 70, 59, 0.08)';
+            textAlign: 'center'
           }}
         >
           View details
@@ -206,29 +182,15 @@ const FigmaJobCard = ({
             type="button"
             onClick={() => navigate('/candidates')}
             style={{
-              backgroundColor: '#0D473B',
+              backgroundColor: '#0C463B',
               color: '#FFFFFF',
-              border: '1px solid #0D473B',
-              borderRadius: '50px',
+              border: '1px solid #0C463B',
+              borderRadius: '8px',
               padding: '8px 16px',
               fontSize: '13.5px',
               fontWeight: '600',
               cursor: 'pointer',
-              textAlign: 'center',
-              boxShadow: '0 2px 8px rgba(13, 71, 59, 0.18)',
-              transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#08342c';
-              e.currentTarget.style.borderColor = '#08342c';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 6px 18px rgba(13, 71, 59, 0.28)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#0D473B';
-              e.currentTarget.style.borderColor = '#0D473B';
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(13, 71, 59, 0.18)';
+              textAlign: 'center'
             }}
           >
             Manage ATS
@@ -238,9 +200,9 @@ const FigmaJobCard = ({
             type="button"
             disabled
             style={{
-              backgroundColor: '#DCFCE7',
-              color: '#0D473B',
-              border: '1px solid #86EFAC',
+              backgroundColor: '#ECFDF5',
+              color: '#065F46',
+              border: '1px solid #A7F3D0',
               borderRadius: '50px',
               padding: '8px 16px',
               fontSize: '13.5px',
@@ -256,29 +218,15 @@ const FigmaJobCard = ({
             type="button"
             onClick={() => onApply && onApply(job)}
             style={{
-              backgroundColor: '#0D473B',
+              backgroundColor: '#0C463B',
               color: '#FFFFFF',
-              border: '1px solid #0D473B',
-              borderRadius: '50px',
+              border: '1px solid #0C463B',
+              borderRadius: '8px',
               padding: '8px 16px',
               fontSize: '13.5px',
               fontWeight: '600',
               cursor: 'pointer',
-              textAlign: 'center',
-              boxShadow: '0 2px 8px rgba(13, 71, 59, 0.18)',
-              transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#08342c';
-              e.currentTarget.style.borderColor = '#08342c';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 6px 18px rgba(13, 71, 59, 0.28)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#0D473B';
-              e.currentTarget.style.borderColor = '#0D473B';
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(13, 71, 59, 0.18)';
+              textAlign: 'center'
             }}
           >
             Apply now

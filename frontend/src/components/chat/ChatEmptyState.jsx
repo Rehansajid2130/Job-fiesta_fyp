@@ -26,40 +26,12 @@ const ChatEmptyState = ({ onNewMessage }) => {
       <p style={{
         fontSize: '14px',
         color: '#6B7280',
-        margin: '0 0 24px 0',
+        margin: '0',
         maxWidth: '440px',
         lineHeight: 1.5
       }}>
-        Choose one from your existing messages, or start a new one.
+        Select a conversation from the list to view messages and chat.
       </p>
-
-      {/* New Message Button: Deep Green Pill matching Figma */}
-      <button
-        type="button"
-        onClick={onNewMessage}
-        style={{
-          backgroundColor: '#114B3E',
-          color: '#FFFFFF',
-          borderRadius: '9999px',
-          padding: '12px 36px',
-          fontSize: '14px',
-          fontWeight: '600',
-          border: 'none',
-          cursor: 'pointer',
-          boxShadow: '0 4px 12px rgba(17, 75, 62, 0.2)',
-          transition: 'background-color 0.2s ease, transform 0.15s ease'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = '#0B342B';
-          e.currentTarget.style.transform = 'translateY(-1px)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = '#114B3E';
-          e.currentTarget.style.transform = 'translateY(0)';
-        }}
-      >
-        New Message
-      </button>
 
       {/* Figma Illustration: Person in armchair with newspaper & lamp */}
       <div style={{ marginTop: '48px', width: '100%', display: 'flex', justifyContent: 'center' }}>

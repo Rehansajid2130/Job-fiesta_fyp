@@ -17,7 +17,8 @@ const ChatSidebar = ({
   searchQuery,
   setSearchQuery,
   user,
-  logout
+  logout,
+  markConversationAsRead
 }) => {
   const navigate = useNavigate();
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -67,22 +68,16 @@ const ChatSidebar = ({
       {/* Top Header Section */}
       <div style={{ padding: '24px 24px 14px 24px' }}>
         
-        {/* Logo row: Sparkle + "Job fiesta" */}
+        {/* Logo row: Clean "Job fiesta" */}
         <Link 
           to="/" 
           style={{ 
             display: 'inline-flex', 
             alignItems: 'center', 
-            gap: '6px', 
             textDecoration: 'none', 
-            marginBottom: '28px' 
+            marginBottom: '24px' 
           }}
         >
-          <img 
-            src="/assets/images/group_3_1.svg" 
-            alt="Sparkle" 
-            style={{ width: '22px', height: '20px' }} 
-          />
           <span style={{
             display: 'inline-flex',
             alignItems: 'baseline'
@@ -109,8 +104,13 @@ const ChatSidebar = ({
           </span>
         </Link>
 
-        {/* Navigation & Title */}
-        <div>
+        {/* Navigation & Title: Back button aligned with Messages title */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          marginBottom: '16px'
+        }}>
           <button
             type="button"
             onClick={() => {
@@ -125,20 +125,26 @@ const ChatSidebar = ({
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              padding: '0 0 10px 0',
-              display: 'flex',
+              padding: '6px',
+              borderRadius: '8px',
+              display: 'inline-flex',
               alignItems: 'center',
-              color: '#111827'
+              justifyContent: 'center',
+              color: '#111827',
+              transition: 'background-color 0.15s ease'
             }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F3F4F6'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
-            <ArrowLeft size={19} strokeWidth={2.4} />
+            <ArrowLeft size={20} strokeWidth={2.4} />
           </button>
           <h2 style={{
             fontSize: '22px',
             fontWeight: '800',
             color: '#111827',
-            margin: '0 0 16px 0',
-            letterSpacing: '-0.01em'
+            margin: 0,
+            letterSpacing: '-0.01em',
+            lineHeight: 1
           }}>
             Messages
           </h2>
@@ -217,14 +223,20 @@ const ChatSidebar = ({
         ) : (
           filteredConversations.map((conv) => {
             const isSelected = conv.id === activeConvId;
-            const lastMsg = conv.messages[conv.messages.length - 1];
+            const lastMsg = conv.messages && conv.messages.length > 0 ? conv.messages[conv.messages.length - 1] : null;
             const snippet = conv.lastMessage || lastMsg?.text || 'No messages yet';
-            const dateDisplay = conv.date || 'Dec 15';
+            const dateDisplay = conv.date || 'Today';
+            const hasUnread = Boolean(conv.unread || (conv.unreadCount && conv.unreadCount > 0));
+            const q = searchQuery.toLowerCase().trim();
+            const matchedMsg = q && conv.messages ? conv.messages.find(m => m.text?.toLowerCase().includes(q)) : null;
 
             return (
               <div
                 key={conv.id}
-                onClick={() => setActiveConvId(conv.id)}
+                onClick={() => {
+                  setActiveConvId(conv.id);
+                  if (markConversationAsRead) markConversationAsRead(conv.id);
+                }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -232,29 +244,44 @@ const ChatSidebar = ({
                   padding: '10px 14px',
                   borderRadius: '12px',
                   cursor: 'pointer',
-                  backgroundColor: isSelected ? '#F3F4F6' : 'transparent',
-                  transition: 'background-color 0.15s ease',
-                  marginBottom: '2px'
+                  backgroundColor: isSelected ? '#F3F4F6' : (hasUnread ? '#F0FDF4' : 'transparent'),
+                  borderLeft: hasUnread ? '3px solid #10B981' : (isSelected ? '3px solid #0C463B' : '3px solid transparent'),
+                  transition: 'all 0.15s ease',
+                  marginBottom: '3px'
                 }}
                 onMouseEnter={(e) => {
-                  if (!isSelected) e.currentTarget.style.backgroundColor = '#F9FAFB';
+                  if (!isSelected && !hasUnread) e.currentTarget.style.backgroundColor = '#F9FAFB';
                 }}
                 onMouseLeave={(e) => {
-                  if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent';
+                  if (!isSelected && !hasUnread) e.currentTarget.style.backgroundColor = 'transparent';
                 }}
               >
-                {/* Participant Avatar */}
-                <img
-                  src={conv.participantAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces'}
-                  alt={conv.participantName}
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                    flexShrink: 0
-                  }}
-                />
+                {/* Participant Avatar with online indicator */}
+                <div style={{ position: 'relative', flexShrink: 0 }}>
+                  <img
+                    src={conv.participantAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces'}
+                    alt={conv.participantName}
+                    style={{
+                      width: '42px',
+                      height: '42px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      display: 'block'
+                    }}
+                  />
+                  {hasUnread && (
+                    <span style={{
+                      position: 'absolute',
+                      top: '-1px',
+                      right: '-1px',
+                      width: '12px',
+                      height: '12px',
+                      backgroundColor: '#10B981',
+                      borderRadius: '50%',
+                      border: '2px solid #FFFFFF'
+                    }} />
+                  )}
+                </div>
 
                 {/* Name + Snippet */}
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -266,8 +293,8 @@ const ChatSidebar = ({
                   }}>
                     <span style={{
                       fontSize: '14px',
-                      fontWeight: '700',
-                      color: '#111827',
+                      fontWeight: hasUnread ? '800' : '700',
+                      color: hasUnread ? '#0C463B' : '#111827',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap'
@@ -276,23 +303,70 @@ const ChatSidebar = ({
                     </span>
                     <span style={{
                       fontSize: '11px',
-                      color: '#9CA3AF',
+                      color: hasUnread ? '#0C463B' : '#9CA3AF',
+                      fontWeight: hasUnread ? '700' : '500',
                       flexShrink: 0
                     }}>
                       {dateDisplay}
                     </span>
                   </div>
 
-                  <p style={{
-                    fontSize: '12px',
-                    color: isSelected ? '#4B5563' : '#6B7280',
-                    margin: '2px 0 0 0',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '8px',
+                    marginTop: '2px'
                   }}>
-                    {snippet}
-                  </p>
+                    <p style={{
+                      fontSize: '12px',
+                      fontWeight: hasUnread ? '600' : '400',
+                      color: hasUnread ? '#111827' : (isSelected ? '#4B5563' : '#6B7280'),
+                      margin: 0,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      flex: 1
+                    }}>
+                      {snippet}
+                    </p>
+
+                    {hasUnread && (
+                      <span style={{
+                        backgroundColor: '#10B981',
+                        color: '#FFFFFF',
+                        fontSize: '10px',
+                        fontWeight: '800',
+                        borderRadius: '9999px',
+                        minWidth: '18px',
+                        height: '18px',
+                        padding: '0 5px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0
+                      }}>
+                        {conv.unreadCount || 'New'}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Show search match snippet inside chat history if found */}
+                  {q && matchedMsg && (
+                    <div style={{
+                      fontSize: '11px',
+                      color: '#0D473B',
+                      backgroundColor: '#E6F4EA',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      marginTop: '4px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      💬 "{matchedMsg.text.length > 32 ? matchedMsg.text.slice(0, 32) + '...' : matchedMsg.text}"
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -306,31 +380,72 @@ const ChatSidebar = ({
         style={{
           position: 'relative',
           borderTop: '1px solid #F1F5F9',
-          padding: '16px 20px',
+          padding: '14px 18px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           backgroundColor: '#FFFFFF'
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <img 
-            src={currentUserAvatar} 
-            alt={currentUserDisplayName}
-            style={{
-              width: '36px',
-              height: '36px',
+        <div 
+          onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+          title="Click to open menu"
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '10px',
+            cursor: 'pointer',
+            padding: '4px 6px',
+            borderRadius: '8px',
+            transition: 'background-color 0.15s ease',
+            flex: 1
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F8FAFC'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+        >
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            <img 
+              src={currentUserAvatar} 
+              alt={currentUserDisplayName}
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '50%',
+                objectFit: 'cover',
+                display: 'block'
+              }}
+            />
+            <span style={{
+              position: 'absolute',
+              bottom: '0px',
+              right: '0px',
+              width: '10px',
+              height: '10px',
+              backgroundColor: '#10B981',
               borderRadius: '50%',
-              objectFit: 'cover'
-            }}
-          />
-          <span style={{
-            fontSize: '14px',
-            fontWeight: '700',
-            color: '#111827'
-          }}>
-            {currentUserDisplayName}
-          </span>
+              border: '2px solid #FFFFFF'
+            }} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            <span style={{
+              fontSize: '14px',
+              fontWeight: '700',
+              color: '#111827',
+              lineHeight: 1.2,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}>
+              {currentUserDisplayName}
+            </span>
+            <span style={{
+              fontSize: '11px',
+              color: '#64748B',
+              fontWeight: '500'
+            }}>
+              {isRecruiter ? 'Recruiter' : 'Job Seeker'} • Online
+            </span>
+          </div>
         </div>
 
         {/* More options button ••• */}

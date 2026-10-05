@@ -31,10 +31,20 @@ const QuickApplyModal = ({
     }
   }, [isOpen, user]);
 
-  const handleApplySubmit = (e) => {
+  const handleApplySubmit = async (e) => {
     e.preventDefault();
+    if (!user) {
+      onClose();
+      navigate('/login', { 
+        state: { 
+          from: selectedJob ? `/job/${selectedJob.id}` : '/jobs',
+          message: 'Please log in to your account to apply for this job.' 
+        } 
+      });
+      return;
+    }
     if (!selectedJob) return;
-    const res = applyToJob(selectedJob.id, coverNote);
+    const res = await applyToJob(selectedJob.id, coverNote);
     if (res.success) {
       setApplySuccess(res.message);
       setTimeout(() => {
@@ -42,7 +52,17 @@ const QuickApplyModal = ({
         onClose();
       }, 1600);
     } else {
-      alert(res.message);
+      if (res.requireLogin) {
+        onClose();
+        navigate('/login', { 
+          state: { 
+            from: `/job/${selectedJob.id}`,
+            message: res.message 
+          } 
+        });
+      } else {
+        alert(res.message);
+      }
     }
   };
 
@@ -175,21 +195,7 @@ const QuickApplyModal = ({
                     backgroundColor: '#EBF8F4',
                     color: '#0C463B',
                     fontWeight: '600',
-                    cursor: 'pointer',
-                    boxShadow: '0 1px 3px rgba(12, 70, 59, 0.08)',
-                    transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#0C463B';
-                    e.currentTarget.style.color = '#FFFFFF';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 70, 59, 0.22)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#EBF8F4';
-                    e.currentTarget.style.color = '#0C463B';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 1px 3px rgba(12, 70, 59, 0.08)';
+                    cursor: 'pointer'
                   }}
                 >
                   Cancel
@@ -198,26 +204,12 @@ const QuickApplyModal = ({
                   type="submit"
                   style={{
                     padding: '10px 24px',
-                    borderRadius: '50px',
+                    borderRadius: '8px',
                     border: '1px solid #0C463B',
                     backgroundColor: '#0C463B',
                     color: '#FFFFFF',
                     fontWeight: '600',
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 8px rgba(12, 70, 59, 0.18)',
-                    transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#08342c';
-                    e.currentTarget.style.borderColor = '#08342c';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 6px 18px rgba(12, 70, 59, 0.28)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#0C463B';
-                    e.currentTarget.style.borderColor = '#0C463B';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(12, 70, 59, 0.18)';
+                    cursor: 'pointer'
                   }}
                 >
                   Confirm &amp; Submit Application

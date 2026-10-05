@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
@@ -14,23 +14,22 @@ import {
   CheckCircle2, 
   X, 
   Send, 
-  Briefcase,
-  ChevronDown,
-  Loader2,
-  Code,
-  Palette,
-  TrendingUp,
-  Cpu,
-  DollarSign,
-  Users,
-  Wrench
+  Briefcase, 
+  ChevronDown, 
+  Loader2, 
+  Code, 
+  Palette, 
+  TrendingUp, 
+  Cpu, 
+  DollarSign, 
+  Users, 
+  Wrench 
 } from 'lucide-react';
-
-
 
 const SearchPage = () => {
   const { jobs: contextJobs, applyToJob, toggleSaveJob, savedJobIds } = useJobs();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Search Inputs
@@ -218,6 +217,7 @@ const SearchPage = () => {
     postedDate: j.postedDate || 'Recent',
     applicantsCount: j.applicantsCount || 0,
     description: j.description || '',
+    tags: j.tags || [],
     isBookmarked: savedJobIds?.includes(j.id) || false
   }));
 
@@ -225,34 +225,38 @@ const SearchPage = () => {
   const filteredJobs = combinedJobs
     .filter(job => {
       if (keywordInput.trim()) {
-        const q = keywordInput.toLowerCase();
-        const matchTitle = job.title.toLowerCase().includes(q);
-        const matchCompany = job.company.toLowerCase().includes(q);
-        if (!matchTitle && !matchCompany) return false;
+        const q = keywordInput.toLowerCase().trim();
+        const matchTitle = job.title?.toLowerCase().includes(q);
+        const matchCompany = job.company?.toLowerCase().includes(q);
+        const matchDesc = job.description?.toLowerCase().includes(q);
+        const matchTags = Array.isArray(job.tags) && job.tags.some(t => t.toLowerCase().includes(q));
+        const matchCategory = job.category?.toLowerCase().includes(q);
+        if (!matchTitle && !matchCompany && !matchDesc && !matchTags && !matchCategory) return false;
       }
 
       if (locationInput.trim()) {
-        const locQ = locationInput.toLowerCase();
-        if (!job.location.toLowerCase().includes(locQ)) return false;
+        const locQ = locationInput.toLowerCase().trim();
+        if (!job.location?.toLowerCase().includes(locQ)) return false;
       }
 
       if (filters.category && filters.category !== 'all') {
-        if (job.category !== filters.category) return false;
+        if (job.category?.toLowerCase() !== filters.category.toLowerCase()) return false;
       }
 
       if (filters.type && filters.type !== 'all') {
-        const matchesType = job.type.toLowerCase().includes(filters.type.toLowerCase());
+        const matchesType = job.type?.toLowerCase().includes(filters.type.toLowerCase());
         if (!matchesType) return false;
       }
 
       if (filters.workMode && filters.workMode !== 'all') {
-        const matchesMode = job.workMode.toLowerCase().includes(filters.workMode.toLowerCase());
+        const matchesMode = job.workMode?.toLowerCase().includes(filters.workMode.toLowerCase());
         if (!matchesMode) return false;
       }
 
       if (filters.experience && filters.experience !== 'all') {
-        const matchesExp = job.experience.toLowerCase().includes(filters.experience.toLowerCase());
-        if (!matchesExp) return false;
+        const expQ = filters.experience.toLowerCase().replace(' level', '').replace('-', '');
+        const jobExp = (job.experience || '').toLowerCase().replace(' level', '').replace('-', '');
+        if (!jobExp.includes(expQ) && !expQ.includes(jobExp)) return false;
       }
 
       if (filters.minSalary) {
@@ -278,19 +282,56 @@ const SearchPage = () => {
       return 0;
     });
 
-  const displayedJobs = usingLiveApi ? liveJobs : filteredJobs;
+  const displayedJobs = (usingLiveApi && liveJobs.length > 0) ? liveJobs : filteredJobs;
 
 
-  const handleApplySubmit = (e) => {
+  const handleOpenApply = (job) => {
+    if (!user) {
+      navigate('/login', { 
+        state: { 
+          from: `/job/${job.id}`,
+          message: 'Please log in to your account to apply for this job.' 
+        } 
+      });
+      return;
+    }
+    setApplyModalJob(job);
+  };
+
+  const handleApplySubmit = async (e) => {
     e.preventDefault();
+    if (!user) {
+      setApplyModalJob(null);
+      navigate('/login', { 
+        state: { 
+          from: applyModalJob ? `/job/${applyModalJob.id}` : '/search',
+          message: 'Please log in to your account to apply for this job.' 
+        } 
+      });
+      return;
+    }
     if (applyModalJob) {
-      applyToJob(applyModalJob.id, coverNote);
-      setApplySuccess(true);
-      setTimeout(() => {
-        setApplySuccess(false);
-        setApplyModalJob(null);
-        setCoverNote('');
-      }, 1500);
+      const res = await applyToJob(applyModalJob.id, coverNote);
+      if (res.success) {
+        setApplySuccess(true);
+        setTimeout(() => {
+          setApplySuccess(false);
+          setApplyModalJob(null);
+          setCoverNote('');
+        }, 1500);
+      } else {
+        if (res.requireLogin) {
+          setApplyModalJob(null);
+          navigate('/login', { 
+            state: { 
+              from: `/job/${applyModalJob.id}`,
+              message: res.message 
+            } 
+          });
+        } else {
+          alert(res.message);
+        }
+      }
     }
   };
 
@@ -395,21 +436,7 @@ const SearchPage = () => {
                 padding: '11px 28px',
                 fontSize: '14px',
                 fontWeight: '600',
-                cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(13, 71, 59, 0.18)',
-                transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#08342c';
-                e.currentTarget.style.borderColor = '#08342c';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 18px rgba(13, 71, 59, 0.28)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#0D473B';
-                e.currentTarget.style.borderColor = '#0D473B';
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(13, 71, 59, 0.18)';
+                cursor: 'pointer'
               }}
             >
               Search
@@ -458,26 +485,8 @@ const SearchPage = () => {
                     fontSize: '13px',
                     fontWeight: isSelected ? '700' : '500',
                     fontFamily: 'Inter, sans-serif',
-                    /* ponytail: smooth viscous easing so departing button gradually drains color while new button absorbs mint tint */
-                    transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
                     flexShrink: 0,
                     userSelect: 'none'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isSelected) {
-                      e.currentTarget.style.backgroundColor = '#F8FAF9';
-                      e.currentTarget.style.borderColor = '#CBD5E1';
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.06)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isSelected) {
-                      e.currentTarget.style.backgroundColor = '#FFFFFF';
-                      e.currentTarget.style.borderColor = '#E2E8F0';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.03)';
-                    }
                   }}
                 >
                   <span style={{
@@ -528,16 +537,7 @@ const SearchPage = () => {
                 justifyContent: 'center',
                 gap: '8px',
                 marginBottom: '16px',
-                cursor: 'pointer',
-                transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.07)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.04)';
+                cursor: 'pointer'
               }}
             >
               <SlidersHorizontal size={18} />
@@ -693,8 +693,8 @@ const SearchPage = () => {
                         </div>
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: 'auto' }}>
-                        <div className="t-skel-shimmer-bar" style={{ height: '36px', borderRadius: '50px' }} />
-                        <div className="t-skel-shimmer-bar" style={{ height: '36px', borderRadius: '50px' }} />
+                        <div className="t-skel-shimmer-bar" style={{ height: '36px', borderRadius: '8px' }} />
+                        <div className="t-skel-shimmer-bar" style={{ height: '36px', borderRadius: '8px' }} />
                       </div>
                     </div>
                   ))}
@@ -719,27 +719,13 @@ const SearchPage = () => {
                     onClick={handleResetFilters}
                     style={{
                       padding: '10px 24px',
-                      backgroundColor: '#0D473B',
+                      backgroundColor: '#0C463B',
                       color: '#FFFFFF',
-                      border: '1px solid #0D473B',
-                      borderRadius: '9999px',
+                      border: '1px solid #0C463B',
+                      borderRadius: '8px',
                       fontWeight: '600',
                       fontSize: '13px',
-                      cursor: 'pointer',
-                      boxShadow: '0 2px 8px rgba(13, 71, 59, 0.18)',
-                      transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#08342c';
-                      e.currentTarget.style.borderColor = '#08342c';
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 6px 18px rgba(13, 71, 59, 0.28)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#0D473B';
-                      e.currentTarget.style.borderColor = '#0D473B';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(13, 71, 59, 0.18)';
+                      cursor: 'pointer'
                     }}
                   >
                     Reset All Filters
@@ -754,7 +740,7 @@ const SearchPage = () => {
                         job={job}
                         isBookmarked={savedJobIds?.includes(job.id)}
                         onToggleBookmark={(id) => toggleSaveJob(id)}
-                        onApply={(j) => setApplyModalJob(j)}
+                        onApply={(j) => handleOpenApply(j)}
                       />
                     ))}
                   </div>
@@ -929,21 +915,7 @@ const SearchPage = () => {
                       color: '#0C463B',
                       fontWeight: '600',
                       fontSize: '13px',
-                      cursor: 'pointer',
-                      boxShadow: '0 1px 3px rgba(12, 70, 59, 0.08)',
-                      transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), color 280ms cubic-bezier(0.4, 0, 0.2, 1), border-color 340ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#0C463B';
-                      e.currentTarget.style.color = '#FFFFFF';
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 70, 59, 0.22)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#EBF8F4';
-                      e.currentTarget.style.color = '#0C463B';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(12, 70, 59, 0.08)';
+                      cursor: 'pointer'
                     }}
                   >
                     Cancel
@@ -952,30 +924,16 @@ const SearchPage = () => {
                     type="submit"
                     style={{
                       padding: '10px 24px',
-                      borderRadius: '9999px',
-                      border: '1px solid #0D473B',
-                      backgroundColor: '#0D473B',
+                      borderRadius: '8px',
+                      border: '1px solid #0C463B',
+                      backgroundColor: '#0C463B',
                       color: '#FFFFFF',
                       fontWeight: '600',
                       fontSize: '13px',
                       cursor: 'pointer',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '8px',
-                      boxShadow: '0 2px 8px rgba(13, 71, 59, 0.18)',
-                      transition: 'background-color 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#08342c';
-                      e.currentTarget.style.borderColor = '#08342c';
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 6px 18px rgba(13, 71, 59, 0.28)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#0D473B';
-                      e.currentTarget.style.borderColor = '#0D473B';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(13, 71, 59, 0.18)';
+                      gap: '8px'
                     }}
                   >
                     <Send size={15} />
