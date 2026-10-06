@@ -1,151 +1,176 @@
 <svg width="320" height="220" viewBox="0 0 320 220" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <!-- Soft Background Gradients -->
-    <radialGradient id="mintGlow" cx="0.5" cy="0.5" r="0.5" fx="0.5" fy="0.5">
-      <stop offset="0%" stop-color="#EBF8F4" stop-opacity="0.9"/>
-      <stop offset="70%" stop-color="#EBF8F4" stop-opacity="0.4"/>
+    <!-- Soft Watercolor Wash Backdrop -->
+    <radialGradient id="searchPencilWash" cx="0.5" cy="0.5" r="0.5" fx="0.5" fy="0.5">
+      <stop offset="0%" stop-color="#EBF8F4" stop-opacity="0.95"/>
+      <stop offset="65%" stop-color="#EBF8F4" stop-opacity="0.3"/>
       <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
     </radialGradient>
-    
-    <linearGradient id="folderGradient" x1="0" y1="0" x2="1" y2="1">
+
+    <!-- Card Wash Tint -->
+    <linearGradient id="cardWashTint" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#FFFFFF"/>
       <stop offset="100%" stop-color="#F8FAFC"/>
     </linearGradient>
 
-    <linearGradient id="primaryEmerald" x1="0" y1="0" x2="1" y2="1">
+    <!-- Mint Tag Wash -->
+    <linearGradient id="tagMintWash" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#D1FAE5"/>
+      <stop offset="100%" stop-color="#A7F3D0"/>
+    </linearGradient>
+
+    <!-- Handle Wash Tint -->
+    <linearGradient id="handleWashTint" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#0C463B"/>
       <stop offset="100%" stop-color="#08342C"/>
     </linearGradient>
-
-    <linearGradient id="accentMint" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#10B981"/>
-      <stop offset="100%" stop-color="#059669"/>
-    </linearGradient>
-
-    <linearGradient id="glassReflection" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.7"/>
-      <stop offset="40%" stop-color="#EBF8F4" stop-opacity="0.3"/>
-      <stop offset="100%" stop-color="#10B981" stop-opacity="0.1"/>
-    </linearGradient>
-
-    <!-- Subtle Drop Shadow -->
-    <filter id="softShadow" x="-10%" y="-10%" width="125%" height="130%" filterUnits="userSpaceOnUse">
-      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#0C463B" flood-opacity="0.08"/>
-    </filter>
-
-    <filter id="lensShadow" x="-20%" y="-20%" width="145%" height="150%" filterUnits="userSpaceOnUse">
-      <feDropShadow dx="2" dy="8" stdDeviation="12" flood-color="#0F172A" flood-opacity="0.12"/>
-    </filter>
   </defs>
 
-  <!-- Ambient Backdrop Glow -->
-  <ellipse cx="160" cy="115" rx="140" ry="85" fill="url(#mintGlow)" />
-  <circle cx="255" cy="50" r="16" fill="#ECFDF5" />
-  <circle cx="65" cy="150" r="22" fill="#EBF8F4" />
+  <!-- Ambient Soft Watercolor Wash Backdrop -->
+  <ellipse cx="160" cy="112" rx="136" ry="84" fill="url(#searchPencilWash)" />
 
-  <!-- Background Decorative Orbit Lines -->
-  <path d="M 40 120 C 70 70, 240 60, 280 110" stroke="#CCFBF1" stroke-width="2" stroke-dasharray="4 6" stroke-linecap="round"/>
-  <path d="M 50 145 C 90 190, 220 185, 270 140" stroke="#E2E8F0" stroke-width="1.5" stroke-dasharray="3 5" stroke-linecap="round"/>
-
-  <!-- Left Floating Badge (Resume / Document) -->
-  <g transform="translate(62, 58) rotate(-7)" filter="url(#softShadow)">
-    <rect width="72" height="96" rx="8" fill="url(#folderGradient)" stroke="#E2E8F0" stroke-width="1.5"/>
-    <!-- Header stripe -->
-    <path d="M 0 8 Q 0 0 8 0 L 64 0 Q 72 0 72 8 L 72 20 L 0 20 Z" fill="#0C463B" />
-    <circle cx="14" cy="10" r="3" fill="#10B981" />
-    <rect x="23" y="8" width="34" height="4" rx="2" fill="#FFFFFF" fill-opacity="0.8"/>
-    <!-- Document lines -->
-    <rect x="12" y="32" width="48" height="5" rx="2.5" fill="#E2E8F0"/>
-    <rect x="12" y="44" width="38" height="4" rx="2" fill="#E2E8F0"/>
-    <rect x="12" y="54" width="44" height="4" rx="2" fill="#E2E8F0"/>
-    <rect x="12" y="64" width="30" height="4" rx="2" fill="#E2E8F0"/>
-    <!-- Mini Stamp Check -->
-    <circle cx="52" cy="78" r="8" fill="#ECFDF5" stroke="#10B981" stroke-width="1.2"/>
-    <path d="M49 78 L51.5 80.5 L56 75.5" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Grounding Pencil Scribble Shadow -->
+  <g stroke="#94A3B8" stroke-width="1.2" stroke-linecap="round" opacity="0.65">
+    <path d="M 68 182 C 108 180, 212 180, 252 182" />
+    <path d="M 84 186 C 124 184.5, 196 184.5, 236 186" />
+    <path d="M 104 189 C 136 188.2, 174 188.2, 214 189" />
+    <!-- Fine 45-degree ground hatch marks -->
+    <path d="M 118 179 L 124 184 M 134 179 L 140 184 M 150 179 L 156 184 M 166 179 L 172 184 M 182 179 L 188 184" stroke-width="0.9" opacity="0.45" />
   </g>
 
-  <!-- Central Primary Card (Job Listing / Search Target) -->
-  <g transform="translate(108, 42)" filter="url(#softShadow)">
-    <rect width="130" height="126" rx="12" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+  <!-- Left Handdrawn Document / Resume (Angled in background) -->
+  <g transform="translate(68, 52) rotate(-8)">
+    <!-- Base Paper Wash -->
+    <path d="M 4 4 C 24 3, 56 3.5, 68 4.5 C 69.5 28, 69 68, 67.5 90 C 48 91.2, 18 90.8, 4 90 C 2.5 68, 3 28, 4 4 Z" fill="#FFFFFF" />
     
-    <!-- Job Header Block -->
-    <rect x="12" y="14" width="30" height="30" rx="8" fill="#EBF8F4" stroke="#A7F3D0" stroke-width="1"/>
-    <!-- Briefcase icon inside header -->
-    <path d="M21 24 H33 V34 H21 Z" fill="#0C463B" fill-opacity="0.15"/>
-    <rect x="22" y="24" width="10" height="8" rx="1.5" fill="none" stroke="#0C463B" stroke-width="1.5"/>
-    <path d="M25 24 V22 Q 25 21 26 21 H 28 Q 29 21 29 22 V 24" fill="none" stroke="#0C463B" stroke-width="1.5"/>
-
-    <!-- Job Title Placeholder Bars -->
-    <rect x="50" y="18" width="66" height="8" rx="4" fill="#0C463B" />
-    <rect x="50" y="32" width="44" height="6" rx="3" fill="#94A3B8" />
-
-    <!-- Divider -->
-    <line x1="12" y1="56" x2="118" y2="56" stroke="#F1F5F9" stroke-width="1.5"/>
-
-    <!-- Job Tags & Details -->
-    <rect x="12" y="66" width="34" height="14" rx="7" fill="#EBF8F4"/>
-    <rect x="18" y="70" width="22" height="5" rx="2.5" fill="#0C463B" fill-opacity="0.7"/>
-
-    <rect x="52" y="66" width="32" height="14" rx="7" fill="#F1F5F9"/>
-    <rect x="58" y="70" width="20" height="5" rx="2.5" fill="#64748B"/>
-
-    <rect x="90" y="66" width="28" height="14" rx="7" fill="#F1F5F9"/>
-    <rect x="96" y="70" width="16" height="5" rx="2.5" fill="#64748B"/>
-
-    <!-- Progress / Location placeholder bar -->
-    <rect x="12" y="94" width="106" height="6" rx="3" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
-    <rect x="12" y="94" width="46" height="6" rx="3" fill="#10B981"/>
+    <!-- Primary Pencil Contour (with corner overshoots) -->
+    <path d="M 0 4.5 C 24 3, 58 3.5, 72 4 M 68 0 C 69.5 28, 69 68, 67.5 94 M 72 90 C 48 91.2, 16 90.8, 0 90 M 4 94 C 2.5 68, 3 28, 4 0" 
+          fill="none" stroke="#64748B" stroke-width="1.3" stroke-linecap="round" />
     
-    <rect x="12" y="108" width="60" height="5" rx="2.5" fill="#CBD5E1"/>
+    <!-- Header Band (Handdrawn wash) -->
+    <path d="M 4 5 L 68 5 L 67.8 22 L 4 22 Z" fill="#EBF8F4" />
+    <path d="M 2 22 C 22 21.5, 48 21.8, 70 22" stroke="#0C463B" stroke-width="1.2" stroke-linecap="round" />
+
+    <!-- Sketched Avatar & Text lines -->
+    <circle cx="15" cy="13.5" r="4.5" fill="#10B981" fill-opacity="0.7" />
+    <path d="M 24 13 C 34 12.6, 48 12.8, 56 13" stroke="#0C463B" stroke-width="1.8" stroke-linecap="round" />
+    
+    <path d="M 12 34 C 26 33.6, 44 33.8, 58 34" stroke="#CBD5E1" stroke-width="1.4" stroke-linecap="round" />
+    <path d="M 12 44 C 24 43.6, 38 43.8, 48 44" stroke="#E2E8F0" stroke-width="1.4" stroke-linecap="round" />
+    <path d="M 12 54 C 28 53.6, 46 53.8, 54 54" stroke="#E2E8F0" stroke-width="1.4" stroke-linecap="round" />
+    <path d="M 12 64 C 22 63.6, 34 63.8, 42 64" stroke="#E2E8F0" stroke-width="1.4" stroke-linecap="round" />
+
+    <!-- Mini Sketched Stamp Check -->
+    <circle cx="50" cy="76" r="7.5" fill="#EBF8F4" stroke="#0C463B" stroke-width="1.2" stroke-linecap="round" />
+    <path d="M 46.5 76 C 47.8 77.5, 48.5 78.2, 49.2 78.8 C 50.5 76.8, 52 74, 54 72" 
+          fill="none" stroke="#0C463B" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
   </g>
 
-  <!-- Big Stylized Magnifying Glass with Modern Glass Lens -->
-  <g transform="translate(162, 70)" filter="url(#lensShadow)">
-    <!-- Lens Rim Outer -->
-    <circle cx="52" cy="52" r="42" fill="#FFFFFF" fill-opacity="0.2" stroke="#0C463B" stroke-width="6"/>
-    <!-- Inner Lens Reflection -->
-    <circle cx="52" cy="52" r="39" fill="url(#glassReflection)"/>
+  <!-- Central Handdrawn Job Listing Card -->
+  <g transform="translate(108, 40)">
+    <!-- Base Paper Wash -->
+    <path d="M 6 6 C 42 4.5, 96 4.8, 126 6.5 C 128 40, 127.5 86, 126 122 C 94 123.5, 40 123, 6 122 C 4.5 86, 5 40, 6 6 Z" fill="#FFFFFF" />
 
-    <!-- Compass / Focus Reticle inside lens -->
-    <circle cx="52" cy="52" r="22" fill="none" stroke="#10B981" stroke-width="1.8" stroke-dasharray="3 4"/>
-    <circle cx="52" cy="52" r="5" fill="#0C463B"/>
-    <circle cx="52" cy="52" r="2" fill="#FFFFFF"/>
-    <line x1="52" y1="24" x2="52" y2="30" stroke="#0C463B" stroke-width="2" stroke-linecap="round"/>
-    <line x1="52" y1="74" x2="52" y2="80" stroke="#0C463B" stroke-width="2" stroke-linecap="round"/>
-    <line x1="24" y1="52" x2="30" y2="52" stroke="#0C463B" stroke-width="2" stroke-linecap="round"/>
-    <line x1="74" y1="52" x2="80" y2="52" stroke="#0C463B" stroke-width="2" stroke-linecap="round"/>
+    <!-- Pencil Contour with Natural Corner Overshoots -->
+    <path d="M 1 6.5 C 42 4.5, 98 4.8, 131 6.5 M 126 1 C 128 40, 127.5 86, 126 127 M 131 122 C 94 123.5, 38 123, 1 122 M 6 127 C 4.5 86, 5 40, 6 1" 
+          fill="none" stroke="#0C463B" stroke-width="1.6" stroke-linecap="round" />
+    
+    <!-- Secondary loose sketchy pencil pass (authentic architectural feel) -->
+    <path d="M 4 4 C 44 5.5, 94 5, 127 6.2 M 128 4 C 126.5 42, 127 88, 125 124 M 127 124 C 92 122.5, 42 122.8, 4 121 M 3.5 123 C 5 86, 4.5 42, 4.5 4" 
+          fill="none" stroke="#94A3B8" stroke-width="0.8" stroke-linecap="round" opacity="0.6" stroke-dasharray="70 4" />
 
-    <!-- Glass Specular Highlight Arc -->
-    <path d="M 28 36 A 34 34 0 0 1 70 24" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+    <!-- Sketched Briefcase Logo Tile -->
+    <path d="M 14 16 C 24 15, 38 15.5, 42 16.5 C 43 25, 42.5 35, 41.5 42 C 32 43, 20 42.5, 14 42 Z" 
+          fill="#EBF8F4" stroke="#0C463B" stroke-width="1.3" stroke-linecap="round" />
+    <!-- Handdrawn briefcase glyph inside tile -->
+    <rect x="22" y="26" width="12" height="9" rx="1.5" fill="none" stroke="#0C463B" stroke-width="1.3" stroke-linecap="round"/>
+    <path d="M 25 26 V 23.5 C 25 22.5, 26 22, 28 22 C 30 22, 31 22.5, 31 23.5 V 26" fill="none" stroke="#0C463B" stroke-width="1.3" stroke-linecap="round" />
 
-    <!-- Handle Connector -->
-    <path d="M 82 82 L 89 89" stroke="#10B981" stroke-width="9" stroke-linecap="round"/>
-    <!-- Ergonomic Handle -->
-    <path d="M 87 87 L 118 118" stroke="url(#primaryEmerald)" stroke-width="12" stroke-linecap="round"/>
-    <!-- Handle Accent Tip -->
-    <circle cx="118" cy="118" r="6" fill="#08342C"/>
-    <circle cx="118" cy="118" r="2.5" fill="#2DD4BF"/>
+    <!-- Handdrawn Job Title and Subtitle Lines -->
+    <path d="M 52 22 C 72 21.2, 94 21.5, 114 22" stroke="#0C463B" stroke-width="2.6" stroke-linecap="round" />
+    <path d="M 52 32 C 68 31.5, 84 31.8, 96 32" stroke="#64748B" stroke-width="1.6" stroke-linecap="round" />
+
+    <!-- Sketched Divider Line -->
+    <path d="M 14 54 C 44 53.5, 84 53.8, 118 54" stroke="#E2E8F0" stroke-width="1.4" stroke-linecap="round" />
+
+    <!-- Handdrawn Tag Pills with Watercolor Tints -->
+    <!-- Pill 1: Mint -->
+    <path d="M 14 64 C 24 63.5, 42 63.8, 46 64.5 C 47 70, 46.5 74, 45.5 76 C 36 77, 22 76.5, 14 76 Z" 
+          fill="url(#tagMintWash)" stroke="#0C463B" stroke-width="1.2" stroke-linecap="round" />
+    <path d="M 20 70 C 26 69.8, 34 70, 40 70" stroke="#0C463B" stroke-width="1.5" stroke-linecap="round" />
+
+    <!-- Pill 2: Slate wash -->
+    <path d="M 54 64 C 64 63.5, 78 63.8, 82 64.5 C 83 70, 82.5 74, 81.5 76 C 72 77, 60 76.5, 54 76 Z" 
+          fill="#F1F5F9" stroke="#64748B" stroke-width="1.2" stroke-linecap="round" />
+    <path d="M 60 70 C 66 69.8, 72 70, 76 70" stroke="#64748B" stroke-width="1.4" stroke-linecap="round" />
+
+    <!-- Pill 3: Slate wash -->
+    <path d="M 90 64 C 98 63.5, 110 63.8, 114 64.5 C 115 70, 114.5 74, 113.5 76 C 106 77, 96 76.5, 90 76 Z" 
+          fill="#F1F5F9" stroke="#64748B" stroke-width="1.2" stroke-linecap="round" />
+    <path d="M 96 70 C 100 69.8, 104 70, 108 70" stroke="#64748B" stroke-width="1.4" stroke-linecap="round" />
+
+    <!-- Handdrawn Progress/Detail Bars -->
+    <path d="M 14 92 C 48 91.5, 82 91.8, 116 92" stroke="#E2E8F0" stroke-width="2.4" stroke-linecap="round" />
+    <path d="M 14 92 C 32 91.6, 52 91.8, 66 92" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" />
+
+    <path d="M 14 104 C 36 103.5, 58 103.8, 74 104" stroke="#CBD5E1" stroke-width="1.5" stroke-linecap="round" />
+
+    <!-- Fine Pencil Cross-Hatch Shading on Card Right Flank -->
+    <g stroke="#0C463B" stroke-width="0.8" stroke-linecap="round" opacity="0.3">
+      <line x1="114" y1="28" x2="122" y2="24" />
+      <line x1="115" y1="36" x2="123" y2="32" />
+      <line x1="116" y1="44" x2="124" y2="40" />
+      <line x1="116" y1="80" x2="124" y2="76" />
+      <line x1="117" y1="88" x2="125" y2="84" />
+      <line x1="117" y1="96" x2="125" y2="92" />
+      <line x1="118" y1="104" x2="125" y2="100" />
+    </g>
   </g>
 
-  <!-- Sparkles & Floating Delight Elements -->
-  <!-- Emerald Star 1 (Top Left) -->
-  <g transform="translate(100, 32)">
-    <path d="M0 -7 Q0 0 7 0 Q0 0 0 7 Q0 0 -7 0 Q0 0 0 -7 Z" fill="#10B981"/>
-  </g>
+  <!-- Big Handdrawn Magnifying Glass (The Inspector Tool) -->
+  <g transform="translate(166, 68)">
+    <!-- Glass Lens Wash -->
+    <circle cx="50" cy="50" r="38" fill="#EBF8F4" fill-opacity="0.5" />
 
-  <!-- Emerald Star 2 (Top Right) -->
-  <g transform="translate(262, 75) scale(0.85)">
-    <path d="M0 -8 Q0 0 8 0 Q0 0 0 8 Q0 0 -8 0 Q0 0 0 -8 Z" fill="#0C463B"/>
-  </g>
+    <!-- Lens Specular Highlight Arc -->
+    <path d="M 28 34 C 34 24, 48 20, 64 22" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" />
 
-  <!-- Emerald Star 3 (Bottom Left) -->
-  <g transform="translate(74, 168) scale(0.7)">
-    <path d="M0 -7 Q0 0 7 0 Q0 0 0 7 Q0 0 -7 0 Q0 0 0 -7 Z" fill="#10B981"/>
-  </g>
+    <!-- Handdrawn Lens Contour (Double pencil pass) -->
+    <circle cx="50" cy="50" r="39" stroke="#0C463B" stroke-width="2.6" stroke-linecap="round" />
+    <path d="M 50 10 C 72 10, 90 28, 90 50 C 90 72, 72 90, 50 90 C 28 90, 10 72, 10 50 C 10 28, 28 10, 50 10" 
+          fill="none" stroke="#0C463B" stroke-width="1.2" stroke-linecap="round" opacity="0.5" stroke-dasharray="60 4" />
 
-  <!-- Floating Circles / Accent Rings -->
-  <circle cx="282" cy="132" r="5" fill="#A7F3D0" />
-  <circle cx="56" cy="98" r="3.5" fill="#34D399" />
-  <circle cx="242" cy="168" r="4" fill="#CBD5E1" />
-  <circle cx="145" cy="22" r="3" fill="#0C463B" fill-opacity="0.4" />
+    <!-- Handdrawn Focus Crosshairs / Reticle inside Lens -->
+    <circle cx="50" cy="50" r="20" fill="none" stroke="#10B981" stroke-width="1.4" stroke-dasharray="3 4" stroke-linecap="round" />
+    <circle cx="50" cy="50" r="4.5" fill="#0C463B" />
+    <circle cx="50" cy="50" r="1.8" fill="#FFFFFF" />
+    <!-- Reticle tick marks with organic pencil strokes -->
+    <line x1="50" y1="24" x2="50" y2="30" stroke="#0C463B" stroke-width="1.8" stroke-linecap="round" />
+    <line x1="50" y1="70" x2="50" y2="76" stroke="#0C463B" stroke-width="1.8" stroke-linecap="round" />
+    <line x1="24" y1="50" x2="30" y2="50" stroke="#0C463B" stroke-width="1.8" stroke-linecap="round" />
+    <line x1="70" y1="50" x2="76" y2="50" stroke="#0C463B" stroke-width="1.8" stroke-linecap="round" />
+
+    <!-- Handdrawn Magnifying Handle -->
+    <!-- Handle Connector Ring -->
+    <ellipse cx="78" cy="78" rx="6" ry="4" transform="rotate(-45 78 78)" fill="#10B981" stroke="#0C463B" stroke-width="1.5" />
+    
+    <!-- Main Ergonomic Handle Body (Drawn with pencil wash and dark contours) -->
+    <path d="M 79 79 L 109 109 C 113 113, 114 118, 110 122 C 106 126, 101 125, 97 121 L 67 91 Z" 
+          fill="url(#handleWashTint)" stroke="#0C463B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    
+    <!-- Handle Highlight Stroke -->
+    <path d="M 77 75 L 104 102" stroke="#2DD4BF" stroke-width="1.2" stroke-linecap="round" opacity="0.8" />
+
+    <!-- Handle Cross-Hatching Texture -->
+    <g stroke="#FFFFFF" stroke-width="0.8" stroke-linecap="round" opacity="0.35">
+      <line x1="82" y1="88" x2="88" y2="84" />
+      <line x1="88" y1="94" x2="94" y2="90" />
+      <line x1="94" y1="100" x2="100" y2="96" />
+      <line x1="100" y1="106" x2="106" y2="102" />
+    </g>
+
+    <!-- Handle Tip Ball -->
+    <circle cx="106" cy="116" r="4.5" fill="#08342C" stroke="#0C463B" stroke-width="1.2" />
+    <circle cx="106" cy="116" r="1.8" fill="#10B981" />
+  </g>
 </svg>

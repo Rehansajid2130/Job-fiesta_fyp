@@ -38,13 +38,53 @@ const JobdetailsPage = () => {
 
   if (!job) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
         <Navbar />
-        <div className="container" style={{ padding: '60px 20px', textAlign: 'center' }}>
-          <h2>Job Not Found</h2>
-          <Link to="/search" style={{ color: '#0C463B', fontWeight: '600', marginTop: '16px', display: 'inline-block' }}>
-            Back to Job Search
-          </Link>
+        <div className="container" style={{ padding: '60px 20px', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{
+            backgroundColor: '#FFFFFF',
+            padding: '48px 24px',
+            borderRadius: '16px',
+            border: '1px solid #E2E8F0',
+            textAlign: 'center',
+            maxWidth: '480px',
+            width: '100%'
+          }}>
+            <img
+              src="/assets/searchimages/job-not-found.svg"
+              alt="Job not found"
+              style={{
+                width: '100%',
+                maxWidth: '220px',
+                height: 'auto',
+                margin: '0 auto 16px auto',
+                display: 'block'
+              }}
+            />
+            <h2 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#0C463B', marginBottom: '8px' }}>
+              Job Not Found
+            </h2>
+            <p style={{ color: '#64748B', fontSize: '0.9rem', marginBottom: '20px', lineHeight: '1.5' }}>
+              This job posting may have expired, been removed by the recruiter, or the link may be incorrect.
+            </p>
+            <Link
+              to="/search"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '10px 20px',
+                borderRadius: '8px',
+                backgroundColor: '#0C463B',
+                color: '#FFFFFF',
+                fontWeight: '600',
+                fontSize: '0.9rem',
+                textDecoration: 'none'
+              }}
+            >
+              Back to Job Search
+            </Link>
+          </div>
         </div>
         <Footer />
       </div>

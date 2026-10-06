@@ -4,7 +4,6 @@ import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import { useJobs } from '../context/JobContext';
 import { 
-  Bell, 
   CheckCheck, 
   MessageSquare, 
   Briefcase, 
@@ -236,18 +235,28 @@ const NotificationsPage = () => {
         <div className="container" style={{ maxWidth: '820px' }}>
           {filteredNotifications.length === 0 ? (
             <div style={{
-              padding: '60px 20px',
+              padding: '48px 24px',
               textAlign: 'center',
               backgroundColor: '#FFFFFF',
               borderRadius: '16px',
               border: '1px solid #E2E8F0'
             }}>
-              <Bell size={40} color="#94A3B8" style={{ marginBottom: '12px' }} />
-              <h3 style={{ fontSize: '1.15rem', fontWeight: '700', color: '#0F172A' }}>
-                No notifications found
+              <img
+                src="/assets/searchimages/no-notifications.svg"
+                alt="All caught up"
+                style={{
+                  width: '100%',
+                  maxWidth: '220px',
+                  height: 'auto',
+                  margin: '0 auto 16px auto',
+                  display: 'block'
+                }}
+              />
+              <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#0C463B', marginBottom: '8px' }}>
+                All caught up!
               </h3>
-              <p style={{ color: '#64748B', fontSize: '0.88rem' }}>
-                You're completely caught up! We will notify you when there are updates to your jobs or messages.
+              <p style={{ color: '#64748B', fontSize: '0.9rem', maxWidth: '380px', margin: '0 auto', lineHeight: '1.5' }}>
+                You have no notifications right now. We will notify you when there are updates on your jobs or messages.
               </p>
             </div>
           ) : (

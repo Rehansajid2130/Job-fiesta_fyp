@@ -1,0 +1,110 @@
+<svg width="280" height="200" viewBox="0 0 280 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Soft Watercolor Wash Backdrop -->
+    <radialGradient id="chatPencilWash" cx="0.5" cy="0.5" r="0.5" fx="0.5" fy="0.5">
+      <stop offset="0%" stop-color="#EBF8F4" stop-opacity="0.95"/>
+      <stop offset="65%" stop-color="#EBF8F4" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Main Bubble Emerald Tint -->
+    <linearGradient id="bubblePencilTint" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0C463B"/>
+      <stop offset="100%" stop-color="#08342C"/>
+    </linearGradient>
+
+    <!-- Small Bubble Mint Tint -->
+    <linearGradient id="smallBubbleMint" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#D1FAE5"/>
+      <stop offset="100%" stop-color="#A7F3D0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ambient Soft Watercolor Wash Backdrop -->
+  <ellipse cx="140" cy="105" rx="120" ry="76" fill="url(#chatPencilWash)" />
+
+  <!-- Grounding Pencil Scribble Shadow -->
+  <g stroke="#94A3B8" stroke-width="1.2" stroke-linecap="round" opacity="0.65">
+    <path d="M 64 168 C 104 166.5, 182 166.8, 222 168" />
+    <path d="M 80 171 C 114 170, 172 170.2, 206 171" />
+    <path d="M 98 174 C 126 173.2, 160 173.2, 188 174" />
+    <!-- Fine 45-degree angled pencil hatch marks on base -->
+    <path d="M 112 166 L 117 170 M 124 166 L 129 170 M 136 166 L 141 170 M 148 166 L 153 170 M 160 166 L 165 170" stroke-width="0.85" opacity="0.45" />
+  </g>
+
+  <!-- Handdrawn Secondary Speech Bubble (Mint tint at top right) -->
+  <g transform="translate(154, 40)">
+    <!-- Base Wash Fill -->
+    <path d="M 10 10 C 26 8.5, 52 8.8, 68 10 C 70 20, 69.5 32, 68 40 C 52 41, 34 40.8, 24 41 L 14 49 L 16 41 C 9 40.5, 9.5 28, 10 10 Z" 
+          fill="url(#smallBubbleMint)" />
+
+    <!-- Inked Bubble Outline (Double pencil pass) -->
+    <path d="M 10 10 C 26 8.5, 52 8.8, 68 10 C 70 20, 69.5 32, 68 40 C 52 41, 34 40.8, 24 41 L 14 49 L 16 41 C 9 40.5, 9.5 28, 10 10 Z" 
+          fill="none" stroke="#0C463B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 12 11.5 C 27 10, 50 10.5, 66 11.5 M 66 11 C 67.5 20, 67 30, 66 38.5" 
+          stroke="#10B981" stroke-width="0.8" stroke-linecap="round" opacity="0.6" stroke-dasharray="24 2" />
+
+    <!-- Chat Message Dots inside Small Bubble -->
+    <circle cx="28" cy="25" r="2.8" fill="#0C463B" />
+    <circle cx="39" cy="25" r="2.8" fill="#0C463B" />
+    <circle cx="50" cy="25" r="2.8" fill="#0C463B" />
+  </g>
+
+  <!-- Main Handdrawn Conversation Card / Primary Speech Bubble -->
+  <g transform="translate(68, 54)">
+    <!-- Base Paper Wash -->
+    <path d="M 6 6 C 42 4.5, 102 4.8, 138 6.5 C 140 32, 139.5 64, 138 88 C 112 89.2, 54 88.8, 38 89 L 22 104 L 26 89 C 5 88.2, 4.5 56, 6 6 Z" 
+          fill="#FFFFFF" />
+
+    <!-- Primary Pencil Contour (with architectural corner overshoots) -->
+    <path d="M 1 6.5 C 42 4.5, 104 4.8, 142 6.5 M 138 1 C 140 32, 139.5 64, 138 92 M 142 88 C 112 89.2, 52 88.8, 38 89 L 22 104 L 26 89 M 28 89 C 5 88.2, 4.5 56, 6 1" 
+          fill="none" stroke="#0C463B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+    
+    <!-- Secondary loose sketchy pencil pass (authentic double line) -->
+    <path d="M 4 4 C 44 5.5, 100 5, 139 6.2 M 139.5 4 C 138 34, 138.5 66, 137 89 M 138 89.5 C 108 88, 56 88.5, 39 89.2" 
+          fill="none" stroke="#94A3B8" stroke-width="0.8" stroke-linecap="round" opacity="0.6" stroke-dasharray="60 3" />
+
+    <!-- Sketched Profile Avatar & Active Indicator inside Main Card -->
+    <circle cx="24" cy="26" r="11" fill="#EBF8F4" stroke="#0C463B" stroke-width="1.3" stroke-linecap="round" />
+    <circle cx="24" cy="23" r="3.5" fill="#0C463B" />
+    <path d="M 17 31 C 17 27.5, 20 27, 24 27 C 28 27, 31 27.5, 31 31" 
+          fill="none" stroke="#0C463B" stroke-width="1.3" stroke-linecap="round" />
+    
+    <!-- Active status green dot -->
+    <circle cx="32" cy="33" r="3.2" fill="#10B981" stroke="#FFFFFF" stroke-width="1" />
+
+    <!-- Handdrawn Candidate / Recruiter Name Lines -->
+    <path d="M 44 20 C 64 19.2, 88 19.5, 106 20" stroke="#0C463B" stroke-width="2.2" stroke-linecap="round" />
+    <path d="M 44 29 C 58 28.5, 74 28.8, 86 29" stroke="#64748B" stroke-width="1.4" stroke-linecap="round" />
+
+    <!-- Sketched Divider Line -->
+    <path d="M 14 44 C 44 43.5, 96 43.8, 130 44" stroke="#E2E8F0" stroke-width="1.3" stroke-linecap="round" />
+
+    <!-- Handdrawn Message Preview Bubble Strip -->
+    <path d="M 14 54 C 40 53.5, 88 53.8, 126 54" stroke="#CBD5E1" stroke-width="1.6" stroke-linecap="round" />
+    <path d="M 14 63 C 34 62.6, 72 62.8, 104 63" stroke="#E2E8F0" stroke-width="1.6" stroke-linecap="round" />
+    <path d="M 14 72 C 28 71.6, 52 71.8, 76 72" stroke="#E2E8F0" stroke-width="1.6" stroke-linecap="round" />
+
+    <!-- Fine Pencil Cross-Hatch Shading on Card Right Flank -->
+    <g stroke="#0C463B" stroke-width="0.75" stroke-linecap="round" opacity="0.28">
+      <line x1="126" y1="24" x2="133" y2="20" />
+      <line x1="127" y1="32" x2="134" y2="28" />
+      <line x1="127" y1="56" x2="134" y2="52" />
+      <line x1="128" y1="64" x2="135" y2="60" />
+      <line x1="128" y1="72" x2="135" y2="68" />
+    </g>
+  </g>
+
+  <!-- Handdrawn Floating Pencil Icon (Drafting new message) -->
+  <g transform="translate(60, 42) rotate(-35)">
+    <!-- Pencil Body Wash -->
+    <path d="M 0 0 L 28 0 L 28 8 L 0 8 Z" fill="#10B981" />
+    <path d="M 28 0 L 36 4 L 28 8 Z" fill="#0C463B" />
+    
+    <!-- Pencil Outlines -->
+    <path d="M 0 0 L 28 0 L 36 4 L 28 8 L 0 8 Z" 
+          fill="none" stroke="#0C463B" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+    <line x1="8" y1="0" x2="8" y2="8" stroke="#0C463B" stroke-width="0.8" />
+    <line x1="28" y1="0" x2="28" y2="8" stroke="#CCFBF1" stroke-width="0.8" />
+  </g>
+</svg>

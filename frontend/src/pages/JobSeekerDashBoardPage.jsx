@@ -8,7 +8,6 @@ import { useAuth } from '../context/AuthContext';
 import { 
   FileText, 
   Bookmark, 
-  Send, 
   CheckCircle, 
   Clock, 
   Calendar, 
@@ -282,13 +281,29 @@ const JobSeekerDashBoardPage = () => {
                 </table>
               </div>
             ) : (
-              <div style={{ padding: '48px 20px', textAlign: 'center' }}>
-                <Send size={40} color="#94A3B8" style={{ margin: '0 auto 16px' }} />
-                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#0F172A', marginBottom: '8px' }}>
+              <div style={{
+                backgroundColor: '#FFFFFF',
+                padding: '40px 24px',
+                borderRadius: '16px',
+                border: '1px solid #E2E8F0',
+                textAlign: 'center'
+              }}>
+                <img
+                  src="/assets/searchimages/no-applications.svg"
+                  alt="No applications yet"
+                  style={{
+                    width: '100%',
+                    maxWidth: '220px',
+                    height: 'auto',
+                    margin: '0 auto 16px auto',
+                    display: 'block'
+                  }}
+                />
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#0C463B', marginBottom: '8px' }}>
                   No applications yet
                 </h3>
-                <p style={{ color: '#64748B', fontSize: '0.9rem', marginBottom: '18px' }}>
-                  Explore open jobs and apply with one click.
+                <p style={{ color: '#64748B', fontSize: '0.9rem', maxWidth: '380px', margin: '0 auto 18px auto', lineHeight: '1.5' }}>
+                  Explore open jobs and apply with one click to kickstart your career journey.
                 </p>
                 <Link
                   to="/search"
@@ -296,12 +311,13 @@ const JobSeekerDashBoardPage = () => {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '6px',
-                    padding: '10px 18px',
+                    padding: '9px 18px',
                     borderRadius: '8px',
                     backgroundColor: '#0C463B',
                     color: '#FFFFFF',
                     fontWeight: '600',
-                    fontSize: '0.9rem'
+                    fontSize: '0.9rem',
+                    textDecoration: 'none'
                   }}
                 >
                   Explore Jobs <ArrowRight size={16} />
@@ -345,14 +361,47 @@ const JobSeekerDashBoardPage = () => {
                 ))}
               </div>
             ) : (
-              <div style={{ backgroundColor: '#FFFFFF', padding: '48px 20px', borderRadius: '16px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
-                <Bookmark size={40} color="#94A3B8" style={{ margin: '0 auto 16px' }} />
-                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#0F172A', marginBottom: '8px' }}>
-                  No saved jobs
+              <div style={{
+                backgroundColor: '#FFFFFF',
+                padding: '40px 24px',
+                borderRadius: '16px',
+                border: '1px solid #E2E8F0',
+                textAlign: 'center'
+              }}>
+                <img
+                  src="/assets/searchimages/no-saved-jobs.svg"
+                  alt="No saved jobs"
+                  style={{
+                    width: '100%',
+                    maxWidth: '220px',
+                    height: 'auto',
+                    margin: '0 auto 16px auto',
+                    display: 'block'
+                  }}
+                />
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#0C463B', marginBottom: '8px' }}>
+                  No saved jobs yet
                 </h3>
-                <p style={{ color: '#64748B', fontSize: '0.9rem' }}>
-                  Click the bookmark icon on any job card to save it for later review.
+                <p style={{ color: '#64748B', fontSize: '0.9rem', maxWidth: '380px', margin: '0 auto 18px auto', lineHeight: '1.5' }}>
+                  Click the bookmark icon on any job card to save it here for quick access later.
                 </p>
+                <Link
+                  to="/search"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '9px 18px',
+                    borderRadius: '8px',
+                    backgroundColor: '#0C463B',
+                    color: '#FFFFFF',
+                    fontWeight: '600',
+                    fontSize: '0.88rem',
+                    textDecoration: 'none'
+                  }}
+                >
+                  Browse Open Jobs <ArrowRight size={15} />
+                </Link>
               </div>
             )}
           </div>

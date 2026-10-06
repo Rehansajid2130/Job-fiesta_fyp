@@ -1,0 +1,132 @@
+<svg width="240" height="170" viewBox="0 0 240 170" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Soft Watercolor / Pencil Wash Backdrop -->
+    <radialGradient id="pencilWashGlow" cx="0.5" cy="0.5" r="0.5" fx="0.5" fy="0.5">
+      <stop offset="0%" stop-color="#EBF8F4" stop-opacity="0.95"/>
+      <stop offset="65%" stop-color="#EBF8F4" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Bell Watercolor Tint -->
+    <linearGradient id="bellWashTint" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F0FDF4"/>
+      <stop offset="100%" stop-color="#E6F7F2"/>
+    </linearGradient>
+
+    <!-- Badge Tint -->
+    <linearGradient id="badgePencilTint" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#D1FAE5"/>
+      <stop offset="100%" stop-color="#A7F3D0"/>
+    </linearGradient>
+
+    <!-- Pencil texture filter (subtle organic displacement) -->
+    <filter id="pencilRoughness" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.2" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </defs>
+
+  <!-- Soft Ambient Pencil Wash Backdrop -->
+  <ellipse cx="120" cy="88" rx="98" ry="64" fill="url(#pencilWashGlow)" />
+
+  <!-- Handdrawn Grounding Pencil Shadow Scribble -->
+  <g stroke="#94A3B8" stroke-width="1.25" stroke-linecap="round" opacity="0.65">
+    <!-- Gentle parallel pencil shading lines on ground -->
+    <path d="M 88 139 C 104 138, 134 138, 152 139" />
+    <path d="M 96 142 C 110 141.2, 130 141.2, 144 142" />
+    <path d="M 104 145 C 114 144.5, 126 144.5, 136 145" />
+    <!-- Light angled pencil hatch on base -->
+    <path d="M 100 137 L 105 141 M 112 137 L 117 141 M 124 137 L 129 141 M 136 137 L 141 141" stroke-width="0.9" opacity="0.5"/>
+  </g>
+
+  <!-- Handdrawn Background Card (with architectural pencil overshoots) -->
+  <g>
+    <!-- Paper base wash fill -->
+    <path d="M 64 36 C 88 34.5, 142 34.8, 175 36.5 C 177.5 54, 176.8 74, 175.2 92 C 144 93.8, 92 93.2, 63.8 91.5 C 62 73, 62.8 53, 64 36 Z" 
+          fill="#FFFFFF" />
+
+    <!-- Primary pencil outline (with slight organic wave) -->
+    <path d="M 59 36.5 C 88 35, 146 35.2, 180 37 C 178 55, 178.5 75, 176.5 95 C 145 93.5, 90 94, 60 92.5 C 61.5 74, 60.8 54, 59 36.5" 
+          fill="none" stroke="#64748B" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+    
+    <!-- Secondary sketchy pencil pass (authentic double line) -->
+    <path d="M 62 34 C 95 35.5, 138 34.8, 176 36.2 M 177 34 C 175.5 56, 176.2 78, 174.5 94.5 M 177 93.5 C 140 92.2, 94 92.8, 62 91 M 61.5 94 C 63 76, 62.2 52, 64 35" 
+          fill="none" stroke="#94A3B8" stroke-width="0.8" stroke-linecap="round" stroke-dasharray="80 3" />
+
+    <!-- Sketched Mini Check Icon inside Card -->
+    <circle cx="78" cy="52" r="7.5" fill="#EBF8F4" stroke="#0C463B" stroke-width="1.2" stroke-linecap="round" />
+    <!-- Sketched checkmark -->
+    <path d="M 74.5 52 C 75.8 53.5, 76.5 54.2, 77.2 54.8 C 78.5 53, 80 50, 82 48.5" 
+          fill="none" stroke="#0C463B" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Hand-drawn wavy text lines -->
+    <path d="M 92 48 C 104 47.5, 122 47.8, 136 48" stroke="#0C463B" stroke-width="2.2" stroke-linecap="round" />
+    <path d="M 92 56 C 112 55.5, 138 55.8, 164 56" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round" />
+    <path d="M 72 71 C 98 70.5, 135 70.8, 164 71" stroke="#CBD5E1" stroke-width="1.4" stroke-linecap="round" />
+    <path d="M 72 78 C 92 77.6, 118 77.8, 140 78" stroke="#E2E8F0" stroke-width="1.4" stroke-linecap="round" />
+  </g>
+
+  <!-- Main Handdrawn Bell Illustration -->
+  <g>
+    <!-- Bell Wash Fill (Soft mint watercolor fill) -->
+    <path d="M 103 107 C 102 86, 107 71, 120 71 C 133 71, 138 86, 137 107 C 137 111, 142 113.8, 144.5 115.5 C 145.5 116.8, 144.5 118.5, 142 118.5 L 98 118.5 C 95.5 118.5, 94.5 116.8, 95.5 115.5 C 98 113.8, 103 111, 103 107 Z" 
+          fill="url(#bellWashTint)" />
+
+    <!-- Handdrawn Pencil Cross-Hatching / Shading on right side of Bell -->
+    <g stroke="#0C463B" stroke-width="1" stroke-linecap="round" opacity="0.38">
+      <line x1="124" y1="80" x2="132" y2="76" />
+      <line x1="125" y1="86" x2="134" y2="82" />
+      <line x1="126" y1="92" x2="135" y2="88" />
+      <line x1="127" y1="98" x2="136" y2="94" />
+      <line x1="127" y1="104" x2="137" y2="100" />
+      <line x1="129" y1="110" x2="140" y2="106" />
+      <!-- Secondary counter-hatch -->
+      <line x1="128" y1="94" x2="135" y2="99" />
+      <line x1="129" y1="100" x2="137" y2="105" />
+    </g>
+
+    <!-- Handdrawn Bell Lip Accent Strip (Mint pencil watercolor) -->
+    <path d="M 96 116 C 110 115, 130 115, 144 116 C 143 118.5, 132 119.5, 120 119.5 C 108 119.5, 97 118.5, 96 116 Z" 
+          fill="#10B981" fill-opacity="0.85" />
+
+    <!-- Handdrawn Bell Main Contour (Deep Emerald pencil stroke) -->
+    <path d="M 103 107 C 102 86, 107.5 70.5, 120 70.5 C 132.5 70.5, 138 86, 137 107 C 137 111, 142 113.8, 144.5 115.5 C 145.8 116.8, 144.5 118.5, 142 118.5 L 98 118.5 C 95.5 118.5, 94.2 116.8, 95.5 115.5 C 98 113.8, 103 111, 103 107 Z" 
+          fill="none" stroke="#0C463B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Secondary loose sketchy pencil pass on bell body -->
+    <path d="M 104.5 106 C 103.5 87, 108 72, 119.5 71.5 C 131 71.5, 136.5 87, 135.5 106 M 96.5 117 C 110 116.5, 130 116.5, 143.5 117" 
+          fill="none" stroke="#0C463B" stroke-width="0.9" stroke-linecap="round" opacity="0.6" />
+
+    <!-- Handdrawn Bell Top Loop (Sketchy ring) -->
+    <path d="M 116 70.5 C 115 62, 116 57, 120 57 C 124 57, 125 62, 124 70.5" 
+          fill="none" stroke="#0C463B" stroke-width="2.2" stroke-linecap="round" />
+    <path d="M 117.5 70 C 116.8 63, 117.5 58.5, 120.2 58.5 C 123 58.5, 123.8 63, 122.8 70" 
+          fill="none" stroke="#10B981" stroke-width="1.1" stroke-linecap="round" />
+
+    <!-- Handdrawn Bell Clapper (Bottom ball with pencil stroke) -->
+    <ellipse cx="120" cy="124" rx="5.5" ry="5.2" fill="#0C463B" />
+    <circle cx="120" cy="124" r="2.2" fill="#EBF8F4" />
+    <path d="M 115 124 C 115 127.5, 117.5 129.5, 120 129.5 C 122.5 129.5, 125 127.5, 125 124" 
+          fill="none" stroke="#0C463B" stroke-width="1.4" stroke-linecap="round" />
+  </g>
+
+  <!-- Handdrawn "All Caught Up" Check Badge (Stamp style) -->
+  <g>
+    <!-- Badge shadow wash -->
+    <circle cx="143" cy="65" r="14" fill="#FFFFFF" />
+
+    <!-- Sketched Double-Loop Badge Perimeter -->
+    <path d="M 143 51 C 151 51, 156.5 56.5, 156.5 64.5 C 156.5 72.5, 150.5 78, 142.5 78 C 134.5 78, 129 72.5, 129 64.5 C 129 56.5, 135 51, 143 51 Z" 
+          fill="url(#badgePencilTint)" stroke="#0C463B" stroke-width="1.8" stroke-linecap="round" />
+    <!-- Secondary organic sketchy pass -->
+    <path d="M 142 52.5 C 149 52, 155 57, 155 64 C 155 71, 150 76.5, 143 76.8 C 136 76.5, 130.5 71.5, 130.5 64.5 C 130.5 57.5, 135.5 52.5, 142 52.5" 
+          fill="none" stroke="#10B981" stroke-width="1" stroke-linecap="round" stroke-dasharray="35 3" />
+
+    <!-- Confident Handdrawn Pencil Checkmark -->
+    <path d="M 136.5 64.5 C 138 66.5, 139.2 68, 140.8 69.8 C 143 65.5, 146.5 61, 150 58" 
+          fill="none" stroke="#0C463B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    <!-- Second pencil pass for checkmark thickness -->
+    <path d="M 137.5 64 C 138.8 66, 139.8 67.5, 141 69 C 143.2 65, 146.2 61, 149.2 58.5" 
+          fill="none" stroke="#065F46" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+</svg>

@@ -33,13 +33,13 @@ const ChatEmptyState = ({ onNewMessage }) => {
         Select a conversation from the list to view messages and chat.
       </p>
 
-      {/* Figma Illustration: Person in armchair with newspaper & lamp */}
-      <div style={{ marginTop: '48px', width: '100%', display: 'flex', justifyContent: 'center' }}>
+      {/* Handdrawn Pencil Sketch Illustration: Conversation & Message Preview */}
+      <div style={{ marginTop: '40px', width: '100%', display: 'flex', justifyContent: 'center' }}>
         <img 
-          src="/assets/images/group_28.svg" 
-          alt="Cozy reading armchair illustration"
+          src="/assets/searchimages/no-chat-selected.svg" 
+          alt="Select a conversation to start messaging"
           style={{
-            width: '320px',
+            width: '280px',
             maxWidth: '85%',
             height: 'auto',
             pointerEvents: 'none'
