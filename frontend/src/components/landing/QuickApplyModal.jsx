@@ -10,7 +10,7 @@ const QuickApplyModal = ({
   user
 }) => {
   const navigate = useNavigate();
-  const { applyToJob } = useJobs();
+  const { applyToJob, showToast } = useJobs();
 
   const [applicantName, setApplicantName] = useState('');
   const [applicantEmail, setApplicantEmail] = useState('');
@@ -60,8 +60,11 @@ const QuickApplyModal = ({
             message: res.message 
           } 
         });
+      } else if (res.alreadyApplied || res.message?.toLowerCase().includes('already applied')) {
+        onClose();
+        showToast('You have already applied for this position.', 'info');
       } else {
-        alert(res.message);
+        showToast(res.message || 'Could not submit application.', 'error');
       }
     }
   };
@@ -75,17 +78,20 @@ const QuickApplyModal = ({
       {selectedJob && (
         <div>
           {applySuccess ? (
-            <div style={{ padding: '32px 24px', textAlign: 'center', color: '#0C463B' }}>
-              <div style={{ marginBottom: '16px' }}>
-                <span className="t-success-check">
-                  <svg width="56" height="56" viewBox="0 0 48 48" fill="none">
-                    <circle cx="24" cy="24" r="22" fill="#EBF8F4" stroke="#0C463B" strokeWidth="2.5" />
-                    <path d="M14 24L21 31L34 17" stroke="#0C463B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-              </div>
+            <div style={{ padding: '24px 16px', textAlign: 'center', color: '#0C463B' }}>
+              <img
+                src="/assets/searchimages/application-success.svg"
+                alt="Application Submitted"
+                style={{
+                  width: '100%',
+                  maxWidth: '220px',
+                  height: 'auto',
+                  margin: '0 auto 16px auto',
+                  display: 'block'
+                }}
+              />
               <h3 style={{ fontSize: '20px', fontWeight: '700', color: '#0C463B', marginBottom: '8px' }}>Application Submitted!</h3>
-              <p style={{ color: '#64748B', fontSize: '14px' }}>{applySuccess}</p>
+              <p style={{ color: '#64748B', fontSize: '14px', maxWidth: '380px', margin: '0 auto', lineHeight: '1.5' }}>{applySuccess}</p>
             </div>
           ) : (
             <form onSubmit={handleApplySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

@@ -7,13 +7,13 @@ import Modal from '../common/Modal';
 import IconSwap from '../common/IconSwap';
 
 const JobCard = ({ job }) => {
-  const { savedJobIds, toggleSaveJob, applyToJob, applications } = useJobs();
+  const { savedJobIds, toggleSaveJob, applyToJob, applications, isJobApplied, showToast } = useJobs();
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [coverNote, setCoverNote] = useState('');
   const [applySuccessMessage, setApplySuccessMessage] = useState('');
 
   const isSaved = savedJobIds.includes(job.id);
-  const isApplied = applications.some(a => a.jobId === job.id);
+  const isApplied = isJobApplied ? isJobApplied(job.id || job._id) : applications.some(a => String(a.jobId) === String(job.id || job._id));
 
   const handleApply = (e) => {
     e.preventDefault();
@@ -24,8 +24,11 @@ const JobCard = ({ job }) => {
         setApplySuccessMessage('');
         setApplyModalOpen(false);
       }, 1500);
+    } else if (result.alreadyApplied || result.message?.toLowerCase().includes('already applied')) {
+      setApplyModalOpen(false);
+      showToast('You have already applied for this position.', 'info');
     } else {
-      alert(result.message);
+      showToast(result.message || 'Could not submit application.', 'error');
     }
   };
 

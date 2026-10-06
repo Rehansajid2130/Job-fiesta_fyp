@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 
 const SearchPage = () => {
-  const { jobs: contextJobs, applyToJob, toggleSaveJob, savedJobIds } = useJobs();
+  const { jobs: contextJobs, applyToJob, toggleSaveJob, savedJobIds, applications, isJobApplied, showToast } = useJobs();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -295,6 +295,9 @@ const SearchPage = () => {
       });
       return;
     }
+    if (isJobApplied ? isJobApplied(job.id || job._id) : applications?.some(a => a.jobId === job.id || (job._id && a.jobId === job._id))) {
+      return;
+    }
     setApplyModalJob(job);
   };
 
@@ -328,8 +331,11 @@ const SearchPage = () => {
               message: res.message 
             } 
           });
+        } else if (res.alreadyApplied || res.message?.toLowerCase().includes('already applied')) {
+          setApplyModalJob(null);
+          showToast('You have already applied for this position.', 'info');
         } else {
-          alert(res.message);
+          showToast(res.message || 'Could not submit application.', 'error');
         }
       }
     }
@@ -703,16 +709,27 @@ const SearchPage = () => {
                 <div style={{
                   backgroundColor: '#FFFFFF',
                   borderRadius: '16px',
-                  padding: '48px 24px',
+                  padding: '40px 24px',
                   textAlign: 'center',
-                  border: '1px dashed #CBD5E1'
+                  border: '1px solid #E2E8F0',
+                  boxShadow: '0 4px 16px rgba(12, 70, 59, 0.04)'
                 }}>
-                  <Briefcase size={40} color="#94A3B8" style={{ margin: '0 auto 16px auto' }} />
-                  <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#1E293B', marginBottom: '8px' }}>
+                  <img
+                    src="/assets/searchimages/empty-search.svg"
+                    alt="No matching jobs found"
+                    style={{
+                      width: '100%',
+                      maxWidth: '260px',
+                      height: 'auto',
+                      margin: '0 auto 20px auto',
+                      display: 'block'
+                    }}
+                  />
+                  <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#0C463B', marginBottom: '8px' }}>
                     No matching jobs found
                   </h3>
-                  <p style={{ fontSize: '14px', color: '#64748B', maxWidth: '420px', margin: '0 auto 20px auto' }}>
-                    Try relaxing your salary range or unchecking some filter categories.
+                  <p style={{ fontSize: '14px', color: '#64748B', maxWidth: '420px', margin: '0 auto 20px auto', lineHeight: '1.5' }}>
+                    We couldn't find any positions matching your active filters. Try searching with different keywords or clearing some filters.
                   </p>
                   <button
                     type="button"
@@ -738,6 +755,7 @@ const SearchPage = () => {
                       <FigmaJobCard
                         key={job.id}
                         job={job}
+                        isApplied={isJobApplied ? isJobApplied(job.id || job._id) : applications?.some(a => String(a.jobId) === String(job.id || job._id))}
                         isBookmarked={savedJobIds?.includes(job.id)}
                         onToggleBookmark={(id) => toggleSaveJob(id)}
                         onApply={(j) => handleOpenApply(j)}
@@ -814,12 +832,22 @@ const SearchPage = () => {
             </button>
 
             {applySuccess ? (
-              <div style={{ textAlign: 'center', padding: '30px 10px' }}>
-                <CheckCircle2 size={56} color="#10B981" style={{ margin: '0 auto 16px auto' }} />
-                <h3 style={{ fontSize: '22px', fontWeight: '800', color: '#0D473B', marginBottom: '8px' }}>
+              <div style={{ textAlign: 'center', padding: '24px 12px' }}>
+                <img
+                  src="/assets/searchimages/application-success.svg"
+                  alt="Application Submitted Successfully"
+                  style={{
+                    width: '100%',
+                    maxWidth: '220px',
+                    height: 'auto',
+                    margin: '0 auto 16px auto',
+                    display: 'block'
+                  }}
+                />
+                <h3 style={{ fontSize: '22px', fontWeight: '800', color: '#0C463B', marginBottom: '8px' }}>
                   Application Submitted!
                 </h3>
-                <p style={{ fontSize: '14px', color: '#4B5563' }}>
+                <p style={{ fontSize: '14px', color: '#64748B', maxWidth: '380px', margin: '0 auto', lineHeight: '1.5' }}>
                   Your profile and cover note have been securely transmitted to {applyModalJob.company}.
                 </p>
               </div>

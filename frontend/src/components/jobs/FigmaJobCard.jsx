@@ -203,7 +203,7 @@ const FigmaJobCard = ({
               backgroundColor: '#ECFDF5',
               color: '#065F46',
               border: '1px solid #A7F3D0',
-              borderRadius: '50px',
+              borderRadius: '8px',
               padding: '8px 16px',
               fontSize: '13.5px',
               fontWeight: '600',

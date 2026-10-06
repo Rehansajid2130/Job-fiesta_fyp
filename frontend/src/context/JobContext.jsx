@@ -32,9 +32,28 @@ export const JobProvider = ({ children }) => {
   const [companies, setCompanies] = useState(initialCompanies);
   const [candidates, setCandidates] = useState([]);
   const [notifications, setNotifications] = useState([]);
-  const [applications, setApplications] = useState([]);
+  const [applications, setApplications] = useState(() => {
+    try {
+      const saved = localStorage.getItem('jobfiesta_user_applications');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
   const [savedJobIds, setSavedJobIds] = useState([]);
   const [conversations, setConversations] = useState([]);
+
+  // Check if a job is already applied across all ID formats
+  const isJobApplied = (jobId) => {
+    if (!jobId) return false;
+    const str = String(jobId);
+    return applications.some(a => {
+      if (!a) return false;
+      const aJobId = a.jobId ? String(a.jobId) : '';
+      const aNestedId = a.job?._id ? String(a.job._id) : (a.job?.id ? String(a.job.id) : '');
+      return aJobId === str || aNestedId === str;
+    });
+  };
 
   // Global toast state for user feedback
   const [toast, setToast] = useState({ open: false, message: '', type: 'success' });
@@ -103,8 +122,10 @@ export const JobProvider = ({ children }) => {
 
     if (token && !token.startsWith('demo-token')) {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const userRole = userObj?.userType || userObj?.role || localStorage.getItem('userType') || 'jobseeker';
+      
       // If recruiter or employer: fetch candidates ATS pipeline
-      if (userObj?.role === 'recruiter' || userObj?.role === 'employer') {
+      if (userRole === 'recruiter' || userRole === 'employer') {
         try {
           const res = await axios.get(`${apiUrl}/api/applications/candidate-pipeline`, {
             headers: { Authorization: `Bearer ${token}` }
@@ -116,26 +137,28 @@ export const JobProvider = ({ children }) => {
         } catch (err) {
           console.warn('Candidate pipeline fetch error:', err.message);
         }
-      }
-
-      // If jobseeker: fetch personal applications
-      if (userObj?.role === 'jobseeker') {
+      } else {
+        // Any jobseeker / applicant: fetch personal applications from backend
         try {
           const res = await axios.get(`${apiUrl}/api/applications/my`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           const rawApps = res.data?.data || res.data?.applications || [];
           if (Array.isArray(rawApps)) {
-            setApplications(rawApps.map(app => ({
+            const mapped = rawApps.map(app => ({
               id: app._id,
-              jobId: app.job?._id || app.job,
+              jobId: app.job?._id || app.job?.id || app.job,
               jobTitle: app.job?.title || 'Position',
               company: app.job?.company || 'Company',
               appliedDate: app.createdAt ? new Date(app.createdAt).toISOString().split('T')[0] : 'Today',
               status: app.status === 'applied' ? 'Applied' : (app.status === 'screening' ? 'Screening' : (app.status === 'interviewing' ? 'Interviewing' : app.status)),
               matchScore: app.matchScore || 85,
               coverNote: app.coverLetter || ''
-            })));
+            }));
+            setApplications(mapped);
+            try {
+              localStorage.setItem('jobfiesta_user_applications', JSON.stringify(mapped));
+            } catch (e) {}
           }
         } catch (err) {
           console.warn('My applications fetch error:', err.message);
@@ -231,9 +254,13 @@ export const JobProvider = ({ children }) => {
     }
 
     const targetJob = jobs.find(j => j.id === jobId || j._id === jobId) || {};
-    const alreadyApplied = applications.some(a => a.jobId === jobId || (targetJob._id && a.jobId === targetJob._id));
+    const alreadyApplied = isJobApplied(jobId) || (targetJob._id && isJobApplied(targetJob._id));
     if (alreadyApplied) {
-      return { success: false, message: 'You have already applied to this position.' };
+      return { 
+        success: false, 
+        alreadyApplied: true, 
+        message: 'You have already applied to this position.' 
+      };
     }
 
     let backendApp = null;
@@ -252,6 +279,26 @@ export const JobProvider = ({ children }) => {
         }
       } catch (err) {
         console.warn('Backend application submission:', err.response?.data?.message || err.message);
+        if (err.response?.data?.message?.toLowerCase().includes('already applied')) {
+          const appEntry = {
+            id: `app-${realJobId || jobId}`,
+            jobId: realJobId || jobId,
+            jobTitle: targetJob.title || 'Position',
+            company: targetJob.company || 'Company',
+            appliedDate: new Date().toISOString().split('T')[0],
+            status: 'Applied'
+          };
+          setApplications(prev => {
+            const updated = [appEntry, ...prev.filter(a => String(a.jobId) !== String(realJobId || jobId))];
+            try { localStorage.setItem('jobfiesta_user_applications', JSON.stringify(updated)); } catch(e){}
+            return updated;
+          });
+          return {
+            success: false,
+            alreadyApplied: true,
+            message: 'You have already applied to this position.'
+          };
+        }
         return {
           success: false,
           message: err.response?.data?.message || 'Failed to submit application to server.'
@@ -270,7 +317,11 @@ export const JobProvider = ({ children }) => {
       coverNote: customCoverNote
     };
 
-    setApplications(prev => [newApplication, ...prev]);
+    setApplications(prev => {
+      const updated = [newApplication, ...prev];
+      try { localStorage.setItem('jobfiesta_user_applications', JSON.stringify(updated)); } catch(e){}
+      return updated;
+    });
 
     // Automatically initiate chat for this job application so job seeker and recruiter can chat
     const jobConvId = `conv-job-${realJobId || jobId}`;
@@ -580,6 +631,7 @@ export const JobProvider = ({ children }) => {
       setSearchFilters,
       toggleSaveJob,
       applyToJob,
+      isJobApplied,
       postNewJob,
       updateApplicationStatus,
       fetchLiveJobs,

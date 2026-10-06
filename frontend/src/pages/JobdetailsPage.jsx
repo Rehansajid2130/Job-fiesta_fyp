@@ -26,7 +26,7 @@ const JobdetailsPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const isRecruiter = user?.userType === 'recruiter';
-  const { jobs, savedJobIds, toggleSaveJob, applyToJob, applications } = useJobs();
+  const { jobs, savedJobIds, toggleSaveJob, applyToJob, applications, isJobApplied, showToast } = useJobs();
 
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [coverNote, setCoverNote] = useState('');
@@ -52,7 +52,7 @@ const JobdetailsPage = () => {
   }
 
   const isSaved = savedJobIds.includes(job.id);
-  const isApplied = applications.some(a => a.jobId === job.id);
+  const isApplied = isJobApplied ? isJobApplied(job.id || job._id) : applications.some(a => String(a.jobId) === String(job.id || job._id));
 
   const handleApply = async (e) => {
     e.preventDefault();
@@ -82,8 +82,11 @@ const JobdetailsPage = () => {
             message: result.message 
           } 
         });
+      } else if (result.alreadyApplied || result.message?.toLowerCase().includes('already applied')) {
+        setApplyModalOpen(false);
+        showToast('You have already applied for this position.', 'info');
       } else {
-        alert(result.message);
+        showToast(result.message || 'Could not submit application.', 'error');
       }
     }
   };
@@ -389,20 +392,24 @@ const JobdetailsPage = () => {
                   </p>
 
                   {isApplied ? (
-                    <div style={{
-                      padding: '14px',
-                      borderRadius: '8px',
-                      backgroundColor: '#ECFDF5',
-                      color: '#065F46',
-                      fontWeight: '700',
-                      fontSize: '0.95rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px'
-                    }}>
+                    <div
+                      style={{
+                        width: '100%',
+                        padding: '14px',
+                        borderRadius: '8px',
+                        backgroundColor: '#ECFDF5',
+                        color: '#065F46',
+                        border: '1px solid #A7F3D0',
+                        fontWeight: '700',
+                        fontSize: '0.95rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px'
+                      }}
+                    >
                       <CheckCircle2 size={18} />
-                      Application Submitted
+                      Applied
                     </div>
                   ) : (
                     <button
@@ -507,11 +514,23 @@ const JobdetailsPage = () => {
       >
         {successMessage ? (
           <div style={{ textAlign: 'center', padding: '24px 0' }}>
-            <CheckCircle2 size={48} color="#10B981" style={{ margin: '0 auto 16px' }} />
-            <h4 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#0F172A', marginBottom: '8px' }}>
+            <img
+              src="/assets/searchimages/application-success.svg"
+              alt="Application Successfully Sent"
+              style={{
+                width: '100%',
+                maxWidth: '220px',
+                height: 'auto',
+                margin: '0 auto 16px auto',
+                display: 'block'
+              }}
+            />
+            <h4 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0C463B', marginBottom: '8px' }}>
               Application Successfully Sent!
             </h4>
-            <p style={{ color: '#64748B', fontSize: '0.9rem' }}>{successMessage}</p>
+            <p style={{ color: '#64748B', fontSize: '0.9rem', maxWidth: '400px', margin: '0 auto', lineHeight: '1.5' }}>
+              {successMessage}
+            </p>
           </div>
         ) : (
           <form onSubmit={handleApply}>
