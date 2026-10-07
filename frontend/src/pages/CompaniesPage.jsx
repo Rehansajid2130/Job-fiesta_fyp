@@ -178,12 +178,61 @@ const CompaniesPage = () => {
             </span>
           </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
-            gap: '24px'
-          }}>
-            {filteredCompanies.map(company => {
+          {filteredCompanies.length === 0 ? (
+            <div style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '16px',
+              border: '1px solid #E2E8F0',
+              padding: '48px 24px',
+              textAlign: 'center',
+              boxShadow: 'var(--shadow-sm)',
+              maxWidth: '680px',
+              margin: '0 auto'
+            }}>
+              <img
+                src="/assets/searchimages/no-company-jobs.svg"
+                alt="No companies found"
+                style={{
+                  width: '100%',
+                  maxWidth: '220px',
+                  height: 'auto',
+                  margin: '0 auto 16px auto',
+                  display: 'block'
+                }}
+              />
+              <h3 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#0C463B', marginBottom: '8px' }}>
+                No companies match your filters
+              </h3>
+              <p style={{ color: '#64748B', fontSize: '0.92rem', maxWidth: '420px', margin: '0 auto 20px auto', lineHeight: '1.5' }}>
+                We couldn't find any verified companies matching your query. Try resetting your search terms or picking another industry category.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedIndustry('all');
+                }}
+                style={{
+                  padding: '9px 18px',
+                  borderRadius: '8px',
+                  backgroundColor: '#0C463B',
+                  color: '#FFFFFF',
+                  fontWeight: '600',
+                  fontSize: '0.88rem',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                Reset All Filters
+              </button>
+            </div>
+          ) : (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
+              gap: '24px'
+            }}>
+              {filteredCompanies.map(company => {
               const companyJobs = jobs.filter(j => 
                 j.company.toLowerCase().includes(company.name.toLowerCase())
               );
@@ -365,6 +414,7 @@ const CompaniesPage = () => {
               );
             })}
           </div>
+          )}
         </div>
       </section>
 

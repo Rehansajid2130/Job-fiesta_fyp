@@ -393,78 +393,125 @@ const CompanyDetailPage = () => {
               </p>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {companyJobs.map(job => (
-                <div
-                  key={job.id}
+            {companyJobs.length === 0 ? (
+              <div style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '16px',
+                padding: '48px 24px',
+                border: '1px solid #E2E8F0',
+                textAlign: 'center',
+                boxShadow: 'var(--shadow-sm)'
+              }}>
+                <img
+                  src="/assets/searchimages/no-company-jobs.svg"
+                  alt="No open roles currently"
                   style={{
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: '16px',
-                    padding: '24px',
-                    border: '1px solid #E2E8F0',
-                    display: 'flex',
-                    flexWrap: 'wrap',
+                    width: '100%',
+                    maxWidth: '220px',
+                    height: 'auto',
+                    margin: '0 auto 16px auto',
+                    display: 'block'
+                  }}
+                />
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#0C463B', marginBottom: '8px' }}>
+                  No open positions currently at {company.name}
+                </h3>
+                <p style={{ color: '#64748B', fontSize: '0.9rem', maxWidth: '420px', margin: '0 auto 20px auto', lineHeight: '1.5' }}>
+                  {company.name} does not have active public openings right now. Check back soon or explore other verified tech organizations.
+                </p>
+                <Link
+                  to="/companies"
+                  style={{
+                    display: 'inline-flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '20px',
-                    boxShadow: 'var(--shadow-sm)'
+                    gap: '8px',
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    backgroundColor: '#0C463B',
+                    color: '#FFFFFF',
+                    fontWeight: '700',
+                    fontSize: '0.9rem',
+                    textDecoration: 'none'
                   }}
                 >
-                  <div style={{ maxWidth: '650px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-                      <h3 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#0F172A', margin: 0 }}>
-                        {job.title}
-                      </h3>
-                      {job.featured && (
-                        <span style={{
-                          padding: '2px 8px',
-                          borderRadius: '6px',
-                          backgroundColor: '#FEF3C7',
-                          color: '#92400E',
-                          fontSize: '0.72rem',
-                          fontWeight: '800'
-                        }}>
-                          FEATURED
-                        </span>
-                      )}
-                    </div>
-                    <p style={{ fontSize: '0.88rem', color: '#475569', marginBottom: '12px', lineHeight: 1.5 }}>
-                      {job.description.slice(0, 160)}...
-                    </p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', fontSize: '0.82rem', color: '#64748B' }}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                        <MapPin size={14} color="#94A3B8" /> {job.location}
-                      </span>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                        <Clock size={14} color="#94A3B8" /> {job.type}
-                      </span>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: '700', color: '#0C463B' }}>
-                        <DollarSign size={14} color="#0C463B" /> {job.salary}
-                      </span>
-                    </div>
-                  </div>
-
-                  <Link
-                    to={`/job/${job.id}`}
+                  <span>Explore Other Companies</span>
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {companyJobs.map(job => (
+                  <div
+                    key={job.id}
                     style={{
-                      padding: '12px 24px',
-                      borderRadius: '10px',
-                      backgroundColor: '#0C463B',
-                      color: '#FFFFFF',
-                      fontSize: '0.92rem',
-                      fontWeight: '700',
-                      textDecoration: 'none',
-                      display: 'inline-flex',
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '16px',
+                      padding: '24px',
+                      border: '1px solid #E2E8F0',
+                      display: 'flex',
+                      flexWrap: 'wrap',
                       alignItems: 'center',
-                      gap: '8px'
+                      justifyContent: 'space-between',
+                      gap: '20px',
+                      boxShadow: 'var(--shadow-sm)'
                     }}
                   >
-                    <span>View Role & Apply</span>
-                    <ArrowRight size={16} />
-                  </Link>
-                </div>
-              ))}
-            </div>
+                    <div style={{ maxWidth: '650px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                        <h3 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#0F172A', margin: 0 }}>
+                          {job.title}
+                        </h3>
+                        {job.featured && (
+                          <span style={{
+                            padding: '2px 8px',
+                            borderRadius: '6px',
+                            backgroundColor: '#FEF3C7',
+                            color: '#92400E',
+                            fontSize: '0.72rem',
+                            fontWeight: '800'
+                          }}>
+                            FEATURED
+                          </span>
+                        )}
+                      </div>
+                      <p style={{ fontSize: '0.88rem', color: '#475569', marginBottom: '12px', lineHeight: 1.5 }}>
+                        {job.description.slice(0, 160)}...
+                      </p>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', fontSize: '0.82rem', color: '#64748B' }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <MapPin size={14} color="#94A3B8" /> {job.location}
+                        </span>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <Clock size={14} color="#94A3B8" /> {job.type}
+                        </span>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: '700', color: '#0C463B' }}>
+                          <DollarSign size={14} color="#0C463B" /> {job.salary}
+                        </span>
+                      </div>
+                    </div>
+
+                    <Link
+                      to={`/job/${job.id}`}
+                      style={{
+                        padding: '12px 24px',
+                        borderRadius: '10px',
+                        backgroundColor: '#0C463B',
+                        color: '#FFFFFF',
+                        fontSize: '0.92rem',
+                        fontWeight: '700',
+                        textDecoration: 'none',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      <span>View Role & Apply</span>
+                      <ArrowRight size={16} />
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

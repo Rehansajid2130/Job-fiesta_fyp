@@ -186,13 +186,61 @@ const CandidatesAtsPage = () => {
 
       {/* ATS Kanban Columns */}
       <main style={{ padding: '36px 0 80px', flex: 1, overflowX: 'auto' }}>
-        <div className="container" style={{ minWidth: '1100px' }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(5, 1fr)',
-            gap: '16px',
-            alignItems: 'flex-start'
-          }}>
+        <div className="container" style={{ minWidth: filteredCandidates.length === 0 ? 'auto' : '1100px', maxWidth: filteredCandidates.length === 0 ? '800px' : 'none' }}>
+          {filteredCandidates.length === 0 ? (
+            <div style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '16px',
+              border: '1px solid #E2E8F0',
+              padding: '48px 24px',
+              textAlign: 'center',
+              boxShadow: 'var(--shadow-sm)'
+            }}>
+              <img
+                src="/assets/searchimages/no-candidates.svg"
+                alt="No candidates found"
+                style={{
+                  width: '100%',
+                  maxWidth: '220px',
+                  height: 'auto',
+                  margin: '0 auto 16px auto',
+                  display: 'block'
+                }}
+              />
+              <h3 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#0C463B', marginBottom: '8px' }}>
+                {searchQuery ? `No candidates match "${searchQuery}"` : 'No candidates in the ATS pipeline yet'}
+              </h3>
+              <p style={{ color: '#64748B', fontSize: '0.92rem', maxWidth: '440px', margin: '0 auto 20px auto', lineHeight: '1.5' }}>
+                {searchQuery
+                  ? 'Try searching by a different name, position, or skill tag, or clear the search input.'
+                  : 'Candidate applications will populate here across screening, technical interviews, and offer stages once job seekers apply.'}
+              </p>
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  style={{
+                    padding: '9px 18px',
+                    borderRadius: '8px',
+                    backgroundColor: '#0C463B',
+                    color: '#FFFFFF',
+                    fontWeight: '600',
+                    fontSize: '0.88rem',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Clear Search Filter
+                </button>
+              )}
+            </div>
+          ) : (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(5, 1fr)',
+              gap: '16px',
+              alignItems: 'flex-start'
+            }}>
             {STAGES.map(stage => {
               const stageCandidates = filteredCandidates.filter(c => c.stage === stage.id);
 
@@ -418,6 +466,7 @@ const CandidatesAtsPage = () => {
               );
             })}
           </div>
+          )}
         </div>
       </main>
 

@@ -252,8 +252,44 @@ const RecruiterDashBoardPage = () => {
               <tbody>
                 {filteredApplications.length === 0 ? (
                   <tr>
-                    <td colSpan="6" style={{ padding: '36px 24px', textAlign: 'center', color: '#64748B' }}>
-                      No candidates currently in this stage. When job seekers apply to your postings, their profiles will appear here.
+                    <td colSpan="6" style={{ padding: '48px 24px', textAlign: 'center' }}>
+                      <img
+                        src="/assets/searchimages/no-candidates.svg"
+                        alt="No candidates found"
+                        style={{
+                          width: '100%',
+                          maxWidth: '220px',
+                          height: 'auto',
+                          margin: '0 auto 16px auto',
+                          display: 'block'
+                        }}
+                      />
+                      <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#0C463B', marginBottom: '8px' }}>
+                        {filterStatus === 'all' ? 'No candidates yet' : `No candidates in "${filterStatus}" stage`}
+                      </h3>
+                      <p style={{ color: '#64748B', fontSize: '0.9rem', maxWidth: '420px', margin: '0 auto 16px auto', lineHeight: '1.5' }}>
+                        {filterStatus === 'all'
+                          ? 'When job seekers apply to your active job listings, their profiles and match scores will appear right here.'
+                          : `There are currently no applicants marked as ${filterStatus}. Switch filters or review newly submitted candidates.`}
+                      </p>
+                      {filterStatus !== 'all' && (
+                        <button
+                          type="button"
+                          onClick={() => setFilterStatus('all')}
+                          style={{
+                            padding: '8px 16px',
+                            borderRadius: '8px',
+                            backgroundColor: '#EBF8F4',
+                            color: '#0C463B',
+                            fontWeight: '600',
+                            fontSize: '0.85rem',
+                            border: '1px solid #A7F3D0',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          View All Candidates
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ) : (
@@ -381,40 +417,83 @@ const RecruiterDashBoardPage = () => {
             </Link>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {displayJobs.map(job => (
-              <div key={job.id} style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '16px',
-                borderRadius: '10px',
-                backgroundColor: '#F8FAFC',
-                border: '1px solid #E2E8F0',
-                gap: '12px'
-              }}>
-                <div>
-                  <Link to={`/job/${job.id}`}>
-                    <div style={{ fontWeight: '700', color: '#0F172A', fontSize: '1.05rem' }}>{job.title}</div>
-                  </Link>
-                  <div style={{ fontSize: '0.85rem', color: '#64748B', marginTop: '2px' }}>
-                    {job.location} • {job.salary} • Posted {job.postedDate}
+          {displayJobs.length === 0 ? (
+            <div style={{
+              padding: '36px 24px',
+              textAlign: 'center'
+            }}>
+              <img
+                src="/assets/searchimages/no-postings.svg"
+                alt="No active job postings"
+                style={{
+                  width: '100%',
+                  maxWidth: '220px',
+                  height: 'auto',
+                  margin: '0 auto 16px auto',
+                  display: 'block'
+                }}
+              />
+              <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#0C463B', marginBottom: '8px' }}>
+                No active job listings yet
+              </h3>
+              <p style={{ color: '#64748B', fontSize: '0.9rem', maxWidth: '420px', margin: '0 auto 18px auto', lineHeight: '1.5' }}>
+                You have not published any job opportunities yet. Post a new role to start sourcing top talent across the platform.
+              </p>
+              <Link
+                to="/post-job"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  backgroundColor: '#0C463B',
+                  color: '#FFFFFF',
+                  fontWeight: '700',
+                  fontSize: '0.9rem',
+                  textDecoration: 'none'
+                }}
+              >
+                <PlusCircle size={16} />
+                <span>Create Your First Listing</span>
+              </Link>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {displayJobs.map(job => (
+                <div key={job.id} style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '16px',
+                  borderRadius: '10px',
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                  gap: '12px'
+                }}>
+                  <div>
+                    <Link to={`/job/${job.id}`}>
+                      <div style={{ fontWeight: '700', color: '#0F172A', fontSize: '1.05rem' }}>{job.title}</div>
+                    </Link>
+                    <div style={{ fontSize: '0.85rem', color: '#64748B', marginTop: '2px' }}>
+                      {job.location} • {job.salary} • Posted {job.postedDate}
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    <Badge variant="primary">{job.type}</Badge>
+                    <Link
+                      to={`/job/${job.id}`}
+                      style={{ fontSize: '0.88rem', fontWeight: '600', color: '#0C463B' }}
+                    >
+                      View Listing →
+                    </Link>
                   </div>
                 </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <Badge variant="primary">{job.type}</Badge>
-                  <Link
-                    to={`/job/${job.id}`}
-                    style={{ fontSize: '0.88rem', fontWeight: '600', color: '#0C463B' }}
-                  >
-                    View Listing →
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
