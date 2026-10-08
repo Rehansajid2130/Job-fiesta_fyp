@@ -1,0 +1,13 @@
+{
+  "name": "job-fiesta",
+  "version": "1.0.0",
+  "description": "Job Fiesta - Recruitment & Career Platform FYP",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "start": "npm --prefix frontend run dev",
+    "frontend": "npm --prefix frontend run dev",
+    "backend": "npm --prefix backend start",
+    "build": "npm --prefix frontend run build"
+  }
+}

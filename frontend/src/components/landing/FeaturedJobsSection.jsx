@@ -2,7 +2,14 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-const FeaturedJobsSection = ({ featuredJobs, totalJobsCount, applications, onOpenApply }) => {
+const FeaturedJobsSection = ({ 
+  featuredJobs, 
+  totalJobsCount, 
+  applications, 
+  onOpenApply, 
+  candidateSkills = [], 
+  isPersonalized = false 
+}) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const isRecruiter = user?.userType === 'recruiter';
@@ -11,14 +18,45 @@ const FeaturedJobsSection = ({ featuredJobs, totalJobsCount, applications, onOpe
     <section id="jobs" className="container" style={{ marginTop: '40px', marginBottom: '80px' }}>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '36px' }}>
         <div>
-          {/* ponytail: fix typo in section header */}
-          <h2 style={{ fontFamily: "'Martel', serif", fontSize: 'clamp(30px, 5vw, 56px)', fontWeight: '700', color: '#0C463B', margin: 0, textAlign: 'left' }}>
-            Our Featured Jobs
-          </h2>
-          {/* ponytail: upgrade color from #6B7280 to #475569 for WCAG AA readability */}
-          <p style={{ fontFamily: 'Inter, sans-serif', color: '#475569', fontSize: '15px', marginTop: '6px' }}>
-            Explore handpicked premier opportunities featured on JobFiesta. Click any position to view details.
-          </p>
+          {/* ponytail: dynamically display AI recommendation header if candidate profile/skills exist */}
+          {isPersonalized ? (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                <h2 style={{ fontFamily: "'Martel', serif", fontSize: 'clamp(28px, 4.5vw, 52px)', fontWeight: '700', color: '#0C463B', margin: 0, textAlign: 'left' }}>
+                  Recommended For You
+                </h2>
+                <span style={{
+                  padding: '4px 12px',
+                  borderRadius: '50px',
+                  backgroundColor: '#EBF8F4',
+                  color: '#0C463B',
+                  fontSize: '13px',
+                  fontWeight: '700',
+                  border: '1px solid #A7F3D0',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}>
+                  ✨ AI Matched
+                </span>
+              </div>
+              <p style={{ fontFamily: 'Inter, sans-serif', color: '#475569', fontSize: '15px', marginTop: '6px' }}>
+                {candidateSkills.length > 0 
+                  ? `Positions algorithmically ranked based on your profile skills & resume (${candidateSkills.slice(0, 4).join(', ')}${candidateSkills.length > 4 ? ` +${candidateSkills.length - 4}` : ''}).`
+                  : 'Positions tailored to your professional background and skill profile.'
+                }
+              </p>
+            </>
+          ) : (
+            <>
+              <h2 style={{ fontFamily: "'Martel', serif", fontSize: 'clamp(30px, 5vw, 56px)', fontWeight: '700', color: '#0C463B', margin: 0, textAlign: 'left' }}>
+                Our Featured Jobs
+              </h2>
+              <p style={{ fontFamily: 'Inter, sans-serif', color: '#475569', fontSize: '15px', marginTop: '6px' }}>
+                Explore handpicked premier opportunities featured on JobFiesta. Click any position to view details.
+              </p>
+            </>
+          )}
         </div>
         <button
           onClick={() => navigate('/search')}
@@ -59,14 +97,28 @@ const FeaturedJobsSection = ({ featuredJobs, totalJobsCount, applications, onOpe
                 cursor: 'pointer'
               }}
             >
-              {/* Top Tags - ponytail: #475569 ensures WCAG AA contrast on white */}
-              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
+              {/* Top Tags & Match Score */}
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '18px', alignItems: 'center' }}>
                 <span style={{ border: '1px solid #D1D5DB', borderRadius: '50px', padding: '4px 14px', fontSize: '13px', color: '#475569', fontFamily: 'Inter, sans-serif' }}>
                   {job.type}
                 </span>
                 <span style={{ border: '1px solid #D1D5DB', borderRadius: '50px', padding: '4px 14px', fontSize: '13px', color: '#475569', fontFamily: 'Inter, sans-serif' }}>
                   {job.location}
                 </span>
+                {job.matchScore && (
+                  <span style={{
+                    borderRadius: '50px',
+                    padding: '3px 12px',
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    backgroundColor: job.matchScore >= 80 ? '#ECFDF5' : '#EFF6FF',
+                    color: job.matchScore >= 80 ? '#065F46' : '#1E40AF',
+                    border: `1px solid ${job.matchScore >= 80 ? '#A7F3D0' : '#BFDBFE'}`,
+                    marginLeft: 'auto'
+                  }}>
+                    ✨ {job.matchScore}% Match
+                  </span>
+                )}
               </div>
 
               {/* Title & Logo Row */}
@@ -91,11 +143,35 @@ const FeaturedJobsSection = ({ featuredJobs, totalJobsCount, applications, onOpe
               </div>
 
               {/* Category & Salary */}
-              <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '15px', color: '#334155', marginBottom: '24px' }}>
+              <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '15px', color: '#334155', marginBottom: '14px' }}>
                 <span style={{ fontWeight: '500' }}>{job.category}</span>
                 <span style={{ margin: '0 8px', color: '#CBD5E1' }}>|</span>
                 <span>{job.salary}</span>
               </div>
+
+              {/* Matched Skills pills */}
+              {Array.isArray(job.matchedSkills) && job.matchedSkills.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '18px' }}>
+                  {job.matchedSkills.slice(0, 3).map(skill => (
+                    <span key={skill} style={{
+                      fontSize: '11px',
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      backgroundColor: '#EBF8F4',
+                      color: '#0C463B',
+                      fontWeight: '600',
+                      border: '1px solid #D1FAE5'
+                    }}>
+                      ✓ {skill}
+                    </span>
+                  ))}
+                  {job.matchedSkills.length > 3 && (
+                    <span style={{ fontSize: '11px', color: '#64748B', alignSelf: 'center' }}>
+                      +{job.matchedSkills.length - 3} more
+                    </span>
+                  )}
+                </div>
+              )}
 
               {/* Apply Button / Applied Status */}
               {isRecruiter ? (

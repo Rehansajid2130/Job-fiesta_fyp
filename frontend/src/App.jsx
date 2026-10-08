@@ -87,8 +87,10 @@ function App() {
               <Route path="/job/:id" element={<JobdetailsPage />} />
               <Route path="/job-details" element={<JobdetailsPage />} />
 
-              {/* Resume Builder (Job Seekers Only) */}
-              <Route path="/resume-builder" element={<RoleRoute allowedRole="jobseeker"><ResumeBuilderPage /></RoleRoute>} />
+              {/* AI Resume Generator & Builder */}
+              <Route path="/resume-builder" element={<ResumeBuilderPage />} />
+              <Route path="/resume-generation" element={<ResumeBuilderPage />} />
+              <Route path="/resume-generator" element={<ResumeBuilderPage />} />
               <Route path="/resume" element={<Navigate to="/resume-builder" replace />} />
 
               {/* Authentication */}

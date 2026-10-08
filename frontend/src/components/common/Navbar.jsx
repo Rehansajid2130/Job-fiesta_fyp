@@ -61,15 +61,8 @@ const Navbar = () => {
   const isAuthPage = ['/login', '/register', '/register-jobseeker', '/register-recruiter', '/signup'].includes(location.pathname);
 
   const handleCategoriesClick = (e) => {
-    if (location.pathname === '/') {
-      e.preventDefault();
-      const el = document.getElementById('categories');
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-      }
-    } else {
-      navigate('/#categories');
-    }
+    if (e && e.preventDefault) e.preventDefault();
+    navigate('/search');
   };
 
   if (isAuthPage) {
@@ -238,25 +231,22 @@ const Navbar = () => {
                 Jobs
               </Link>
 
-              <button 
-                type="button"
-                onClick={handleCategoriesClick}
+              <Link 
+                to="/search" 
                 style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 0,
                   fontSize: '0.92rem',
                   fontWeight: '500',
                   color: '#475569',
-                  transition: 'color 0.2s ease',
-                  fontFamily: 'inherit'
+                  textDecoration: 'none',
+                  transition: 'color 0.2s ease'
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.color = '#0C463B'}
-                onMouseLeave={(e) => e.currentTarget.style.color = '#475569'}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = '#475569';
+                }}
               >
                 Categories
-              </button>
+              </Link>
 
               <Link 
                 to="/companies" 
@@ -871,16 +861,13 @@ const Navbar = () => {
           >
             Jobs
           </Link>
-          <button 
-            type="button"
-            onClick={(e) => {
-              setMobileMenuOpen(false);
-              handleCategoriesClick(e);
-            }}
-            style={{ background: 'none', border: 'none', padding: 0, textAlign: 'left', fontSize: '1rem', fontWeight: '500', color: '#334155', cursor: 'pointer', fontFamily: 'inherit' }}
+          <Link 
+            to="/search" 
+            onClick={() => setMobileMenuOpen(false)}
+            style={{ background: 'none', border: 'none', padding: 0, textAlign: 'left', fontSize: '1rem', fontWeight: '500', color: '#334155', textDecoration: 'none', fontFamily: 'inherit' }}
           >
             Categories
-          </button>
+          </Link>
           <Link 
             to="/companies" 
             onClick={() => setMobileMenuOpen(false)}

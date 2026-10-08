@@ -61,6 +61,15 @@ const applicationSchema = new mongoose.Schema(
       min: 0,
       max: 100,
     },
+    // ponytail: store pre-computed matched and missing skills arrays to avoid re-running match loops on every view
+    matchedSkills: {
+      type: [String],
+      default: [],
+    },
+    missingSkills: {
+      type: [String],
+      default: [],
+    },
     screeningAnswers: {
       type: [screeningAnswerSchema],
       default: [],

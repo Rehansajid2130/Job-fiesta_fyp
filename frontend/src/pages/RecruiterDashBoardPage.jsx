@@ -316,12 +316,13 @@ const RecruiterDashBoardPage = () => {
                           {cand.role || cand.jobTitle || 'Applicant'}
                         </td>
                         <td style={{ padding: '18px 20px' }}>
+                          {/* ponytail: dynamic match score badge with tier coloring */}
                           <span style={{
                             display: 'inline-flex',
                             padding: '4px 8px',
                             borderRadius: '6px',
-                            backgroundColor: '#ECFDF5',
-                            color: '#065F46',
+                            backgroundColor: (cand.matchScore || 85) >= 80 ? '#ECFDF5' : ((cand.matchScore || 85) >= 65 ? '#EFF6FF' : '#FFFBEB'),
+                            color: (cand.matchScore || 85) >= 80 ? '#065F46' : ((cand.matchScore || 85) >= 65 ? '#1E40AF' : '#92400E'),
                             fontWeight: '700',
                             fontSize: '0.85rem'
                           }}>

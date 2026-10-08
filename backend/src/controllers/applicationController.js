@@ -3,6 +3,41 @@ const Job = require('../models/Job');
 const Notification = require('../models/Notification');
 const { sendSuccess, sendError, asyncHandler } = require('../utils/response');
 
+// ponytail: compute deterministic ATS match percentage, matched skills, and missing skills
+// Zero external dependencies: standard JS Set, array filter, and substring matching (KISS)
+const computeAtsMatch = (candidateSkills = [], jobRequirements = []) => {
+  const reqs = Array.isArray(jobRequirements) ? jobRequirements.filter(Boolean) : [];
+  if (reqs.length === 0) {
+    return {
+      matchScore: 92,
+      matchedSkills: candidateSkills || [],
+      missingSkills: [],
+    };
+  }
+
+  const candLower = (candidateSkills || []).map((s) => String(s).trim().toLowerCase());
+  const matched = [];
+  const missing = [];
+
+  reqs.forEach((r) => {
+    const rLower = String(r).trim().toLowerCase();
+    const isMatched = candLower.some((c) => c === rLower || c.includes(rLower) || rLower.includes(c));
+    if (isMatched) {
+      matched.push(r);
+    } else {
+      missing.push(r);
+    }
+  });
+
+  const ratio = matched.length / reqs.length;
+  // Scaled dynamically: 50% baseline up to 98% based on match coverage
+  const matchScore = Math.min(98, Math.max(50, Math.round(50 + ratio * 48)));
+
+  return { matchScore, matchedSkills: matched, missingSkills: missing };
+};
+
+exports.computeAtsMatch = computeAtsMatch;
+
 /**
  * @desc    Apply to a job with resume, salary expectation & screening answers
  * @route   POST /api/applications/:jobId
@@ -39,20 +74,10 @@ exports.applyToJob = asyncHandler(async (req, res) => {
     return sendError(res, 'You have already applied for this position', 400);
   }
 
-  // Calculate ATS Match Score based on candidate skills vs job requirements/tags
-  let matchScore = 85;
-  const candidateSkills = Array.isArray(skills) ? skills : (req.user.skills || []);
-  const jobRequirements = [...(job.skills || []), ...(job.tags || [])];
-  
-  if (jobRequirements.length > 0 && candidateSkills.length > 0) {
-    const matched = candidateSkills.filter((s) =>
-      jobRequirements.some((reqSkill) => reqSkill.toLowerCase().includes(s.toLowerCase()))
-    );
-    matchScore = Math.min(
-      98,
-      Math.max(70, Math.round(75 + (matched.length / jobRequirements.length) * 23))
-    );
-  }
+  // Calculate ATS Match Score dynamically based on candidate skills vs job requirements/tags
+  const candidateSkills = Array.isArray(skills) && skills.length > 0 ? skills : (req.user.skills || []);
+  const jobRequirements = [...new Set([...(job.skills || []), ...(job.tags || [])])];
+  const { matchScore, matchedSkills, missingSkills } = computeAtsMatch(candidateSkills, jobRequirements);
 
   const application = await Application.create({
     job: jobId,
@@ -65,6 +90,8 @@ exports.applyToJob = asyncHandler(async (req, res) => {
     experience: experience || '',
     skills: candidateSkills,
     matchScore,
+    matchedSkills,
+    missingSkills,
     screeningAnswers: Array.isArray(screeningAnswers) ? screeningAnswers : [],
     status: 'applied',
   });
@@ -97,8 +124,22 @@ exports.getMyApplications = asyncHandler(async (req, res) => {
     .populate('job')
     .sort({ createdAt: -1 });
 
-  return sendSuccess(res, applications, 'My applications retrieved successfully', 200, {
-    count: applications.length,
+  // ponytail: ensure matchedSkills & missingSkills are present for candidate dashboard
+  const enriched = applications.map((app) => {
+    const obj = app.toObject ? app.toObject() : { ...app };
+    if (!obj.matchedSkills || obj.matchedSkills.length === 0) {
+      const candSkills = obj.skills?.length > 0 ? obj.skills : (req.user.skills || []);
+      const jobReqs = [...new Set([...(obj.job?.skills || []), ...(obj.job?.tags || [])])];
+      const ats = computeAtsMatch(candSkills, jobReqs);
+      obj.matchScore = obj.matchScore || ats.matchScore;
+      obj.matchedSkills = ats.matchedSkills;
+      obj.missingSkills = ats.missingSkills;
+    }
+    return obj;
+  });
+
+  return sendSuccess(res, enriched, 'My applications retrieved successfully', 200, {
+    count: enriched.length,
   });
 });
 
@@ -128,34 +169,45 @@ exports.getCandidatePipeline = asyncHandler(async (req, res) => {
   }
 
   const applications = await Application.find(query)
-    .populate('job', 'title company location salary jobType')
+    .populate('job', 'title company location salary jobType skills tags')
     .populate('applicant', 'fullName email avatar phone location headline skills')
     .sort({ createdAt: -1 });
 
-  // Map to unified ATS candidate format
-  const candidates = applications.map((app) => ({
-    id: app._id,
-    applicationId: app._id,
-    name: app.applicant?.fullName || 'Anonymous Applicant',
-    email: app.applicant?.email || '',
-    avatar:
-      app.applicant?.avatar ||
-      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces',
-    role: app.job?.title || 'Applicant',
-    company: app.job?.company || '',
-    jobId: app.job?._id,
-    stage: app.status,
-    appliedDate: app.createdAt ? new Date(app.createdAt).toLocaleDateString() : 'Recent',
-    experience: app.experience || '3+ Years',
-    matchScore: app.matchScore || 85,
-    expectedSalary: app.expectedSalary || 'Competitive',
-    location: app.applicant?.location || 'Remote',
-    skills: app.skills?.length > 0 ? app.skills : app.applicant?.skills || [],
-    notes: app.notes || '',
-    screeningAnswers: app.screeningAnswers || [],
-    resumeUrl: app.resumeUrl || '',
-    coverLetter: app.coverLetter || '',
-  }));
+  // Map to unified ATS candidate format with dynamic match breakdown
+  const candidates = applications.map((app) => {
+    const candSkills = app.skills?.length > 0 ? app.skills : (app.applicant?.skills || []);
+    const jobReqs = [...new Set([...(app.job?.skills || []), ...(app.job?.tags || [])])];
+    // ponytail: fallback to dynamic computation if legacy record lacks matchedSkills array
+    const ats = (app.matchedSkills && app.matchedSkills.length > 0)
+      ? { matchScore: app.matchScore, matchedSkills: app.matchedSkills, missingSkills: app.missingSkills || [] }
+      : computeAtsMatch(candSkills, jobReqs);
+
+    return {
+      id: app._id,
+      applicationId: app._id,
+      name: app.applicant?.fullName || 'Anonymous Applicant',
+      email: app.applicant?.email || '',
+      avatar:
+        app.applicant?.avatar ||
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces',
+      role: app.job?.title || 'Applicant',
+      company: app.job?.company || '',
+      jobId: app.job?._id,
+      stage: app.status,
+      appliedDate: app.createdAt ? new Date(app.createdAt).toLocaleDateString() : 'Recent',
+      experience: app.experience || '3+ Years',
+      matchScore: ats.matchScore,
+      matchedSkills: ats.matchedSkills,
+      missingSkills: ats.missingSkills,
+      expectedSalary: app.expectedSalary || 'Competitive',
+      location: app.applicant?.location || 'Remote',
+      skills: candSkills,
+      notes: app.notes || '',
+      screeningAnswers: app.screeningAnswers || [],
+      resumeUrl: app.resumeUrl || '',
+      coverLetter: app.coverLetter || '',
+    };
+  });
 
   return sendSuccess(res, candidates, 'Candidate pipeline retrieved successfully', 200, {
     count: candidates.length,

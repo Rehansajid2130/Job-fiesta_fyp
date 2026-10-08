@@ -9,6 +9,37 @@ import {
   initialNotifications 
 } from '../data/mockData';
 
+// ponytail: pure, deterministic ATS match computation (KISS - no external dependencies)
+export const computeAtsMatch = (candidateSkills = [], jobRequirements = []) => {
+  const reqs = Array.isArray(jobRequirements) ? jobRequirements.filter(Boolean) : [];
+  if (reqs.length === 0) {
+    return {
+      matchScore: 92,
+      matchedSkills: candidateSkills || [],
+      missingSkills: [],
+    };
+  }
+
+  const candLower = (candidateSkills || []).map(s => String(s).trim().toLowerCase());
+  const matched = [];
+  const missing = [];
+
+  reqs.forEach(r => {
+    const rLower = String(r).trim().toLowerCase();
+    const isMatched = candLower.some(c => c === rLower || c.includes(rLower) || rLower.includes(c));
+    if (isMatched) {
+      matched.push(r);
+    } else {
+      missing.push(r);
+    }
+  });
+
+  const ratio = matched.length / reqs.length;
+  const matchScore = Math.min(98, Math.max(50, Math.round(50 + ratio * 48)));
+
+  return { matchScore, matchedSkills: matched, missingSkills: missing };
+};
+
 const JobContext = createContext();
 
 export const useJobs = () => useContext(JobContext);
@@ -153,6 +184,8 @@ export const JobProvider = ({ children }) => {
               appliedDate: app.createdAt ? new Date(app.createdAt).toISOString().split('T')[0] : 'Today',
               status: app.status === 'applied' ? 'Applied' : (app.status === 'screening' ? 'Screening' : (app.status === 'interviewing' ? 'Interviewing' : app.status)),
               matchScore: app.matchScore || 85,
+              matchedSkills: app.matchedSkills || [],
+              missingSkills: app.missingSkills || [],
               coverNote: app.coverLetter || ''
             }));
             setApplications(mapped);
@@ -306,6 +339,11 @@ export const JobProvider = ({ children }) => {
       }
     }
 
+    // ponytail: evaluate deterministic ATS match between candidate profile skills & job requirements
+    const candSkills = currentUser.skills || [];
+    const jobReqs = [...new Set([...(targetJob.skills || []), ...(targetJob.tags || [])])];
+    const clientAts = computeAtsMatch(candSkills, jobReqs);
+
     const newApplication = {
       id: backendApp ? backendApp._id : `app-${Date.now()}`,
       jobId: realJobId || jobId,
@@ -313,7 +351,9 @@ export const JobProvider = ({ children }) => {
       company: targetJob.company || 'Company',
       appliedDate: new Date().toISOString().split('T')[0],
       status: 'Applied',
-      matchScore: backendApp?.matchScore || 88,
+      matchScore: backendApp?.matchScore || clientAts.matchScore,
+      matchedSkills: backendApp?.matchedSkills || clientAts.matchedSkills,
+      missingSkills: backendApp?.missingSkills || clientAts.missingSkills,
       coverNote: customCoverNote
     };
 

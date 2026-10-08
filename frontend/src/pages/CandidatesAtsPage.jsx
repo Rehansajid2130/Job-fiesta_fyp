@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import Modal from '../components/common/Modal';
-import { useJobs } from '../context/JobContext';
+import { useJobs, computeAtsMatch } from '../context/JobContext';
 import { useAuth } from '../context/AuthContext';
 import { 
   Users, 
@@ -37,10 +37,25 @@ const STAGES = [
 const CandidatesAtsPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { candidates, updateCandidateStage, showToast, startOrGetConversation, refreshUserData } = useJobs();
+  const { jobs, candidates, updateCandidateStage, showToast, startOrGetConversation, refreshUserData } = useJobs();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
+
+  // ponytail: resolve ATS match breakdown (uses server pre-computed arrays or computes client-side if missing)
+  const candidateAts = React.useMemo(() => {
+    if (!selectedCandidate) return null;
+    if (selectedCandidate.matchedSkills?.length > 0 || selectedCandidate.missingSkills?.length > 0) {
+      return {
+        matchScore: selectedCandidate.matchScore || 85,
+        matchedSkills: selectedCandidate.matchedSkills || [],
+        missingSkills: selectedCandidate.missingSkills || []
+      };
+    }
+    const targetJob = (jobs || []).find(j => j.id === selectedCandidate.jobId || j._id === selectedCandidate.jobId || j.title === selectedCandidate.role);
+    const reqs = targetJob ? [...new Set([...(targetJob.skills || []), ...(targetJob.tags || [])])] : [];
+    return computeAtsMatch(selectedCandidate.skills || [], reqs);
+  }, [selectedCandidate, jobs]);
 
   React.useEffect(() => {
     if (!user) {
@@ -367,14 +382,15 @@ const CandidatesAtsPage = () => {
                             marginBottom: '10px',
                             fontSize: '0.78rem'
                           }}>
+                            {/* ponytail: dynamic ATS score badge with tier coloring */}
                             <span style={{
-                              padding: '2px 6px',
+                              padding: '2px 8px',
                               borderRadius: '4px',
-                              backgroundColor: '#EBF8F4',
-                              color: '#0C463B',
+                              backgroundColor: (cand.matchScore || 85) >= 80 ? '#EBF8F4' : ((cand.matchScore || 85) >= 65 ? '#EFF6FF' : '#FFFBEB'),
+                              color: (cand.matchScore || 85) >= 80 ? '#0C463B' : ((cand.matchScore || 85) >= 65 ? '#1E40AF' : '#92400E'),
                               fontWeight: '700'
                             }}>
-                              {cand.matchScore}% Match
+                              {cand.matchScore || 85}% Match
                             </span>
                             <span style={{ color: '#94A3B8' }}>{cand.experience}</span>
                           </div>
@@ -515,7 +531,13 @@ const CandidatesAtsPage = () => {
             }}>
               <div>
                 <div style={{ fontSize: '0.75rem', color: '#64748B' }}>ATS Match</div>
-                <div style={{ fontSize: '1.15rem', fontWeight: '800', color: '#10B981' }}>{selectedCandidate.matchScore}%</div>
+                <div style={{ 
+                  fontSize: '1.15rem', 
+                  fontWeight: '800', 
+                  color: (candidateAts?.matchScore || 85) >= 80 ? '#10B981' : ((candidateAts?.matchScore || 85) >= 65 ? '#2563EB' : '#D97706') 
+                }}>
+                  {candidateAts?.matchScore || selectedCandidate.matchScore || 85}%
+                </div>
               </div>
               <div>
                 <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Expected Salary</div>
@@ -527,10 +549,94 @@ const CandidatesAtsPage = () => {
               </div>
             </div>
 
+            {/* ponytail: ATS Match Breakdown with matched & missing requirements */}
+            <div style={{
+              marginBottom: '20px',
+              padding: '16px',
+              borderRadius: '10px',
+              backgroundColor: '#F8FAFC',
+              border: '1px solid #E2E8F0'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <h4 style={{ fontSize: '0.92rem', fontWeight: '700', color: '#0F172A', margin: 0 }}>
+                  ATS Match Breakdown
+                </h4>
+                <span style={{
+                  fontSize: '0.78rem',
+                  fontWeight: '700',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  backgroundColor: (candidateAts?.matchScore || 85) >= 80 ? '#ECFDF5' : ((candidateAts?.matchScore || 85) >= 65 ? '#EFF6FF' : '#FFFBEB'),
+                  color: (candidateAts?.matchScore || 85) >= 80 ? '#065F46' : ((candidateAts?.matchScore || 85) >= 65 ? '#1E40AF' : '#92400E')
+                }}>
+                  {candidateAts?.matchScore || selectedCandidate.matchScore || 85}% Match
+                </span>
+              </div>
+
+              {/* Match Progress Bar */}
+              <div style={{ width: '100%', height: '8px', backgroundColor: '#E2E8F0', borderRadius: '4px', overflow: 'hidden', marginBottom: '14px' }}>
+                <div style={{
+                  width: `${candidateAts?.matchScore || selectedCandidate.matchScore || 85}%`,
+                  height: '100%',
+                  backgroundColor: (candidateAts?.matchScore || 85) >= 80 ? '#10B981' : ((candidateAts?.matchScore || 85) >= 65 ? '#3B82F6' : '#F59E0B'),
+                  borderRadius: '4px',
+                  transition: 'width 0.3s ease'
+                }} />
+              </div>
+
+              {/* Matched Requirements */}
+              {candidateAts?.matchedSkills?.length > 0 && (
+                <div style={{ marginBottom: '12px' }}>
+                  <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#065F46', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <CheckCircle2 size={14} color="#10B981" /> Matched Requirements ({candidateAts.matchedSkills.length})
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {candidateAts.matchedSkills.map(s => (
+                      <span key={s} style={{
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        backgroundColor: '#ECFDF5',
+                        color: '#065F46',
+                        fontSize: '0.78rem',
+                        fontWeight: '600',
+                        border: '1px solid #A7F3D0'
+                      }}>
+                        ✓ {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Missing Requirements */}
+              {candidateAts?.missingSkills?.length > 0 && (
+                <div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#991B1B', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <AlertCircle size={14} color="#EF4444" /> Unmatched / Gap Requirements ({candidateAts.missingSkills.length})
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {candidateAts.missingSkills.map(s => (
+                      <span key={s} style={{
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        backgroundColor: '#FEF2F2',
+                        color: '#991B1B',
+                        fontSize: '0.78rem',
+                        fontWeight: '600',
+                        border: '1px solid #FECACA'
+                      }}>
+                        ! {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Skills */}
             <div style={{ marginBottom: '20px' }}>
               <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#0F172A', marginBottom: '8px' }}>
-                Skills & Tech Stack
+                All Candidate Skills
               </h4>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                 {selectedCandidate.skills.map(s => (
@@ -539,8 +645,8 @@ const CandidatesAtsPage = () => {
                     style={{
                       padding: '4px 10px',
                       borderRadius: '6px',
-                      backgroundColor: '#EBF8F4',
-                      color: '#0C463B',
+                      backgroundColor: '#F1F5F9',
+                      color: '#475569',
                       fontSize: '0.82rem',
                       fontWeight: '600'
                     }}

@@ -243,7 +243,20 @@ const JobSeekerDashBoardPage = () => {
                         <td style={{ padding: '18px 20px', color: '#475569' }}>{app.company}</td>
                         <td style={{ padding: '18px 20px', color: '#64748B' }}>{app.appliedDate}</td>
                         <td style={{ padding: '18px 20px' }}>
-                          <span style={{ fontWeight: '700', color: '#10B981' }}>{app.matchScore}%</span>
+                          {/* ponytail: dynamic match score badge with tier coloring */}
+                          <span style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            fontWeight: '700',
+                            padding: '3px 8px',
+                            borderRadius: '6px',
+                            fontSize: '0.82rem',
+                            backgroundColor: (app.matchScore || 85) >= 80 ? '#ECFDF5' : ((app.matchScore || 85) >= 65 ? '#EFF6FF' : '#FFFBEB'),
+                            color: (app.matchScore || 85) >= 80 ? '#065F46' : ((app.matchScore || 85) >= 65 ? '#1E40AF' : '#92400E')
+                          }}>
+                            {app.matchScore || 85}% Match
+                          </span>
                         </td>
                         <td style={{ padding: '18px 20px' }}>
                           {getStatusBadge(app.status)}

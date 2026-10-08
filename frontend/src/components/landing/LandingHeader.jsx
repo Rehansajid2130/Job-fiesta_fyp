@@ -57,7 +57,7 @@ const LandingHeader = ({ scrollToSection }) => {
               Jobs
             </button>
             <button 
-              onClick={() => scrollToSection('categories')}
+              onClick={() => navigate('/search')}
               style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', fontWeight: '500', color: '#1A1A1A', cursor: 'pointer', background: 'none', border: 'none' }}
             >
               Categories
@@ -196,7 +196,7 @@ const LandingHeader = ({ scrollToSection }) => {
           <button 
             onClick={() => {
               setMobileMenuOpen(false);
-              scrollToSection('categories');
+              navigate('/search');
             }}
             style={{ textAlign: 'left', fontFamily: 'Inter, sans-serif', fontSize: '16px', fontWeight: '600', color: '#1A1A1A', padding: '8px 0', borderBottom: '1px solid #F3F4F6', background: 'none', border: 'none', cursor: 'pointer' }}
           >

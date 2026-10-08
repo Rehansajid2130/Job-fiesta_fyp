@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useJobs } from '../context/JobContext';
+import { useJobs, computeAtsMatch } from '../context/JobContext';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
@@ -136,21 +136,75 @@ const LandingPage = () => {
     }
   ];
 
-  // Dynamic Featured Jobs derived from real jobs database with curated fallback
-  const featuredJobs = (jobs && jobs.length > 0)
-    ? jobs.slice(0, 6).map((job, idx) => ({
+  // ponytail: extract candidate skills from AuthContext or saved AI resume
+  const candidateSkills = React.useMemo(() => {
+    let list = [];
+    if (user && user.userType !== 'recruiter' && Array.isArray(user.skills) && user.skills.length > 0) {
+      list = [...user.skills];
+    }
+    try {
+      const savedResume = localStorage.getItem('jobfiesta_resume');
+      if (savedResume) {
+        const parsed = JSON.parse(savedResume);
+        if (Array.isArray(parsed?.skills) && parsed.skills.length > 0) {
+          list = [...new Set([...list, ...parsed.skills])];
+        }
+      }
+    } catch (e) {}
+    return list;
+  }, [user]);
+
+  // Candidate title/headline preference for role affinity
+  const candidateHeadline = (user?.headline || user?.role || '').toLowerCase();
+
+  // ponytail: algorithmic job recommendation & sorting based on candidate skills (KISS)
+  const recommendedJobs = React.useMemo(() => {
+    if (!jobs || jobs.length === 0) return defaultFeaturedJobs;
+
+    const mapped = jobs.map((job) => {
+      const jobReqs = [...new Set([...(job.skills || []), ...(job.tags || [])])];
+      const ats = candidateSkills.length > 0 
+        ? computeAtsMatch(candidateSkills, jobReqs)
+        : null;
+
+      // Small role affinity bonus if job title matches headline
+      let finalScore = ats ? ats.matchScore : null;
+      if (ats && candidateHeadline && job.title) {
+        const titleLower = job.title.toLowerCase();
+        if (candidateHeadline.split(' ').some(w => w.length > 3 && titleLower.includes(w))) {
+          finalScore = Math.min(99, finalScore + 4);
+        }
+      }
+
+      return {
         id: job.id || job._id,
         title: job.title,
         company: job.company,
-        type: job.type || 'Full Time',
+        type: job.type || job.jobType || 'Full Time',
         location: job.location,
         category: job.category || 'Tech',
         filterCategory: (job.category || 'tech').toLowerCase(),
         salary: job.salary || `$${Math.round((job.salaryMin || 100000)/1000)}k - $${Math.round((job.salaryMax || 140000)/1000)}k`,
         logo: job.logo || '/assets/Landingpageimages/spotify_1_.svg',
-        isPrimaryBtn: idx === 0
-      }))
-    : defaultFeaturedJobs;
+        skills: job.skills || [],
+        matchScore: finalScore,
+        matchedSkills: ats ? ats.matchedSkills : [],
+        missingSkills: ats ? ats.missingSkills : [],
+        isPrimaryBtn: false
+      };
+    });
+
+    if (candidateSkills.length > 0) {
+      // Sort descending: highest algorithmic match score first
+      mapped.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+    }
+
+    const top = mapped.slice(0, 6);
+    if (top.length > 0) {
+      top[0].isPrimaryBtn = true;
+    }
+    return top;
+  }, [jobs, candidateSkills, candidateHeadline]);
 
   // 5 Exact Categories from Figma Screenshot
   const categories = [
@@ -205,12 +259,14 @@ const LandingPage = () => {
         onQuickSearch={handleQuickSearch}
       />
 
-      {/* 3. FEATURED JOBS */}
+      {/* 3. FEATURED / RECOMMENDED JOBS */}
       <FeaturedJobsSection
-        featuredJobs={featuredJobs}
+        featuredJobs={recommendedJobs}
         totalJobsCount={jobs?.length || 6}
         applications={applications}
         onOpenApply={handleOpenApply}
+        candidateSkills={candidateSkills}
+        isPersonalized={candidateSkills.length > 0}
       />
 
       {/* 4. CATEGORIES */}

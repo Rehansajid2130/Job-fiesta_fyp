@@ -329,6 +329,7 @@ app.use('/api/applications', require('./routes/applicationRoutes'));
 app.use('/api/conversations', require('./routes/conversationRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/resume', require('./routes/resumeRoutes'));
 
 // Error handling middleware
 app.use(notFound);
