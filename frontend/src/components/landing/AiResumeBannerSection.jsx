@@ -205,10 +205,6 @@ const AiResumeBannerSection = () => {
                 <span>Launch AI Resume Builder</span>
                 <ArrowRight size={16} color="#0C463B" />
               </button>
-
-              <span style={{ fontSize: '13px', color: '#A7F3D0', fontWeight: '500' }}>
-                ⚡ 100% Free • No Credit Card Required
-              </span>
             </div>
           </div>
 
@@ -255,26 +251,6 @@ const AiResumeBannerSection = () => {
               position: 'relative',
               border: '2px solid rgba(255, 255, 255, 0.2)'
             }}>
-              {/* ATS Score Floating Badge */}
-              <div style={{
-                position: 'absolute',
-                top: '-14px',
-                right: '24px',
-                backgroundColor: '#ECFDF5',
-                border: '1.5px solid #10B981',
-                borderRadius: '24px',
-                padding: '4px 12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)'
-              }}>
-                <Award size={14} color="#059669" />
-                <span style={{ fontSize: '12px', fontWeight: '800', color: '#065F46' }}>
-                  {activeRole.score}% ATS Score
-                </span>
-              </div>
-
               {/* Header profile row */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                 <div>
