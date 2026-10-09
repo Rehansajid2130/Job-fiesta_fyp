@@ -12,17 +12,36 @@ import {
   CheckCircle2, 
   XCircle, 
   Clock, 
-  Star,
-  MessageSquare,
-  ArrowRight,
-  Filter
+  Star, 
+  MessageSquare, 
+  ArrowRight, 
+  Filter,
+  Calendar,
+  Video,
+  ExternalLink,
+  Sparkles
 } from 'lucide-react';
+import ScheduleInterviewModal from '../components/common/ScheduleInterviewModal';
 
 const RecruiterDashBoardPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { jobs, applications, updateApplicationStatus, candidates, updateCandidateStage, startOrGetConversation, showToast, refreshUserData, fetchLiveJobs } = useJobs();
+  const { 
+    jobs, 
+    applications, 
+    updateApplicationStatus, 
+    candidates, 
+    updateCandidateStage, 
+    startOrGetConversation, 
+    showToast, 
+    refreshUserData, 
+    fetchLiveJobs,
+    interviews,
+    cancelInterview 
+  } = useJobs();
   const [filterStatus, setFilterStatus] = useState('all');
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+  const [selectedInterviewCandidate, setSelectedInterviewCandidate] = useState(null);
 
   React.useEffect(() => {
     if (!user) {
@@ -151,9 +170,9 @@ const RecruiterDashBoardPage = () => {
         }}>
           {[
             { label: 'Active Postings', value: displayJobs.length, icon: Briefcase, color: '#0C463B', bg: '#EBF8F4' },
-            { label: 'Total Applicants', value: applications.length, icon: Users, color: '#10B981', bg: '#ECFDF5' },
-            { label: 'Shortlisted', value: applications.filter(a => a.status === 'Shortlisted').length, icon: CheckCircle2, color: '#3B82F6', bg: '#EFF6FF' },
-            { label: 'Interviews Booked', value: applications.filter(a => a.status === 'Interview Scheduled').length, icon: Clock, color: '#F59E0B', bg: '#FFFBEB' }
+            { label: 'Total Applicants', value: displayCandidates.length, icon: Users, color: '#10B981', bg: '#ECFDF5' },
+            { label: 'Shortlisted', value: displayCandidates.filter(a => (a.stage || a.status) === 'screening' || (a.stage || a.status) === 'Shortlisted').length, icon: CheckCircle2, color: '#3B82F6', bg: '#EFF6FF' },
+            { label: 'Interviews Scheduled', value: (interviews?.filter(i => i.status !== 'Cancelled').length || displayCandidates.filter(a => (a.stage || a.status) === 'interviewing' || (a.stage || a.status) === 'Interview Scheduled').length), icon: Calendar, color: '#8B5CF6', bg: '#F5F3FF' }
           ].map((metric, i) => {
             const Icon = metric.icon;
             return (
@@ -187,6 +206,154 @@ const RecruiterDashBoardPage = () => {
             );
           })}
         </div>
+
+        {/* Scheduled Candidate Interviews Widget */}
+        {interviews && interviews.filter(i => i.status !== 'Cancelled').length > 0 && (
+          <div style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            border: '1px solid #BBF7D0',
+            boxShadow: '0 4px 18px rgba(16, 185, 129, 0.08)',
+            marginBottom: '36px',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              padding: '16px 24px',
+              borderBottom: '1px solid #E2E8F0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: '#F8FAFC'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Calendar size={18} color="#0C463B" />
+                <h2 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0F172A', margin: 0 }}>
+                  Upcoming Scheduled Interviews ({interviews.filter(i => i.status !== 'Cancelled').length})
+                </h2>
+              </div>
+              <Link
+                to="/candidates"
+                style={{ fontSize: '0.85rem', fontWeight: '700', color: '#0C463B', textDecoration: 'none' }}
+              >
+                Open Candidate ATS Pipeline ➔
+              </Link>
+            </div>
+
+            <div style={{ padding: '20px 24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
+              {interviews.filter(i => i.status !== 'Cancelled').map((int) => (
+                <div
+                  key={int.id}
+                  style={{
+                    padding: '18px',
+                    borderRadius: '12px',
+                    border: '1px solid #E2E8F0',
+                    backgroundColor: '#FFFFFF',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <img
+                        src={int.candidateAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces'}
+                        alt={int.candidateName}
+                        style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
+                      />
+                      <div>
+                        <div style={{ fontWeight: '700', fontSize: '0.94rem', color: '#0F172A' }}>{int.candidateName}</div>
+                        <div style={{ fontSize: '0.8rem', color: '#64748B' }}>{int.candidateRole || int.jobTitle}</div>
+                      </div>
+                    </div>
+                    <span style={{
+                      fontSize: '0.75rem',
+                      fontWeight: '700',
+                      color: '#065F46',
+                      backgroundColor: '#ECFDF5',
+                      padding: '3px 8px',
+                      borderRadius: '8px'
+                    }}>
+                      {int.duration}
+                    </span>
+                  </div>
+
+                  <div style={{ fontSize: '0.88rem', fontWeight: '700', color: '#0C463B' }}>
+                    {int.roundType}
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '0.82rem', color: '#475569' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                      <Calendar size={13} color="#0C463B" /> {int.date}
+                    </span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                      <Clock size={13} color="#0C463B" /> {int.time}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                    {int.meetingLink && (
+                      <a
+                        href={int.meetingLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          flex: 1,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          padding: '9px 14px',
+                          borderRadius: '8px',
+                          backgroundColor: '#0C463B',
+                          color: '#FFFFFF',
+                          fontWeight: '700',
+                          fontSize: '0.84rem',
+                          textDecoration: 'none'
+                        }}
+                      >
+                        <Video size={14} />
+                        <span>Join Meeting</span>
+                      </a>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => handleMessageApplicant({ id: int.candidateId, name: int.candidateName, role: int.candidateRole, company: int.company })}
+                      style={{
+                        padding: '9px 14px',
+                        borderRadius: '8px',
+                        border: '1px solid #CBD5E1',
+                        backgroundColor: '#FFFFFF',
+                        color: '#334155',
+                        fontWeight: '600',
+                        fontSize: '0.84rem',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Chat
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => cancelInterview && cancelInterview(int.id)}
+                      style={{
+                        padding: '9px 12px',
+                        borderRadius: '8px',
+                        border: '1px solid #FCA5A5',
+                        backgroundColor: '#FEF2F2',
+                        color: '#DC2626',
+                        fontWeight: '600',
+                        fontSize: '0.8rem',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Candidate Pipeline Section */}
         <div style={{
@@ -363,34 +530,59 @@ const RecruiterDashBoardPage = () => {
                           </select>
                         </td>
                         <td style={{ padding: '18px 24px', textAlign: 'right' }}>
-                          <button
-                            type="button"
-                            onClick={() => handleMessageApplicant(cand, cand)}
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              padding: '7px 14px',
-                              borderRadius: '6px',
-                              backgroundColor: '#EBF8F4',
-                              color: '#0C463B',
-                              fontWeight: '700',
-                              fontSize: '0.85rem',
-                              border: 'none',
-                              cursor: 'pointer',
-                              transition: 'all 0.15s ease'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = '#0C463B';
-                              e.currentTarget.style.color = '#FFFFFF';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = '#EBF8F4';
-                              e.currentTarget.style.color = '#0C463B';
-                            }}
-                          >
-                            <MessageSquare size={14} /> Message
-                          </button>
+                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedInterviewCandidate(cand);
+                                setScheduleModalOpen(true);
+                              }}
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                                padding: '7px 12px',
+                                borderRadius: '6px',
+                                backgroundColor: '#0C463B',
+                                color: '#FFFFFF',
+                                fontWeight: '700',
+                                fontSize: '0.82rem',
+                                border: 'none',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <Calendar size={13} />
+                              <span>Schedule</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleMessageApplicant(cand, cand)}
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                padding: '7px 14px',
+                                borderRadius: '6px',
+                                backgroundColor: '#EBF8F4',
+                                color: '#0C463B',
+                                fontWeight: '700',
+                                fontSize: '0.85rem',
+                                border: 'none',
+                                cursor: 'pointer',
+                                transition: 'all 0.15s ease'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = '#0C463B';
+                                e.currentTarget.style.color = '#FFFFFF';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = '#EBF8F4';
+                                e.currentTarget.style.color = '#0C463B';
+                              }}
+                            >
+                              <MessageSquare size={14} /> Message
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -497,6 +689,13 @@ const RecruiterDashBoardPage = () => {
           )}
         </div>
       </div>
+
+      {/* Schedule Interview Modal */}
+      <ScheduleInterviewModal
+        isOpen={scheduleModalOpen}
+        onClose={() => setScheduleModalOpen(false)}
+        candidate={selectedInterviewCandidate}
+      />
 
       <Footer />
     </div>

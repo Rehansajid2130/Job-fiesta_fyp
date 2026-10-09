@@ -508,9 +508,132 @@ export const initialJobs = [
   }
 ];
 
-export const initialApplications = [];
+export const initialApplications = [
+  {
+    id: 'app-user-1',
+    jobId: 'job-1',
+    jobTitle: 'Senior Frontend Engineer',
+    company: 'Nexus Innovations',
+    logo: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&h=100&fit=crop&crop=faces',
+    appliedDate: '2026-10-08',
+    status: 'Interview Scheduled',
+    matchScore: 94,
+    matchedSkills: ['React', 'TypeScript', 'TailwindCSS', 'Vite', 'REST APIs'],
+    missingSkills: [],
+    location: 'San Francisco, CA (Remote)',
+    salary: '$130k - $160k',
+    interview: {
+      id: 'int-101',
+      date: '2026-10-15',
+      time: '02:00 PM',
+      duration: '45 mins',
+      roundType: 'System Architecture & Technical Deep Dive',
+      interviewer: 'Suzana Colin (Head of Engineering Talent)',
+      meetingLink: 'https://meet.google.com/job-fiesta-frontend',
+      notes: 'Review micro-frontend patterns, core web vitals optimization techniques, and recent React 19 concurrent feature adoptions.'
+    }
+  },
+  {
+    id: 'app-user-2',
+    jobId: 'job-2',
+    jobTitle: 'Lead Product Designer',
+    company: 'Aurora Creative Labs',
+    logo: 'https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=100&h=100&fit=crop&crop=faces',
+    appliedDate: '2026-10-06',
+    status: 'Under Review',
+    matchScore: 88,
+    matchedSkills: ['Figma', 'Design Systems', 'UX Research', 'Prototyping'],
+    missingSkills: [],
+    location: 'New York, NY (Hybrid)',
+    salary: '$115k - $145k'
+  },
+  {
+    id: 'app-user-3',
+    jobId: 'job-3',
+    jobTitle: 'Machine Learning Research Engineer',
+    company: 'Cognitive Dynamics AI',
+    logo: 'https://images.unsplash.com/photo-1614680376593-902f749f7ffc?w=100&h=100&fit=crop&crop=faces',
+    appliedDate: '2026-10-02',
+    status: 'Applied',
+    matchScore: 82,
+    matchedSkills: ['Python', 'PyTorch', 'Transformers'],
+    missingSkills: ['CUDA', 'vLLM'],
+    location: 'Austin, TX (Remote)',
+    salary: '$150k - $190k'
+  }
+];
 
-export const initialConversations = [];
+export const initialConversations = [
+  {
+    id: 'conv-suzana',
+    candidateId: 'cand-1',
+    participantName: 'Suzana Colin',
+    participantRole: 'Head of Engineering Talent',
+    company: 'Nexus Innovations',
+    participantAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&h=120&fit=crop&crop=faces',
+    date: '10:30 AM',
+    unreadCount: 0,
+    messages: [
+      {
+        id: 1,
+        sender: 'recruiter',
+        text: "Hi Alex! We were really impressed by your profile and frontend engineering portfolio for our Senior Frontend Engineer opening.",
+        timestamp: '10:15 AM'
+      },
+      {
+        id: 2,
+        sender: 'jobseeker',
+        text: "Hello Suzana! Thank you so much for reaching out. I'm very excited about Nexus Innovations and the real-time cloud collaboration platform.",
+        timestamp: '10:20 AM'
+      },
+      {
+        id: 3,
+        sender: 'recruiter',
+        text: "We would love to schedule a technical architecture discussion with our team to dive into your past work with React and performance optimization.",
+        timestamp: '10:25 AM'
+      },
+      {
+        id: 4,
+        sender: 'recruiter',
+        text: "📅 Interview Scheduled: System Architecture & Technical Deep Dive on 2026-10-15 at 02:00 PM",
+        timestamp: '10:30 AM',
+        isInterviewInvite: true,
+        interviewDetails: {
+          id: 'int-101',
+          roundType: 'System Architecture & Technical Deep Dive',
+          date: '2026-10-15',
+          time: '02:00 PM',
+          duration: '45 mins',
+          meetingPlatform: 'Google Meet',
+          meetingLink: 'https://meet.google.com/job-fiesta-frontend',
+          notes: 'Review micro-frontend patterns, core web vitals optimization techniques, and recent React 19 concurrent feature adoptions.',
+          status: 'Scheduled'
+        }
+      }
+    ],
+    rated: false
+  },
+  {
+    id: 'conv-hassan',
+    candidateId: 'cand-3',
+    participantName: 'Hassan Tariq',
+    participantRole: 'Tech Lead @ Cognitive Dynamics',
+    company: 'Cognitive Dynamics AI',
+    participantAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=faces',
+    date: 'Yesterday',
+    unreadCount: 1,
+    messages: [
+      {
+        id: 1,
+        sender: 'recruiter',
+        text: "Greetings! We received your application for the Machine Learning Research Engineer position. Could you share more about your experience fine-tuning LLMs?",
+        timestamp: 'Yesterday 3:45 PM'
+      }
+    ],
+    rated: false
+  }
+];
+
 
 
 export const initialCompanies = [
@@ -632,7 +755,130 @@ export const initialCompanies = [
   }
 ];
 
-export const initialCandidates = [];
+export const initialCandidates = [
+  {
+    id: 'cand-1',
+    applicationId: 'app-101',
+    name: 'Alex Rivera',
+    email: 'alex.rivera@gmail.com',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces',
+    role: 'Senior Frontend Engineer',
+    company: 'Nexus Innovations',
+    jobId: 'job-1',
+    stage: 'interviewing',
+    appliedDate: '2 days ago',
+    experience: '5+ years',
+    location: 'San Francisco, CA (Remote)',
+    matchScore: 94,
+    skills: ['React', 'TypeScript', 'TailwindCSS', 'Vite', 'REST APIs', 'Redux', 'Jest'],
+    matchedSkills: ['React', 'TypeScript', 'TailwindCSS', 'Vite', 'REST APIs'],
+    missingSkills: [],
+    bio: 'Lead frontend developer with extensive expertise in React 19, responsive UX systems, and web performance profiling.',
+    interviewDate: '2026-10-15',
+    interviewTime: '02:00 PM',
+    interviewType: 'System Architecture & Technical Deep Dive',
+    interviewMeetingLink: 'https://meet.google.com/job-fiesta-frontend'
+  },
+  {
+    id: 'cand-2',
+    applicationId: 'app-102',
+    name: 'Samantha Chen',
+    email: 'samantha.chen@designhub.io',
+    avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=120&h=120&fit=crop&crop=faces',
+    role: 'Lead Product Designer',
+    company: 'Aurora Creative Labs',
+    jobId: 'job-2',
+    stage: 'screening',
+    appliedDate: '3 days ago',
+    experience: '6 years',
+    location: 'New York, NY (Hybrid)',
+    matchScore: 92,
+    skills: ['Figma', 'Design Systems', 'UX Research', 'Prototyping', 'Auto-Layout'],
+    matchedSkills: ['Figma', 'Design Systems', 'UX Research', 'Prototyping'],
+    missingSkills: [],
+    bio: 'Award-winning product designer specialized in multi-brand design systems, token architecture, and user research.'
+  },
+  {
+    id: 'cand-3',
+    applicationId: 'app-103',
+    name: 'David Kalu',
+    email: 'david.kalu@ai-research.org',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=faces',
+    role: 'Machine Learning Research Engineer',
+    company: 'Cognitive Dynamics AI',
+    jobId: 'job-3',
+    stage: 'applied',
+    appliedDate: '1 day ago',
+    experience: '4 years',
+    location: 'Austin, TX (Remote)',
+    matchScore: 88,
+    skills: ['Python', 'PyTorch', 'vLLM', 'HuggingFace', 'Transformers', 'CUDA'],
+    matchedSkills: ['Python', 'PyTorch', 'HuggingFace', 'Transformers'],
+    missingSkills: ['CUDA'],
+    bio: 'NLP and LLM evaluation specialist with experience fine-tuning open source model checkpoints on GPU clusters.'
+  },
+  {
+    id: 'cand-4',
+    applicationId: 'app-104',
+    name: 'Elena Rostova',
+    email: 'elena.rostova@cloudscale.net',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&h=120&fit=crop&crop=faces',
+    role: 'Senior Frontend Engineer',
+    company: 'Nexus Innovations',
+    jobId: 'job-1',
+    stage: 'offered',
+    appliedDate: '1 week ago',
+    experience: '7 years',
+    location: 'San Jose, CA',
+    matchScore: 96,
+    skills: ['React', 'TypeScript', 'TailwindCSS', 'GraphQL', 'Next.js', 'Vite'],
+    matchedSkills: ['React', 'TypeScript', 'TailwindCSS', 'Vite'],
+    missingSkills: [],
+    bio: 'Former Stripe frontend engineer specializing in design systems, micro-animations, and low-latency client state.'
+  },
+  {
+    id: 'cand-5',
+    applicationId: 'app-105',
+    name: 'Marcus Brody',
+    email: 'marcus.brody@devpulse.io',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&crop=faces',
+    role: 'Cybersecurity Defense Analyst',
+    company: 'CrowdStrike',
+    jobId: 'job-12',
+    stage: 'interviewing',
+    appliedDate: '4 days ago',
+    experience: '4 years',
+    location: 'Austin, TX (Remote)',
+    matchScore: 90,
+    skills: ['SIEM', 'Splunk', 'Threat Detection', 'Incident Response', 'Python'],
+    matchedSkills: ['SIEM', 'Threat Detection', 'Incident Response', 'Python'],
+    missingSkills: [],
+    bio: 'SOC tier-2 analyst experienced in threat hunting, MITRE ATT&CK mapping, and automated playbook orchestration.',
+    interviewDate: '2026-10-16',
+    interviewTime: '04:00 PM',
+    interviewType: 'Incident Response Scenario Drill',
+    interviewMeetingLink: 'https://meet.google.com/job-fiesta-security'
+  },
+  {
+    id: 'cand-6',
+    applicationId: 'app-106',
+    name: 'Zoe Martinez',
+    email: 'zoe.martinez@techfront.com',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&crop=faces',
+    role: 'Growth Marketing Manager',
+    company: 'HubSpot',
+    jobId: 'job-7',
+    stage: 'screening',
+    appliedDate: '5 days ago',
+    experience: '3 years',
+    location: 'Boston, MA (Remote)',
+    matchScore: 86,
+    skills: ['SEO', 'Google Analytics 4', 'A/B Testing', 'Copywriting', 'HubSpot CRM'],
+    matchedSkills: ['SEO', 'A/B Testing', 'Copywriting'],
+    missingSkills: ['HubSpot CRM'],
+    bio: 'Performance marketer focused on acquisition experiments, landing page optimization, and organic inbound funnels.'
+  }
+];
 
 export const initialNotifications = [];
 

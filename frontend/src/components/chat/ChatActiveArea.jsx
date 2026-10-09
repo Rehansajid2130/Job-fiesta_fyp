@@ -9,8 +9,15 @@ import {
   Search,
   X,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Calendar,
+  Video,
+  ExternalLink,
+  Clock,
+  Sparkles,
+  CheckCircle2
 } from 'lucide-react';
+import ScheduleInterviewModal from '../common/ScheduleInterviewModal';
 
 const ChatActiveArea = ({
   activeConv,
@@ -25,6 +32,7 @@ const ChatActiveArea = ({
 }) => {
   const navigate = useNavigate();
   const [chatSearchOpen, setChatSearchOpen] = useState(false);
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
   const [chatQuery, setChatQuery] = useState('');
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const messageRefs = useRef({});
@@ -219,6 +227,33 @@ const ChatActiveArea = ({
           >
             <Search size={15} />
             <span className="search-btn-label">Search</span>
+          </button>
+
+          {/* Schedule Interview Button */}
+          <button
+            type="button"
+            onClick={() => setScheduleModalOpen(true)}
+            title="Schedule an interview round"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: '8px',
+              backgroundColor: '#0C463B',
+              color: '#FFFFFF',
+              fontSize: '12px',
+              fontWeight: '700',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 2px 6px rgba(12, 70, 59, 0.2)',
+              transition: 'transform 0.15s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+          >
+            <Calendar size={13} />
+            <span>Schedule Interview</span>
           </button>
 
           {activeConv.rated && (
@@ -441,20 +476,168 @@ const ChatActiveArea = ({
                   />
                 )}
 
-                {/* Bubble */}
-                <div style={{
-                  backgroundColor: isSentByMe ? '#114B3E' : '#F3F4F6',
-                  color: isSentByMe ? '#FFFFFF' : '#111827',
-                  borderRadius: '18px',
-                  padding: '14px 20px',
-                  fontSize: '14px',
-                  lineHeight: '1.5',
-                  wordBreak: 'break-word',
-                  boxShadow: isSentByMe ? '0 2px 6px rgba(17, 75, 62, 0.15)' : 'none',
-                  border: matchingMessages[currentMatchIndex]?.id === msg.id ? '2px solid #F59E0B' : 'none'
-                }}>
-                  {renderMessageText(msg.text, msg.id)}
-                </div>
+                {/* Bubble or Interactive Interview Card */}
+                {msg.isInterviewInvite || msg.interviewDetails ? (
+                  <div style={{
+                    backgroundColor: '#FFFFFF',
+                    border: '1.5px solid #10B981',
+                    borderRadius: '16px',
+                    padding: '18px 20px',
+                    boxShadow: '0 8px 24px rgba(16, 185, 129, 0.12)',
+                    maxWidth: '460px',
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px',
+                    textAlign: 'left'
+                  }}>
+                    {/* Top Tag & Status */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '3px 10px',
+                        borderRadius: '20px',
+                        backgroundColor: '#EBF8F4',
+                        color: '#0C463B',
+                        fontSize: '0.78rem',
+                        fontWeight: '700',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.04em'
+                      }}>
+                        <Calendar size={13} />
+                        Interview Round Scheduled
+                      </span>
+                      <span style={{
+                        fontSize: '0.75rem',
+                        fontWeight: '700',
+                        color: '#059669',
+                        backgroundColor: '#ECFDF5',
+                        padding: '2px 8px',
+                        borderRadius: '12px'
+                      }}>
+                        {msg.interviewDetails?.status || 'Confirmed'}
+                      </span>
+                    </div>
+
+                    {/* Round Title */}
+                    <div style={{ fontSize: '1.05rem', fontWeight: '800', color: '#0F172A', lineHeight: '1.3' }}>
+                      {msg.interviewDetails?.roundType || 'System Architecture & Technical Deep Dive'}
+                    </div>
+
+                    {/* Date & Time Grid */}
+                    <div style={{
+                      backgroundColor: '#F8FAFC',
+                      border: '1px solid #E2E8F0',
+                      borderRadius: '10px',
+                      padding: '12px 14px',
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: '10px'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Calendar size={16} color="#0C463B" />
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: '600' }}>DATE</div>
+                          <div style={{ fontSize: '0.88rem', fontWeight: '700', color: '#0F172A' }}>
+                            {msg.interviewDetails?.date || 'Upcoming'}
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Clock size={16} color="#0C463B" />
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: '600' }}>TIME & DURATION</div>
+                          <div style={{ fontSize: '0.88rem', fontWeight: '700', color: '#0F172A' }}>
+                            {msg.interviewDetails?.time || '02:00 PM'} ({msg.interviewDetails?.duration || '45 mins'})
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Notes & Agenda */}
+                    {msg.interviewDetails?.notes && (
+                      <div style={{
+                        fontSize: '0.84rem',
+                        color: '#475569',
+                        lineHeight: '1.45',
+                        backgroundColor: '#FFFBEB',
+                        borderLeft: '3px solid #F59E0B',
+                        padding: '8px 12px',
+                        borderRadius: '0 8px 8px 0'
+                      }}>
+                        <strong style={{ color: '#92400E' }}>Agenda: </strong>
+                        {msg.interviewDetails.notes}
+                      </div>
+                    )}
+
+                    {/* Actions: Join Call & Add to Calendar */}
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '4px', flexWrap: 'wrap' }}>
+                      {msg.interviewDetails?.meetingLink && (
+                        <a
+                          href={msg.interviewDetails.meetingLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            flex: 1,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            padding: '10px 16px',
+                            backgroundColor: '#0C463B',
+                            color: '#FFFFFF',
+                            borderRadius: '8px',
+                            fontWeight: '700',
+                            fontSize: '0.86rem',
+                            textDecoration: 'none',
+                            boxShadow: '0 2px 8px rgba(12, 70, 59, 0.25)'
+                          }}
+                        >
+                          <Video size={16} />
+                          <span>Join Video Call</span>
+                          <ExternalLink size={13} />
+                        </a>
+                      )}
+                      <a
+                        href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(msg.interviewDetails?.roundType || 'Job Fiesta Interview')}&details=${encodeURIComponent(msg.interviewDetails?.notes || 'Interview with Hiring Team')}&location=${encodeURIComponent(msg.interviewDetails?.meetingLink || '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '10px 14px',
+                          backgroundColor: '#FFFFFF',
+                          border: '1px solid #CBD5E1',
+                          color: '#334155',
+                          borderRadius: '8px',
+                          fontWeight: '600',
+                          fontSize: '0.84rem',
+                          textDecoration: 'none'
+                        }}
+                      >
+                        <Calendar size={14} />
+                        <span>Add to Calendar</span>
+                      </a>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{
+                    backgroundColor: isSentByMe ? '#114B3E' : '#F3F4F6',
+                    color: isSentByMe ? '#FFFFFF' : '#111827',
+                    borderRadius: '18px',
+                    padding: '14px 20px',
+                    fontSize: '14px',
+                    lineHeight: '1.5',
+                    wordBreak: 'break-word',
+                    boxShadow: isSentByMe ? '0 2px 6px rgba(17, 75, 62, 0.15)' : 'none',
+                    border: matchingMessages[currentMatchIndex]?.id === msg.id ? '2px solid #F59E0B' : 'none'
+                  }}>
+                    {renderMessageText(msg.text, msg.id)}
+                  </div>
+                )}
               </div>
 
               {/* Timestamp */}
@@ -610,6 +793,20 @@ const ChatActiveArea = ({
           </div>
         </form>
       </div>
+
+      {/* Schedule Interview Modal */}
+      <ScheduleInterviewModal
+        isOpen={scheduleModalOpen}
+        onClose={() => setScheduleModalOpen(false)}
+        candidate={{
+          id: activeConv.candidateId,
+          name: activeConv.participantName,
+          role: activeConv.participantRole,
+          avatar: activeConv.participantAvatar,
+          company: activeConv.company,
+          conversationId: activeConv.id
+        }}
+      />
     </>
   );
 };

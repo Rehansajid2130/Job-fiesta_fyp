@@ -23,8 +23,13 @@ import {
   TrendingUp,
   UserCheck,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  Calendar,
+  Video,
+  ExternalLink,
+  Sparkles
 } from 'lucide-react';
+import ScheduleInterviewModal from '../components/common/ScheduleInterviewModal';
 
 const STAGES = [
   { id: 'applied', label: 'Applied', color: '#3B82F6', bg: '#EFF6FF' },
@@ -41,6 +46,8 @@ const CandidatesAtsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+  const [interviewTargetCandidate, setInterviewTargetCandidate] = useState(null);
 
   // ponytail: resolve ATS match breakdown (uses server pre-computed arrays or computes client-side if missing)
   const candidateAts = React.useMemo(() => {
@@ -418,6 +425,25 @@ const CandidatesAtsPage = () => {
                             )}
                           </div>
 
+                          {/* Scheduled Interview Badge if present */}
+                          {(cand.interviewDate || cand.stage === 'interviewing') && (
+                            <div style={{
+                              fontSize: '0.73rem',
+                              fontWeight: '700',
+                              color: '#6D28D9',
+                              backgroundColor: '#F5F3FF',
+                              padding: '3px 8px',
+                              borderRadius: '6px',
+                              marginBottom: '8px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}>
+                              <Calendar size={12} />
+                              <span>{cand.interviewDate ? `${cand.interviewDate} • ${cand.interviewTime || '02:00 PM'}` : 'Interview Round Active'}</span>
+                            </div>
+                          )}
+
                           {/* Quick Stage Mover & Chat */}
                           <div
                             onClick={(e) => e.stopPropagation()}
@@ -429,29 +455,55 @@ const CandidatesAtsPage = () => {
                               justifyContent: 'space-between'
                             }}
                           >
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleChatWithCandidate(cand);
-                              }}
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                background: 'none',
-                                border: 'none',
-                                color: '#0C463B',
-                                fontSize: '0.75rem',
-                                fontWeight: '700',
-                                cursor: 'pointer',
-                                padding: '2px 4px',
-                                borderRadius: '4px'
-                              }}
-                              title={`Message ${cand.name}`}
-                            >
-                              <MessageSquare size={13} /> Chat
-                            </button>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleChatWithCandidate(cand);
+                                }}
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '3px',
+                                  background: 'none',
+                                  border: 'none',
+                                  color: '#0C463B',
+                                  fontSize: '0.75rem',
+                                  fontWeight: '700',
+                                  cursor: 'pointer',
+                                  padding: '2px 4px',
+                                  borderRadius: '4px'
+                                }}
+                                title={`Message ${cand.name}`}
+                              >
+                                <MessageSquare size={13} /> Chat
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setInterviewTargetCandidate(cand);
+                                  setScheduleModalOpen(true);
+                                }}
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '3px',
+                                  background: 'none',
+                                  border: 'none',
+                                  color: '#8B5CF6',
+                                  fontSize: '0.75rem',
+                                  fontWeight: '700',
+                                  cursor: 'pointer',
+                                  padding: '2px 4px',
+                                  borderRadius: '4px'
+                                }}
+                                title={`Schedule interview with ${cand.name}`}
+                              >
+                                <Calendar size={13} /> Schedule
+                              </button>
+                            </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                               <select
                                 value={cand.stage}
@@ -727,6 +779,31 @@ const CandidatesAtsPage = () => {
 
                 <button
                   type="button"
+                  onClick={() => {
+                    setInterviewTargetCandidate(selectedCandidate);
+                    setScheduleModalOpen(true);
+                  }}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '10px 18px',
+                    borderRadius: '8px',
+                    backgroundColor: '#8B5CF6',
+                    color: '#FFFFFF',
+                    fontSize: '0.88rem',
+                    fontWeight: '700',
+                    border: 'none',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 6px rgba(139, 92, 246, 0.25)'
+                  }}
+                >
+                  <Calendar size={16} />
+                  <span>Schedule Interview</span>
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => handleChatWithCandidate(selectedCandidate)}
                   style={{
                     display: 'inline-flex',
@@ -750,6 +827,23 @@ const CandidatesAtsPage = () => {
           </div>
         </Modal>
       )}
+
+      {/* Schedule Interview Modal */}
+      <ScheduleInterviewModal
+        isOpen={scheduleModalOpen}
+        onClose={() => setScheduleModalOpen(false)}
+        candidate={interviewTargetCandidate}
+        onScheduled={(newInt) => {
+          if (selectedCandidate && selectedCandidate.id === newInt.candidateId) {
+            setSelectedCandidate(prev => ({
+              ...prev,
+              stage: 'interviewing',
+              interviewDate: newInt.date,
+              interviewTime: newInt.time
+            }));
+          }
+        }}
+      />
 
       <Footer />
     </div>

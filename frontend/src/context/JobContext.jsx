@@ -61,18 +61,69 @@ export const JobProvider = ({ children }) => {
   // Pure in-memory state: loaded from and synchronized with secure backend API
   const [jobs, setJobs] = useState(initialJobs);
   const [companies, setCompanies] = useState(initialCompanies);
-  const [candidates, setCandidates] = useState([]);
+  const [candidates, setCandidates] = useState(initialCandidates);
   const [notifications, setNotifications] = useState([]);
   const [applications, setApplications] = useState(() => {
     try {
       const saved = localStorage.getItem('jobfiesta_user_applications');
-      return saved ? JSON.parse(saved) : [];
+      return saved ? JSON.parse(saved) : initialApplications;
     } catch (e) {
-      return [];
+      return initialApplications;
     }
   });
   const [savedJobIds, setSavedJobIds] = useState([]);
-  const [conversations, setConversations] = useState([]);
+  const [conversations, setConversations] = useState(initialConversations);
+
+  // Default interview schedules
+  const defaultInterviews = [
+    {
+      id: 'int-101',
+      candidateId: 'cand-1',
+      candidateName: 'Alex Rivera',
+      candidateRole: 'Senior Frontend Engineer',
+      candidateAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces',
+      jobTitle: 'Senior Frontend Engineer',
+      company: 'Nexus Innovations',
+      interviewer: 'Suzana Colin (Head of Engineering Talent)',
+      date: '2026-10-15',
+      time: '02:00 PM',
+      duration: '45 mins',
+      roundType: 'System Architecture & Technical Deep Dive',
+      meetingPlatform: 'Google Meet',
+      meetingLink: 'https://meet.google.com/job-fiesta-frontend',
+      notes: 'Review micro-frontend patterns, core web vitals optimization techniques, and recent React 19 concurrent feature adoptions.',
+      status: 'Scheduled',
+      createdAt: '2026-10-08T10:00:00Z'
+    },
+    {
+      id: 'int-102',
+      candidateId: 'cand-5',
+      candidateName: 'Marcus Brody',
+      candidateRole: 'Cybersecurity Defense Analyst',
+      candidateAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&crop=faces',
+      jobTitle: 'Cybersecurity Defense Analyst',
+      company: 'CrowdStrike',
+      interviewer: 'David Thorne (Security Operations Director)',
+      date: '2026-10-16',
+      time: '04:00 PM',
+      duration: '60 mins',
+      roundType: 'Incident Response Scenario Drill',
+      meetingPlatform: 'Google Meet',
+      meetingLink: 'https://meet.google.com/job-fiesta-security',
+      notes: 'Hands-on triage of mock SIEM log feeds and lateral movement detection analysis.',
+      status: 'Scheduled',
+      createdAt: '2026-10-09T14:30:00Z'
+    }
+  ];
+
+  const [interviews, setInterviews] = useState(() => {
+    try {
+      const saved = localStorage.getItem('jobfiesta_user_interviews');
+      return saved ? JSON.parse(saved) : defaultInterviews;
+    } catch (e) {
+      return defaultInterviews;
+    }
+  });
 
   // Check if a job is already applied across all ID formats
   const isJobApplied = (jobId) => {
@@ -485,12 +536,13 @@ export const JobProvider = ({ children }) => {
     ));
   };
 
-  const sendMessage = async (conversationId, text, sender = 'jobseeker') => {
+  const sendMessage = async (conversationId, text, sender = 'jobseeker', extraPayload = {}) => {
     const newMessage = {
       id: Date.now(),
       sender,
       text,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      ...extraPayload
     };
     // If message is from someone else, mark unread
     const currentUserRole = localStorage.getItem('userType') || 'jobseeker';
@@ -525,6 +577,113 @@ export const JobProvider = ({ children }) => {
         console.warn('Backend message save error:', err.message);
       }
     }
+  };
+
+  const scheduleInterview = (interviewData) => {
+    const newInterviewId = interviewData.id || `int-${Date.now()}`;
+    const newInterview = {
+      id: newInterviewId,
+      candidateId: interviewData.candidateId || null,
+      candidateName: interviewData.candidateName || 'Candidate',
+      candidateRole: interviewData.candidateRole || interviewData.jobTitle || 'Applicant',
+      candidateAvatar: interviewData.candidateAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces',
+      jobTitle: interviewData.jobTitle || interviewData.candidateRole || 'Position',
+      company: interviewData.company || 'Nexus Innovations',
+      interviewer: interviewData.interviewer || 'Hiring Team',
+      date: interviewData.date,
+      time: interviewData.time,
+      duration: interviewData.duration || '45 mins',
+      roundType: interviewData.roundType || 'Technical Interview',
+      meetingPlatform: interviewData.meetingPlatform || 'Google Meet',
+      meetingLink: interviewData.meetingLink || `https://meet.google.com/job-${Math.random().toString(36).substring(2, 8)}`,
+      notes: interviewData.notes || 'Please prepare your architecture portfolio and system design approach.',
+      status: 'Scheduled',
+      createdAt: new Date().toISOString()
+    };
+
+    // 1. Update interviews list
+    setInterviews(prev => {
+      const updated = [newInterview, ...prev.filter(i => i.id !== newInterviewId)];
+      try {
+        localStorage.setItem('jobfiesta_user_interviews', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+
+    // 2. Advance candidate stage to 'interviewing' in ATS pipeline
+    if (interviewData.candidateId) {
+      updateCandidateStage(interviewData.candidateId, 'interviewing');
+    }
+
+    // 3. Update candidate application status
+    setApplications(prev => {
+      const updated = prev.map(app => {
+        const isMatch = (interviewData.candidateId && app.candidateId === interviewData.candidateId) ||
+                        (interviewData.jobId && app.jobId === interviewData.jobId) ||
+                        (app.jobTitle && app.jobTitle.toLowerCase() === (interviewData.candidateRole || '').toLowerCase());
+        if (isMatch) {
+          return {
+            ...app,
+            status: 'Interview Scheduled',
+            interview: newInterview
+          };
+        }
+        return app;
+      });
+      try {
+        localStorage.setItem('jobfiesta_user_applications', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+
+    // 4. Send interactive interview invite message in chat
+    const targetConvId = interviewData.conversationId || (interviewData.candidateId ? startOrGetConversation({
+      id: interviewData.candidateId,
+      name: interviewData.candidateName,
+      role: interviewData.candidateRole,
+      avatar: interviewData.candidateAvatar,
+      company: interviewData.company
+    }) : null);
+
+    if (targetConvId) {
+      const inviteMsgText = `📅 Interview Scheduled: ${newInterview.roundType} on ${newInterview.date} at ${newInterview.time}`;
+      sendMessage(targetConvId, inviteMsgText, 'recruiter', {
+        isInterviewInvite: true,
+        interviewDetails: newInterview
+      });
+    }
+
+    // 5. Add notification
+    addNotification({
+      title: 'Interview Scheduled! 📅',
+      message: `${newInterview.roundType} with ${newInterview.candidateName} on ${newInterview.date} at ${newInterview.time}.`,
+      type: 'calendar'
+    });
+
+    showToast(`Interview successfully scheduled for ${newInterview.candidateName}!`, 'success');
+    return newInterview;
+  };
+
+  const cancelInterview = (interviewId) => {
+    setInterviews(prev => {
+      const updated = prev.map(i => i.id === interviewId ? { ...i, status: 'Cancelled' } : i);
+      try {
+        localStorage.setItem('jobfiesta_user_interviews', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+    showToast('Interview cancelled.', 'info');
+  };
+
+  const rescheduleInterview = (interviewId, newDate, newTime) => {
+    setInterviews(prev => {
+      const updated = prev.map(i => i.id === interviewId ? { ...i, date: newDate, time: newTime } : i);
+      try {
+        localStorage.setItem('jobfiesta_user_interviews', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+    showToast('Interview successfully rescheduled.', 'success');
   };
 
   const markConversationAsRead = (conversationId) => {
@@ -680,7 +839,11 @@ export const JobProvider = ({ children }) => {
       fetchConversationMessages,
       sendMessage,
       rateJobseeker,
-      startOrGetConversation
+      startOrGetConversation,
+      interviews,
+      scheduleInterview,
+      cancelInterview,
+      rescheduleInterview
     }}>
       {children}
     </JobContext.Provider>
