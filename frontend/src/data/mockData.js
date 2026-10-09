@@ -28,7 +28,7 @@ export const initialJobs = [
     workplaceType: 'Remote',
     postedDate: '1 day ago',
     featured: true,
-    isPrimaryBtn: true,
+    isPrimaryBtn: false,
     applicantsCount: 24,
     viewsCount: 380,
     tags: ['React', 'TypeScript', 'Vite', 'TailwindCSS'],

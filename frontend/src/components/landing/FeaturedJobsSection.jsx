@@ -215,24 +215,6 @@ const FeaturedJobsSection = ({
                 >
                   ✓ Applied
                 </button>
-              ) : job.isPrimaryBtn ? (
-                <button
-                  onClick={(e) => onOpenApply(job, e)}
-                  style={{
-                    width: '100%',
-                    backgroundColor: '#0C463B',
-                    color: '#FFFFFF',
-                    border: '1px solid #0C463B',
-                    borderRadius: '8px',
-                    padding: '12px 0',
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Apply Now
-                </button>
               ) : (
                 <button
                   onClick={(e) => onOpenApply(job, e)}
@@ -246,7 +228,16 @@ const FeaturedJobsSection = ({
                     fontFamily: 'Inter, sans-serif',
                     fontSize: '16px',
                     fontWeight: '600',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#0C463B';
+                    e.currentTarget.style.color = '#FFFFFF';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#EBF8F4';
+                    e.currentTarget.style.color = '#0C463B';
                   }}
                 >
                   Apply Now

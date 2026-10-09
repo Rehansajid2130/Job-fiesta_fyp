@@ -72,7 +72,7 @@ const LandingPage = () => {
       filterCategory: 'tech',
       salary: '$120k - $150k',
       logo: '/assets/Landingpageimages/spotify_1_.svg',
-      isPrimaryBtn: true
+      isPrimaryBtn: false
     },
     {
       id: 'figma-2',
@@ -199,11 +199,7 @@ const LandingPage = () => {
       mapped.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
     }
 
-    const top = mapped.slice(0, 6);
-    if (top.length > 0) {
-      top[0].isPrimaryBtn = true;
-    }
-    return top;
+    return mapped.slice(0, 6);
   }, [jobs, candidateSkills, candidateHeadline]);
 
   // 5 Exact Categories from Figma Screenshot
