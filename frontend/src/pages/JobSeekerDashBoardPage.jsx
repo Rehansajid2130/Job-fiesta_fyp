@@ -16,7 +16,7 @@ import {
   TrendingUp,
   Sparkles,
   Send,
-  Video,
+  MapPin,
   ExternalLink,
   MessageSquare,
   CheckCircle2,
@@ -249,7 +249,7 @@ const JobSeekerDashBoardPage = () => {
                 </span>
               </div>
               <span style={{ fontSize: '0.85rem', color: '#A7F3D0', fontWeight: '500' }}>
-                Join link ready • Direct video room
+                Interview Confirmed • On Schedule
               </span>
             </div>
 
@@ -279,12 +279,15 @@ const JobSeekerDashBoardPage = () => {
                   <div style={{ fontSize: '0.9rem', color: '#475569', marginTop: '4px', fontWeight: '500' }}>
                     <strong>{activeInterviews[0].company}</strong> • With {activeInterviews[0].interviewer || 'Hiring Lead'}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '8px', fontSize: '0.85rem', color: '#0C463B', fontWeight: '700' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '8px', fontSize: '0.85rem', color: '#0C463B', fontWeight: '700', flexWrap: 'wrap' }}>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                       <Calendar size={15} /> {activeInterviews[0].date}
                     </span>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                       <Clock size={15} /> {activeInterviews[0].time}
+                    </span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: '#475569' }}>
+                      <MapPin size={15} color="#0C463B" /> {activeInterviews[0].location || 'Office HQ (On-site)'}
                     </span>
                   </div>
                   {activeInterviews[0].notes && (
@@ -296,30 +299,27 @@ const JobSeekerDashBoardPage = () => {
               </div>
 
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                {activeInterviews[0].meetingLink && (
-                  <a
-                    href={activeInterviews[0].meetingLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '12px 20px',
-                      borderRadius: '10px',
-                      backgroundColor: '#0C463B',
-                      color: '#FFFFFF',
-                      fontWeight: '700',
-                      fontSize: '0.92rem',
-                      textDecoration: 'none',
-                      boxShadow: 'var(--shadow-md)'
-                    }}
-                  >
-                    <Video size={16} />
-                    <span>Join Video Call</span>
-                    <ExternalLink size={13} />
-                  </a>
-                )}
+                <a
+                  href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(activeInterviews[0].roundType || 'Interview Round')}&details=${encodeURIComponent(activeInterviews[0].notes || 'Interview with Hiring Team')}&location=${encodeURIComponent(activeInterviews[0].location || 'Company HQ')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '12px 20px',
+                    borderRadius: '10px',
+                    backgroundColor: '#0C463B',
+                    color: '#FFFFFF',
+                    fontWeight: '700',
+                    fontSize: '0.92rem',
+                    textDecoration: 'none',
+                    boxShadow: 'var(--shadow-md)'
+                  }}
+                >
+                  <Calendar size={16} />
+                  <span>Add to Calendar</span>
+                </a>
                 <button
                   type="button"
                   onClick={() => handleMessageCompany({ company: activeInterviews[0].company, jobTitle: activeInterviews[0].jobTitle })}
@@ -479,29 +479,21 @@ const JobSeekerDashBoardPage = () => {
                           </td>
                           <td style={{ padding: '18px 24px', textAlign: 'right' }}>
                             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                              {isInterview && interviewData?.meetingLink && (
-                                <a
-                                  href={interviewData.meetingLink}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  title="Join direct video call"
-                                  style={{
-                                    fontSize: '0.82rem',
-                                    fontWeight: '700',
-                                    color: '#FFFFFF',
-                                    backgroundColor: '#0C463B',
-                                    padding: '6px 12px',
-                                    borderRadius: '6px',
-                                    textDecoration: 'none',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '5px',
-                                    boxShadow: '0 2px 6px rgba(12, 70, 59, 0.2)'
-                                  }}
-                                >
-                                  <Video size={13} />
-                                  <span>Join Call</span>
-                                </a>
+                              {isInterview && interviewData && (
+                                <span style={{
+                                  fontSize: '0.78rem',
+                                  fontWeight: '700',
+                                  color: '#0C463B',
+                                  backgroundColor: '#EBF8F4',
+                                  padding: '5px 10px',
+                                  borderRadius: '6px',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '5px'
+                                }}>
+                                  <Calendar size={12} />
+                                  <span>{interviewData.time || 'Round Set'}</span>
+                                </span>
                               )}
                               <button
                                 type="button"
@@ -654,7 +646,7 @@ const JobSeekerDashBoardPage = () => {
                           <Clock size={14} /> {int.time}
                         </span>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: '#64748B' }}>
-                          <Video size={14} /> {int.meetingPlatform || 'Google Meet'}
+                          <MapPin size={14} color="#0C463B" /> {int.location || 'Office HQ (On-site)'}
                         </span>
                       </div>
                       {int.notes && (
@@ -666,30 +658,27 @@ const JobSeekerDashBoardPage = () => {
                   </div>
 
                   <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                    {int.meetingLink && (
-                      <a
-                        href={int.meetingLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: '10px 18px',
-                          borderRadius: '8px',
-                          backgroundColor: '#0C463B',
-                          color: '#FFFFFF',
-                          fontWeight: '700',
-                          fontSize: '0.88rem',
-                          textDecoration: 'none',
-                          boxShadow: 'var(--shadow-sm)'
-                        }}
-                      >
-                        <Video size={15} />
-                        <span>Join Meeting</span>
-                        <ExternalLink size={12} />
-                      </a>
-                    )}
+                    <a
+                      href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(int.roundType || 'Interview Round')}&details=${encodeURIComponent(int.notes || 'Interview with Hiring Team')}&location=${encodeURIComponent(int.location || 'Company HQ')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '10px 18px',
+                        borderRadius: '8px',
+                        backgroundColor: '#0C463B',
+                        color: '#FFFFFF',
+                        fontWeight: '700',
+                        fontSize: '0.88rem',
+                        textDecoration: 'none',
+                        boxShadow: 'var(--shadow-sm)'
+                      }}
+                    >
+                      <Calendar size={15} />
+                      <span>Add to Calendar</span>
+                    </a>
                     <button
                       type="button"
                       onClick={() => handleMessageCompany({ company: int.company, jobTitle: int.jobTitle })}

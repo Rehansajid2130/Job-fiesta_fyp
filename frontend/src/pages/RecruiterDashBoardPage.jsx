@@ -17,7 +17,7 @@ import {
   ArrowRight, 
   Filter,
   Calendar,
-  Video,
+  MapPin,
   ExternalLink,
   Sparkles
 } from 'lucide-react';
@@ -282,40 +282,19 @@ const RecruiterDashBoardPage = () => {
                     {int.roundType}
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '0.82rem', color: '#475569' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '0.82rem', color: '#475569', flexWrap: 'wrap' }}>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                       <Calendar size={13} color="#0C463B" /> {int.date}
                     </span>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                       <Clock size={13} color="#0C463B" /> {int.time}
                     </span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                      <MapPin size={13} color="#0C463B" /> {int.location || 'Office HQ'}
+                    </span>
                   </div>
 
                   <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-                    {int.meetingLink && (
-                      <a
-                        href={int.meetingLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          flex: 1,
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '6px',
-                          padding: '9px 14px',
-                          borderRadius: '8px',
-                          backgroundColor: '#0C463B',
-                          color: '#FFFFFF',
-                          fontWeight: '700',
-                          fontSize: '0.84rem',
-                          textDecoration: 'none'
-                        }}
-                      >
-                        <Video size={14} />
-                        <span>Join Meeting</span>
-                      </a>
-                    )}
                     <button
                       type="button"
                       onClick={() => handleMessageApplicant({ id: int.candidateId, name: int.candidateName, role: int.candidateRole, company: int.company })}

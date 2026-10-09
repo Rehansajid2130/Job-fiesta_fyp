@@ -25,7 +25,6 @@ import {
   XCircle,
   AlertCircle,
   Calendar,
-  Video,
   ExternalLink,
   Sparkles
 } from 'lucide-react';

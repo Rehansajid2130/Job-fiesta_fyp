@@ -11,7 +11,7 @@ import {
   ChevronUp,
   ChevronDown,
   Calendar,
-  Video,
+  MapPin,
   ExternalLink,
   Clock,
   Sparkles,
@@ -556,6 +556,22 @@ const ChatActiveArea = ({
                       </div>
                     </div>
 
+                    {/* Location / Venue */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '8px 12px',
+                      backgroundColor: '#F1F5F9',
+                      borderRadius: '8px',
+                      fontSize: '0.85rem',
+                      color: '#334155',
+                      fontWeight: '600'
+                    }}>
+                      <MapPin size={15} color="#0C463B" />
+                      <span><strong>Venue / Format:</strong> {msg.interviewDetails?.location || 'Office HQ (On-site)'}</span>
+                    </div>
+
                     {/* Notes & Agenda */}
                     {msg.interviewDetails?.notes && (
                       <div style={{
@@ -572,54 +588,30 @@ const ChatActiveArea = ({
                       </div>
                     )}
 
-                    {/* Actions: Join Call & Add to Calendar */}
+                    {/* Action: Add to Calendar */}
                     <div style={{ display: 'flex', gap: '10px', marginTop: '4px', flexWrap: 'wrap' }}>
-                      {msg.interviewDetails?.meetingLink && (
-                        <a
-                          href={msg.interviewDetails.meetingLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{
-                            flex: 1,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '8px',
-                            padding: '10px 16px',
-                            backgroundColor: '#0C463B',
-                            color: '#FFFFFF',
-                            borderRadius: '8px',
-                            fontWeight: '700',
-                            fontSize: '0.86rem',
-                            textDecoration: 'none',
-                            boxShadow: '0 2px 8px rgba(12, 70, 59, 0.25)'
-                          }}
-                        >
-                          <Video size={16} />
-                          <span>Join Video Call</span>
-                          <ExternalLink size={13} />
-                        </a>
-                      )}
                       <a
-                        href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(msg.interviewDetails?.roundType || 'Job Fiesta Interview')}&details=${encodeURIComponent(msg.interviewDetails?.notes || 'Interview with Hiring Team')}&location=${encodeURIComponent(msg.interviewDetails?.meetingLink || '')}`}
+                        href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(msg.interviewDetails?.roundType || 'Job Fiesta Interview')}&details=${encodeURIComponent(msg.interviewDetails?.notes || 'Interview with Hiring Team')}&location=${encodeURIComponent(msg.interviewDetails?.location || 'Company HQ')}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
+                          flex: 1,
                           display: 'inline-flex',
                           alignItems: 'center',
-                          gap: '6px',
-                          padding: '10px 14px',
-                          backgroundColor: '#FFFFFF',
-                          border: '1px solid #CBD5E1',
-                          color: '#334155',
+                          justifyContent: 'center',
+                          gap: '8px',
+                          padding: '10px 16px',
+                          backgroundColor: '#0C463B',
+                          color: '#FFFFFF',
                           borderRadius: '8px',
-                          fontWeight: '600',
-                          fontSize: '0.84rem',
-                          textDecoration: 'none'
+                          fontWeight: '700',
+                          fontSize: '0.86rem',
+                          textDecoration: 'none',
+                          boxShadow: '0 2px 8px rgba(12, 70, 59, 0.2)'
                         }}
                       >
-                        <Calendar size={14} />
-                        <span>Add to Calendar</span>
+                        <Calendar size={15} />
+                        <span>Add to Google Calendar</span>
                       </a>
                     </div>
                   </div>

@@ -4,12 +4,10 @@ import { useJobs } from '../../context/JobContext';
 import { 
   Calendar, 
   Clock, 
-  Video, 
+  MapPin, 
   Sparkles, 
   FileText, 
-  CheckCircle2, 
-  RefreshCw,
-  ExternalLink 
+  CheckCircle2 
 } from 'lucide-react';
 
 const ROUND_TYPES = [
@@ -28,10 +26,11 @@ const TIME_PRESETS = [
   '05:00 PM'
 ];
 
-const PLATFORMS = [
-  { id: 'Google Meet', label: 'Google Meet', prefix: 'https://meet.google.com/job-' },
-  { id: 'Zoom', label: 'Zoom Meeting', prefix: 'https://zoom.us/j/84' },
-  { id: 'Teams', label: 'Microsoft Teams', prefix: 'https://teams.microsoft.com/l/meetup-join/' }
+const LOCATION_PRESETS = [
+  'Office HQ (On-site)',
+  'Main Conference Room',
+  'Phone Discussion',
+  'Executive Boardroom'
 ];
 
 const ScheduleInterviewModal = ({ isOpen, onClose, candidate, onScheduled }) => {
@@ -41,17 +40,9 @@ const ScheduleInterviewModal = ({ isOpen, onClose, candidate, onScheduled }) => 
   const [time, setTime] = useState('02:00 PM');
   const [duration, setDuration] = useState('45 mins');
   const [roundType, setRoundType] = useState(ROUND_TYPES[0]);
-  const [platform, setPlatform] = useState('Google Meet');
-  const [meetingLink, setMeetingLink] = useState('');
+  const [location, setLocation] = useState('Office HQ (On-site)');
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Generate meeting link whenever platform or candidate changes
-  const generateNewMeetingLink = (targetPlatform = platform) => {
-    const selected = PLATFORMS.find(p => p.id === targetPlatform) || PLATFORMS[0];
-    const randCode = Math.random().toString(36).substring(2, 6) + '-' + Math.random().toString(36).substring(2, 6);
-    return `${selected.prefix}${randCode}`;
-  };
 
   useEffect(() => {
     if (isOpen) {
@@ -63,8 +54,7 @@ const ScheduleInterviewModal = ({ isOpen, onClose, candidate, onScheduled }) => 
       setTime('02:00 PM');
       setDuration('45 mins');
       setRoundType(ROUND_TYPES[0]);
-      setPlatform('Google Meet');
-      setMeetingLink(generateNewMeetingLink('Google Meet'));
+      setLocation('Office HQ (On-site)');
       setNotes(`Please prepare an overview of your recent projects and architecture decisions for the ${candidate?.role || 'open position'}.`);
     }
   }, [isOpen, candidate]);
@@ -88,8 +78,7 @@ const ScheduleInterviewModal = ({ isOpen, onClose, candidate, onScheduled }) => 
         time,
         duration,
         roundType,
-        meetingPlatform: platform,
-        meetingLink,
+        location: location || 'Office HQ (On-site)',
         notes,
         conversationId: candidate?.conversationId
       };
@@ -274,27 +263,24 @@ const ScheduleInterviewModal = ({ isOpen, onClose, candidate, onScheduled }) => 
           </div>
         </div>
 
-        {/* Video Platform & Meeting URL */}
+        {/* Interview Location / Venue */}
         <div>
           <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: '700', color: '#334155', marginBottom: '6px' }}>
-            Meeting Platform & Direct Video Link
+            Interview Location / Venue
           </label>
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-            {PLATFORMS.map((p) => (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
+            {LOCATION_PRESETS.map((loc) => (
               <button
-                key={p.id}
+                key={loc}
                 type="button"
-                onClick={() => {
-                  setPlatform(p.id);
-                  setMeetingLink(generateNewMeetingLink(p.id));
-                }}
+                onClick={() => setLocation(loc)}
                 style={{
                   padding: '6px 12px',
                   borderRadius: '8px',
-                  border: platform === p.id ? '2px solid #0C463B' : '1px solid #E2E8F0',
-                  backgroundColor: platform === p.id ? '#EBF8F4' : '#FFFFFF',
-                  color: platform === p.id ? '#0C463B' : '#64748B',
-                  fontWeight: platform === p.id ? '700' : '500',
+                  border: location === loc ? '2px solid #0C463B' : '1px solid #E2E8F0',
+                  backgroundColor: location === loc ? '#EBF8F4' : '#FFFFFF',
+                  color: location === loc ? '#0C463B' : '#64748B',
+                  fontWeight: location === loc ? '700' : '500',
                   fontSize: '0.84rem',
                   cursor: 'pointer',
                   display: 'inline-flex',
@@ -302,50 +288,35 @@ const ScheduleInterviewModal = ({ isOpen, onClose, candidate, onScheduled }) => 
                   gap: '6px'
                 }}
               >
-                <Video size={14} />
-                {p.label}
+                <MapPin size={13} />
+                {loc}
               </button>
             ))}
           </div>
 
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ position: 'relative' }}>
+            <MapPin 
+              size={16} 
+              color="#94A3B8" 
+              style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} 
+            />
             <input
-              type="url"
-              value={meetingLink}
-              onChange={(e) => setMeetingLink(e.target.value)}
-              placeholder="Meeting link URL"
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="e.g. Nexus Innovation HQ, Floor 4 - Room 402, or Phone call details"
               required
               style={{
-                flex: 1,
-                padding: '10px 14px',
+                width: '100%',
+                padding: '10px 14px 10px 36px',
                 borderRadius: '8px',
                 border: '1px solid #CBD5E1',
                 fontSize: '0.88rem',
                 outline: 'none',
                 color: '#0F172A',
-                backgroundColor: '#F8FAFC'
+                backgroundColor: '#FFFFFF'
               }}
             />
-            <button
-              type="button"
-              onClick={() => setMeetingLink(generateNewMeetingLink())}
-              title="Generate new meeting room link"
-              style={{
-                padding: '10px 14px',
-                borderRadius: '8px',
-                border: '1px solid #CBD5E1',
-                backgroundColor: '#FFFFFF',
-                color: '#475569',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                fontSize: '0.85rem'
-              }}
-            >
-              <RefreshCw size={14} />
-              <span>Regenerate</span>
-            </button>
           </div>
         </div>
 

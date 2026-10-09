@@ -594,8 +594,7 @@ export const JobProvider = ({ children }) => {
       time: interviewData.time,
       duration: interviewData.duration || '45 mins',
       roundType: interviewData.roundType || 'Technical Interview',
-      meetingPlatform: interviewData.meetingPlatform || 'Google Meet',
-      meetingLink: interviewData.meetingLink || `https://meet.google.com/job-${Math.random().toString(36).substring(2, 8)}`,
+      location: interviewData.location || 'Office HQ (On-site)',
       notes: interviewData.notes || 'Please prepare your architecture portfolio and system design approach.',
       status: 'Scheduled',
       createdAt: new Date().toISOString()
