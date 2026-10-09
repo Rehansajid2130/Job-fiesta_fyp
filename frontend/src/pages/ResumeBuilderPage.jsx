@@ -27,7 +27,8 @@ import {
   FileCheck2,
   Award,
   Zap,
-  HelpCircle
+  HelpCircle,
+  CheckCircle2
 } from 'lucide-react';
 
 const PRESET_PROFILES = {
@@ -202,7 +203,7 @@ const POPULAR_ROLES = [
 
 const ResumeBuilderPage = () => {
   const { user } = useAuth();
-  const { showToast } = useJobs();
+  const { showToast, activeResume, saveActiveResume } = useJobs();
   const navigate = useNavigate();
 
   // Step Management
@@ -221,8 +222,13 @@ const ResumeBuilderPage = () => {
   const [enhancingExpId, setEnhancingExpId] = useState(null);
   const [copiedSuccess, setCopiedSuccess] = useState(false);
 
-  // Resume Form Data
-  const [resumeData, setResumeData] = useState(PRESET_PROFILES.frontend);
+  // Resume Form Data (defaults to saved active resume if available)
+  const [resumeData, setResumeData] = useState(() => {
+    if (activeResume && activeResume.fullName) {
+      return activeResume;
+    }
+    return PRESET_PROFILES.frontend;
+  });
   const [newSkill, setNewSkill] = useState('');
   const [newHobby, setNewHobby] = useState('');
 
@@ -230,6 +236,17 @@ const ResumeBuilderPage = () => {
   const [atsScore, setAtsScore] = useState(85);
 
   const activeTheme = THEMES[selectedTheme] || THEMES.emerald;
+
+  const handleSaveToProfile = () => {
+    if (saveActiveResume) {
+      saveActiveResume({
+        ...resumeData,
+        atsScore,
+        selectedTheme
+      });
+      showToast('Resume saved to your profile! You can now 1-Click Quick Apply on any job.', 'success');
+    }
+  };
 
   // Compute live ATS score
   useEffect(() => {
@@ -635,6 +652,27 @@ ${resumeData.jobFit || 'N/A'}
             </button>
             <button
               type="button"
+              onClick={handleSaveToProfile}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                backgroundColor: '#0C463B',
+                color: '#FFFFFF',
+                fontSize: '0.88rem',
+                fontWeight: '700',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 2px 4px rgba(12, 70, 59, 0.2)'
+              }}
+            >
+              <CheckCircle2 size={15} />
+              Save & Sync
+            </button>
+            <button
+              type="button"
               onClick={() => window.print()}
               style={{
                 display: 'inline-flex',
@@ -642,8 +680,8 @@ ${resumeData.jobFit || 'N/A'}
                 gap: '6px',
                 padding: '8px 16px',
                 borderRadius: '8px',
-                backgroundColor: activeTheme.primary,
-                color: '#FFFFFF',
+                backgroundColor: '#E2E8F0',
+                color: '#1E293B',
                 fontSize: '0.88rem',
                 fontWeight: '700',
                 border: 'none',
@@ -682,14 +720,16 @@ ${resumeData.jobFit || 'N/A'}
               }} />
             </div>
 
-            {/* Stepper Milestones */}
+            {/* Stepper Milestones (Touch accessible on mobile) */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               gap: '8px',
               overflowX: 'auto',
-              paddingBottom: '4px'
+              paddingBottom: '4px',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none'
             }}>
               {STEPS.map((s) => {
                 const Icon = s.icon;
@@ -704,31 +744,34 @@ ${resumeData.jobFit || 'N/A'}
                       display: 'flex',
                       alignItems: 'center',
                       gap: '8px',
-                      padding: '6px 12px',
+                      padding: '8px 14px',
+                      minHeight: '44px',
                       borderRadius: '8px',
                       border: `1px solid ${isActive ? activeTheme.border : isPassed ? '#E2E8F0' : 'transparent'}`,
                       backgroundColor: isActive ? activeTheme.light : isPassed ? '#F8FAFC' : 'transparent',
                       color: isActive ? activeTheme.primary : isPassed ? '#334155' : '#94A3B8',
                       cursor: 'pointer',
-                      fontSize: '0.82rem',
+                      fontSize: '0.84rem',
                       fontWeight: isActive ? '700' : '500',
                       whiteSpace: 'nowrap',
-                      transition: 'all 0.2s ease'
+                      transition: 'all 0.2s ease',
+                      touchAction: 'manipulation'
                     }}
                   >
                     <div style={{
-                      width: '22px',
-                      height: '22px',
+                      width: '28px',
+                      height: '28px',
+                      minWidth: '28px',
                       borderRadius: '50%',
                       backgroundColor: isActive ? activeTheme.primary : isPassed ? '#10B981' : '#E2E8F0',
                       color: '#FFFFFF',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '0.72rem',
+                      fontSize: '0.78rem',
                       fontWeight: '700'
                     }}>
-                      {isPassed ? <Check size={12} /> : s.id}
+                      {isPassed ? <Check size={14} /> : s.id}
                     </div>
                     <span>{s.title}</span>
                   </button>
@@ -1546,26 +1589,69 @@ ${resumeData.jobFit || 'N/A'}
                     Generate & View Resume <Sparkles size={16} />
                   </button>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => window.print()}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '10px 22px',
-                      borderRadius: '8px',
-                      backgroundColor: '#10B981',
-                      color: '#FFFFFF',
-                      fontSize: '0.92rem',
-                      fontWeight: '700',
-                      border: 'none',
-                      cursor: 'pointer',
-                      boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)'
-                    }}
-                  >
-                    <Download size={16} /> Export & Download PDF
-                  </button>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
+                    <button
+                      type="button"
+                      onClick={handleSaveToProfile}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '10px 18px',
+                        borderRadius: '8px',
+                        backgroundColor: '#0C463B',
+                        color: '#FFFFFF',
+                        fontSize: '0.9rem',
+                        fontWeight: '700',
+                        border: 'none',
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 4px rgba(12, 70, 59, 0.2)'
+                      }}
+                    >
+                      <CheckCircle2 size={16} /> Save to Profile
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleSaveToProfile();
+                        navigate(`/search?keyword=${encodeURIComponent(resumeData.title || '')}`);
+                      }}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '10px 18px',
+                        borderRadius: '8px',
+                        backgroundColor: '#EBF8F4',
+                        color: '#0C463B',
+                        border: '1px solid #A7F3D0',
+                        fontSize: '0.9rem',
+                        fontWeight: '700',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Briefcase size={16} /> Find Matching Jobs
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => window.print()}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '10px 18px',
+                        borderRadius: '8px',
+                        backgroundColor: '#F1F5F9',
+                        color: '#1E293B',
+                        border: '1px solid #E2E8F0',
+                        fontSize: '0.9rem',
+                        fontWeight: '700',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Download size={16} /> Export PDF
+                    </button>
+                  </div>
                 )}
               </div>
             )}

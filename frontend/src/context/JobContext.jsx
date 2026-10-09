@@ -125,6 +125,31 @@ export const JobProvider = ({ children }) => {
     }
   });
 
+  // User Active AI Resume State (synchronizes between Resume Builder, Profile, and 1-Click Quick Apply)
+  const [activeResume, setActiveResume] = useState(() => {
+    try {
+      const saved = localStorage.getItem('jobfiesta_active_resume');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  const saveActiveResume = (resumeData) => {
+    try {
+      const toSave = {
+        ...resumeData,
+        updatedAt: new Date().toISOString()
+      };
+      localStorage.setItem('jobfiesta_active_resume', JSON.stringify(toSave));
+      setActiveResume(toSave);
+      return true;
+    } catch (e) {
+      console.error('Failed to save active resume', e);
+      return false;
+    }
+  };
+
   // Check if a job is already applied across all ID formats
   const isJobApplied = (jobId) => {
     if (!jobId) return false;
@@ -842,7 +867,9 @@ export const JobProvider = ({ children }) => {
       interviews,
       scheduleInterview,
       cancelInterview,
-      rescheduleInterview
+      rescheduleInterview,
+      activeResume,
+      saveActiveResume
     }}>
       {children}
     </JobContext.Provider>

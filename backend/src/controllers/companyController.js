@@ -134,6 +134,12 @@ const updateCompany = asyncHandler(async (req, res) => {
     return sendError(res, 'Company not found', 404);
   }
 
+  // IDOR Defense: Only the company creator or an admin can update this company profile
+  const isCreator = company.creator && company.creator.toString() === req.user._id.toString();
+  if (!isCreator && req.user.role !== 'admin') {
+    return sendError(res, 'Forbidden: You are not authorized to edit this company profile', 403);
+  }
+
   const updatedCompany = await Company.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,

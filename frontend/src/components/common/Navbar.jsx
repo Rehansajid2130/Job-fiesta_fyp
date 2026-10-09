@@ -288,7 +288,7 @@ const Navbar = () => {
                 Salaries
               </Link>
 
-              {user && (isRecruiter ? (
+              {isRecruiter ? (
                 <>
                   <Link 
                     to="/candidates" 
@@ -353,7 +353,7 @@ const Navbar = () => {
                   <FileText size={15} />
                   AI Resume
                 </Link>
-              ))}
+              )}
             </div>
 
             {/* Right Navigation: Role Indicator, Browse Jobs, Notifications & Auth Buttons */}
@@ -882,7 +882,7 @@ const Navbar = () => {
           >
             Salaries
           </Link>
-          {user && (isRecruiter ? (
+          {isRecruiter ? (
             <>
               <Link 
                 to="/candidates" 
@@ -907,7 +907,7 @@ const Navbar = () => {
             >
               AI Resume Builder
             </Link>
-          ))}
+          )}
 
           <hr style={{ border: 'none', borderTop: '1px solid #F1F5F9', margin: '4px 0' }} />
 

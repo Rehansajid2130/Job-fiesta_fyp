@@ -333,11 +333,22 @@ exports.updateCandidateStage = asyncHandler(async (req, res) => {
  */
 exports.getApplicationById = asyncHandler(async (req, res) => {
   const application = await Application.findById(req.params.id)
-    .populate('job')
+    .populate('job', 'title company postedBy')
     .populate('applicant', 'fullName email avatar phone location headline skills resumeUrl');
 
   if (!application) {
     return sendError(res, 'Application not found', 404);
+  }
+
+  // IDOR Defense: Only the applicant, the recruiter who posted the job, or an admin can access this application
+  const applicantId = application.applicant?._id || application.applicant;
+  const isApplicant = applicantId && applicantId.toString() === req.user.id.toString();
+  const jobOwnerId = application.job?.postedBy;
+  const isJobOwner = jobOwnerId && jobOwnerId.toString() === req.user.id.toString();
+  const isAdmin = req.user.role === 'admin';
+
+  if (!isApplicant && !isJobOwner && !isAdmin) {
+    return sendError(res, 'Forbidden: You are not authorized to view this application', 403);
   }
 
   return sendSuccess(res, application, 'Application details retrieved successfully');

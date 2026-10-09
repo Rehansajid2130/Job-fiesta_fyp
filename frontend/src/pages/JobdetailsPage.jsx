@@ -26,7 +26,7 @@ const JobdetailsPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const isRecruiter = user?.userType === 'recruiter';
-  const { jobs, savedJobIds, toggleSaveJob, applyToJob, applications, isJobApplied, showToast } = useJobs();
+  const { jobs, savedJobIds, toggleSaveJob, applyToJob, applications, isJobApplied, showToast, activeResume } = useJobs();
 
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [coverNote, setCoverNote] = useState('');
@@ -586,16 +586,31 @@ const JobdetailsPage = () => {
             <div style={{
               backgroundColor: '#EBF8F4',
               borderRadius: '8px',
+              border: '1px solid #A7F3D0',
               padding: '12px 16px',
               fontSize: '0.85rem',
               color: '#0C463B',
               marginBottom: '16px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between'
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '8px'
             }}>
-              <span>Resume: <strong>{user?.name ? `${user.name.replace(/\s+/g, '_')}_CV.pdf` : 'Candidate_CV.pdf'}</strong></span>
-              <Badge variant="success">ATS Ready</Badge>
+              <div>
+                <span>Resume: <strong>{activeResume?.title ? `${activeResume.fullName || user?.name} • ${activeResume.title}.pdf` : (user?.name ? `${user.name.replace(/\s+/g, '_')}_CV.pdf` : 'Candidate_CV.pdf')}</strong></span>
+                {activeResume?.atsScore && (
+                  <div style={{ fontSize: '0.78rem', color: '#059669', marginTop: '2px', fontWeight: '600' }}>
+                    ATS Score: {activeResume.atsScore}% • AI Tailored Profile
+                  </div>
+                )}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Badge variant="success">ATS Ready</Badge>
+                <Link to="/resume-builder" style={{ fontSize: '0.78rem', color: '#0C463B', fontWeight: '700', textDecoration: 'underline' }}>
+                  Edit in AI Builder
+                </Link>
+              </div>
             </div>
 
             <div style={{ marginBottom: '20px' }}>

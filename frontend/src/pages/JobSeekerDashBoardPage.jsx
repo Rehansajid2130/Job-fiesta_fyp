@@ -34,7 +34,8 @@ const JobSeekerDashBoardPage = () => {
     showToast, 
     refreshUserData,
     interviews,
-    cancelInterview 
+    cancelInterview,
+    activeResume
   } = useJobs();
   const [activeTab, setActiveTab] = useState('applications'); // applications, interviews, saved, recommended
 
@@ -210,6 +211,119 @@ const JobSeekerDashBoardPage = () => {
               </div>
             );
           })}
+        </div>
+
+        {/* Active AI Resume & Profile Showcase Card */}
+        <div style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: '16px',
+          border: '1px solid #E2E8F0',
+          padding: '24px 28px',
+          boxShadow: 'var(--shadow-sm)',
+          marginBottom: '32px',
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '20px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{
+              width: '52px',
+              height: '52px',
+              borderRadius: '14px',
+              backgroundColor: '#EBF8F4',
+              color: '#0C463B',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <Sparkles size={26} />
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#0F172A', margin: 0 }}>
+                  {activeResume?.title ? `${activeResume.fullName || user?.name} • ${activeResume.title}` : 'AI Resume & ATS Profile'}
+                </h3>
+                <span style={{
+                  backgroundColor: '#ECFDF5',
+                  color: '#059669',
+                  border: '1px solid #A7F3D0',
+                  fontSize: '0.78rem',
+                  fontWeight: '700',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}>
+                  <CheckCircle2 size={12} /> {activeResume?.atsScore ? `${activeResume.atsScore}% ATS Ready` : 'ATS Optimized'}
+                </span>
+              </div>
+              <p style={{ fontSize: '0.86rem', color: '#64748B', marginTop: '4px', marginBottom: 0 }}>
+                {activeResume?.updatedAt 
+                  ? `Last updated on ${new Date(activeResume.updatedAt).toLocaleDateString()} • Synced with 1-Click Quick Apply` 
+                  : 'Your AI Resume connects directly to your job applications and recruiter searches.'}
+              </p>
+              {activeResume?.skills && activeResume.skills.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' }}>
+                  {activeResume.skills.slice(0, 6).map((sk, idx) => (
+                    <span key={idx} style={{
+                      fontSize: '0.75rem',
+                      backgroundColor: '#F1F5F9',
+                      color: '#334155',
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      fontWeight: '600'
+                    }}>
+                      {sk}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            <Link
+              to="/resume-builder"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '9px 16px',
+                borderRadius: '8px',
+                backgroundColor: '#EBF8F4',
+                color: '#0C463B',
+                fontWeight: '700',
+                fontSize: '0.86rem',
+                border: '1px solid #A7F3D0',
+                textDecoration: 'none'
+              }}
+            >
+              <FileText size={15} />
+              <span>{activeResume ? 'Edit AI Resume' : 'Build AI Resume'}</span>
+            </Link>
+            <Link
+              to={`/search${activeResume?.title ? `?keyword=${encodeURIComponent(activeResume.title)}` : ''}`}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '9px 18px',
+                borderRadius: '8px',
+                backgroundColor: '#0C463B',
+                color: '#FFFFFF',
+                fontWeight: '700',
+                fontSize: '0.86rem',
+                textDecoration: 'none'
+              }}
+            >
+              <Briefcase size={15} />
+              <span>Find Matching Roles</span>
+            </Link>
+          </div>
         </div>
 
         {/* Upcoming Interview Spotlight Banner */}
@@ -550,26 +664,76 @@ const JobSeekerDashBoardPage = () => {
                 <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#0C463B', marginBottom: '8px' }}>
                   No applications yet
                 </h3>
-                <p style={{ color: '#64748B', fontSize: '0.9rem', maxWidth: '380px', margin: '0 auto 18px auto', lineHeight: '1.5' }}>
-                  Explore open jobs and apply with one click to kickstart your career journey.
+                <p style={{ color: '#64748B', fontSize: '0.9rem', maxWidth: '420px', margin: '0 auto 20px auto', lineHeight: '1.5' }}>
+                  Explore verified openings and apply in 1 click using your ATS-ready profile, or create an AI resume tailored to your target role.
                 </p>
-                <Link
-                  to="/search"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    padding: '9px 18px',
-                    borderRadius: '8px',
-                    backgroundColor: '#0C463B',
-                    color: '#FFFFFF',
-                    fontWeight: '700',
-                    fontSize: '0.9rem'
-                  }}
-                >
-                  <span>Explore Open Jobs</span>
-                  <ArrowRight size={14} />
-                </Link>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '24px' }}>
+                  <Link
+                    to="/search"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '10px 20px',
+                      borderRadius: '8px',
+                      backgroundColor: '#0C463B',
+                      color: '#FFFFFF',
+                      fontWeight: '700',
+                      fontSize: '0.9rem',
+                      textDecoration: 'none'
+                    }}
+                  >
+                    <span>Explore Open Jobs</span>
+                    <ArrowRight size={14} />
+                  </Link>
+                  <Link
+                    to="/resume-builder"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '10px 18px',
+                      borderRadius: '8px',
+                      backgroundColor: '#EBF8F4',
+                      color: '#0C463B',
+                      fontWeight: '700',
+                      fontSize: '0.9rem',
+                      border: '1px solid #A7F3D0',
+                      textDecoration: 'none'
+                    }}
+                  >
+                    <Sparkles size={14} />
+                    <span>Create AI Resume</span>
+                  </Link>
+                </div>
+
+                {/* Popular career quick search chips */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '0.82rem', color: '#94A3B8', fontWeight: '600' }}>Popular:</span>
+                  {[
+                    { label: 'React / Frontend', query: 'Frontend' },
+                    { label: 'Full Stack', query: 'Full Stack' },
+                    { label: 'UI / UX Design', query: 'Design' },
+                    { label: 'Remote Only', query: 'Remote' }
+                  ].map((chip) => (
+                    <Link
+                      key={chip.label}
+                      to={`/search?keyword=${encodeURIComponent(chip.query)}`}
+                      style={{
+                        fontSize: '0.78rem',
+                        fontWeight: '600',
+                        color: '#475569',
+                        backgroundColor: '#F1F5F9',
+                        padding: '4px 10px',
+                        borderRadius: '20px',
+                        textDecoration: 'none',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      {chip.label}
+                    </Link>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -808,23 +972,45 @@ const JobSeekerDashBoardPage = () => {
                 <p style={{ color: '#64748B', fontSize: '0.9rem', maxWidth: '380px', margin: '0 auto 18px auto', lineHeight: '1.5' }}>
                   Click the bookmark icon on any job card to save it here for quick access later.
                 </p>
-                <Link
-                  to="/search"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    padding: '9px 18px',
-                    borderRadius: '8px',
-                    backgroundColor: '#0C463B',
-                    color: '#FFFFFF',
-                    fontWeight: '600',
-                    fontSize: '0.88rem',
-                    textDecoration: 'none'
-                  }}
-                >
-                  Browse Open Jobs <ArrowRight size={15} />
-                </Link>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  <Link
+                    to="/search"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '10px 18px',
+                      borderRadius: '8px',
+                      backgroundColor: '#0C463B',
+                      color: '#FFFFFF',
+                      fontWeight: '700',
+                      fontSize: '0.88rem',
+                      textDecoration: 'none'
+                    }}
+                  >
+                    <span>Browse Open Jobs</span>
+                    <ArrowRight size={14} />
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('recommended')}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '10px 18px',
+                      borderRadius: '8px',
+                      backgroundColor: '#EBF8F4',
+                      color: '#0C463B',
+                      fontWeight: '700',
+                      fontSize: '0.88rem',
+                      border: '1px solid #A7F3D0',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <span>Recommended Roles</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>

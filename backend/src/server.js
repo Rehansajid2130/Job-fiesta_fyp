@@ -232,6 +232,16 @@ io.on('connection', (socket) => {
   });
 });
 
+// Security Headers: Apply first to all requests
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  next();
+});
+
 // Middleware & Security
 app.use(
   cors({
@@ -292,22 +302,13 @@ app.post('/api/seed', async (req, res) => {
   }
 });
 
-// ponytail: standard security headers without adding extra dependencies (KISS)
-app.use((req, res, next) => {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  next();
-});
-
-// ponytail: lightweight native in-memory rate limiter for auth routes
+// Native in-memory rate limiter for auth routes (Brute force & credential stuffing defense)
 const authAttempts = new Map();
 const authRateLimiter = (req, res, next) => {
   const ip = req.ip || req.socket?.remoteAddress || 'unknown';
   const now = Date.now();
   const windowMs = 15 * 60 * 1000;
-  const maxAttempts = 100;
+  const maxAttempts = 60;
   const record = authAttempts.get(ip) || { count: 0, resetTime: now + windowMs };
   if (now > record.resetTime) {
     record.count = 0;
@@ -321,6 +322,26 @@ const authRateLimiter = (req, res, next) => {
   next();
 };
 
+// Native in-memory rate limiter for AI Resume endpoints (DoS & resource exhaustion defense)
+const resumeAttempts = new Map();
+const resumeRateLimiter = (req, res, next) => {
+  const ip = req.ip || req.socket?.remoteAddress || 'unknown';
+  const now = Date.now();
+  const windowMs = 60 * 1000;
+  const maxRequests = 45;
+  const record = resumeAttempts.get(ip) || { count: 0, resetTime: now + windowMs };
+  if (now > record.resetTime) {
+    record.count = 0;
+    record.resetTime = now + windowMs;
+  }
+  record.count += 1;
+  resumeAttempts.set(ip, record);
+  if (record.count > maxRequests) {
+    return res.status(429).json({ success: false, message: 'Too many requests to AI Resume service. Please wait a moment and try again.' });
+  }
+  next();
+};
+
 // API Routes
 app.use('/api/auth', authRateLimiter, require('./routes/authRoutes'));
 app.use('/api/jobs', require('./routes/jobRoutes'));
@@ -329,7 +350,7 @@ app.use('/api/applications', require('./routes/applicationRoutes'));
 app.use('/api/conversations', require('./routes/conversationRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
-app.use('/api/resume', require('./routes/resumeRoutes'));
+app.use('/api/resume', resumeRateLimiter, require('./routes/resumeRoutes'));
 
 // Error handling middleware
 app.use(notFound);

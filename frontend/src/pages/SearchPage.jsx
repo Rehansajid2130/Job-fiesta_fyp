@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 
 const SearchPage = () => {
-  const { jobs: contextJobs, applyToJob, toggleSaveJob, savedJobIds, applications, isJobApplied, showToast } = useJobs();
+  const { jobs: contextJobs, applyToJob, toggleSaveJob, savedJobIds, applications, isJobApplied, showToast, activeResume } = useJobs();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -340,6 +340,74 @@ const SearchPage = () => {
       }
     }
   };
+
+  // Compute active filters for the pill bar
+  const activeFilterList = [];
+  if (keywordInput.trim()) {
+    activeFilterList.push({
+      id: 'keyword',
+      label: `Keyword: "${keywordInput.trim()}"`,
+      clear: () => {
+        setKeywordInput('');
+        const p = new URLSearchParams(searchParams);
+        p.delete('keyword');
+        setSearchParams(p);
+      }
+    });
+  }
+  if (locationInput.trim()) {
+    activeFilterList.push({
+      id: 'location',
+      label: `Location: "${locationInput.trim()}"`,
+      clear: () => {
+        setLocationInput('');
+        const p = new URLSearchParams(searchParams);
+        p.delete('location');
+        setSearchParams(p);
+      }
+    });
+  }
+  if (filters.category && filters.category !== 'all') {
+    const catObj = searchCategories.find(c => c.id === filters.category);
+    activeFilterList.push({
+      id: 'category',
+      label: `Category: ${catObj ? catObj.name : filters.category}`,
+      clear: () => handleCategorySelect('all')
+    });
+  }
+  if (filters.type && filters.type !== 'all') {
+    activeFilterList.push({
+      id: 'type',
+      label: `Type: ${filters.type}`,
+      clear: () => setFilters(prev => ({ ...prev, type: 'all' }))
+    });
+  }
+  if (filters.workMode && filters.workMode !== 'all') {
+    activeFilterList.push({
+      id: 'workMode',
+      label: `Mode: ${filters.workMode}`,
+      clear: () => setFilters(prev => ({ ...prev, workMode: 'all' }))
+    });
+  }
+  if (filters.experience && filters.experience !== 'all') {
+    activeFilterList.push({
+      id: 'experience',
+      label: `Exp: ${filters.experience}`,
+      clear: () => setFilters(prev => ({ ...prev, experience: 'all' }))
+    });
+  }
+  if (filters.minSalary || filters.maxSalary) {
+    const salLabel = filters.minSalary && filters.maxSalary
+      ? `$${filters.minSalary}k - $${filters.maxSalary}k`
+      : filters.minSalary
+      ? `$${filters.minSalary}k+`
+      : `Up to $${filters.maxSalary}k`;
+    activeFilterList.push({
+      id: 'salary',
+      label: `Salary: ${salLabel}`,
+      clear: () => setFilters(prev => ({ ...prev, minSalary: '', maxSalary: '' }))
+    });
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#F7F7F7' }}>
@@ -679,6 +747,77 @@ const SearchPage = () => {
                 </div>
               </div>
 
+              {/* Active Filter Pills Bar */}
+              {activeFilterList.length > 0 && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '8px',
+                  marginTop: '14px',
+                  marginBottom: '16px',
+                  padding: '10px 14px',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '10px',
+                  border: '1px solid #E5E7EB'
+                }}>
+                  <span style={{ fontSize: '12px', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    Active Filters:
+                  </span>
+                  {activeFilterList.map(item => (
+                    <span
+                      key={item.id}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        backgroundColor: '#EBF8F4',
+                        color: '#0C463B',
+                        border: '1px solid #A7F3D0',
+                        padding: '3px 10px',
+                        borderRadius: '20px',
+                        fontSize: '12px',
+                        fontWeight: '600'
+                      }}
+                    >
+                      <span>{item.label}</span>
+                      <button
+                        type="button"
+                        onClick={item.clear}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#0C463B',
+                          cursor: 'pointer',
+                          padding: 0,
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}
+                        aria-label={`Remove filter ${item.label}`}
+                      >
+                        <X size={12} />
+                      </button>
+                    </span>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={handleResetFilters}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#DC2626',
+                      fontSize: '12px',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      padding: '2px 6px',
+                      marginLeft: 'auto'
+                    }}
+                  >
+                    Clear All
+                  </button>
+                </div>
+              )}
+
               {isLiveLoading ? (
                 <div className="search-jobs-grid" style={{ marginBottom: '24px' }}>
                   {[1, 2, 3, 4].map((n) => (
@@ -867,6 +1006,41 @@ const SearchPage = () => {
                       {applyModalJob.title} • {applyModalJob.location}
                     </p>
                   </div>
+                </div>
+
+                {/* Active AI Resume Box */}
+                <div style={{
+                  backgroundColor: '#EBF8F4',
+                  borderRadius: '8px',
+                  border: '1px solid #A7F3D0',
+                  padding: '10px 14px',
+                  fontSize: '13px',
+                  color: '#0C463B',
+                  marginBottom: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '8px'
+                }}>
+                  <div>
+                    <span>Resume: <strong>{activeResume?.title ? `${activeResume.fullName || user?.name} • ${activeResume.title}.pdf` : (user?.name ? `${user.name.replace(/\s+/g, '_')}_CV.pdf` : 'Candidate_CV.pdf')}</strong></span>
+                    {activeResume?.atsScore && (
+                      <div style={{ fontSize: '11px', color: '#059669', marginTop: '2px', fontWeight: '600' }}>
+                        ATS Score: {activeResume.atsScore}% • Verified Profile
+                      </div>
+                    )}
+                  </div>
+                  <span style={{
+                    backgroundColor: '#10B981',
+                    color: '#FFFFFF',
+                    fontSize: '11px',
+                    fontWeight: '700',
+                    padding: '3px 8px',
+                    borderRadius: '4px'
+                  }}>
+                    ATS Ready
+                  </span>
                 </div>
 
                 <div style={{ marginBottom: '16px' }}>

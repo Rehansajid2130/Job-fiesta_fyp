@@ -5,7 +5,7 @@ import Footer from '../components/common/Footer';
 import { useJobs } from '../context/JobContext';
 import { useAuth } from '../context/AuthContext';
 import { categories } from '../data/mockData';
-import { Briefcase, Building, MapPin, DollarSign, CheckCircle2, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
+import { Briefcase, Building, MapPin, DollarSign, CheckCircle2, ArrowRight, AlertCircle, Loader2, Sparkles } from 'lucide-react';
 
 const PostJobPage = () => {
   const navigate = useNavigate();
@@ -40,7 +40,72 @@ const PostJobPage = () => {
 
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
+  const handleAIGenerateJob = async () => {
+    if (!formData.title.trim()) {
+      setErrorMsg('Please enter a Position Title first to generate job details with AI.');
+      return;
+    }
+    setErrorMsg('');
+    setIsGeneratingAI(true);
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const token = localStorage.getItem('token');
+      const res = await axios.post(
+        `${apiUrl}/api/jobs/generate-description`,
+        {
+          title: formData.title,
+          category: formData.category,
+          experienceLevel: formData.experience,
+          type: formData.type,
+          company: formData.company
+        },
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        }
+      );
+
+      if (res.data?.success && res.data?.data) {
+        const { description, requirements, benefits, tags } = res.data.data;
+        setFormData(prev => ({
+          ...prev,
+          description: description || prev.description,
+          requirements: requirements || prev.requirements,
+          benefits: benefits || prev.benefits,
+          tags: tags || prev.tags
+        }));
+        if (showToast) showToast('AI Job Description generated successfully!', 'success');
+      }
+    } catch (err) {
+      const serverMsg = err.response?.data?.message;
+      if (err.response?.status === 429) {
+        if (showToast) showToast(serverMsg || 'Rate limit reached. Please wait before generating again.', 'warning');
+      } else {
+        // Fallback local smart generator
+        const lower = formData.title.toLowerCase();
+        let fallbackDesc = `At ${formData.company || 'Our Company'}, we are looking for a driven ${formData.title} to join our high-impact team. You will lead key initiatives, collaborate with cross-functional partners, and deliver high-quality solutions.`;
+        let fallbackReqs = `Strong background and experience relevant to ${formData.title}.\nDemonstrated problem solving and communication skills.\nProficiency with modern industry workflows and collaboration tools.`;
+        let fallbackBenefits = `Competitive salary and comprehensive benefits.\nFlexible work hours and remote options.\nContinuous learning and wellness stipends.`;
+
+        if (lower.includes('developer') || lower.includes('engineer') || lower.includes('tech')) {
+          fallbackDesc = `We are seeking an experienced ${formData.title} to develop scalable, modern software at ${formData.company || 'Our Company'}. You will build resilient features, write clean testable code, and optimize production performance.`;
+          fallbackReqs = `Demonstrated experience with modern web and software development stacks.\nFamiliarity with Git, unit testing, and agile sprints.\nCommitment to high quality, scalable architecture.`;
+        }
+
+        setFormData(prev => ({
+          ...prev,
+          description: fallbackDesc,
+          requirements: fallbackReqs,
+          benefits: fallbackBenefits
+        }));
+        if (showToast) showToast('Generated role details using smart template copilot.', 'info');
+      }
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -132,9 +197,41 @@ const PostJobPage = () => {
                 </div>
               )}
               <div>
-                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: '600', color: '#334155', marginBottom: '6px' }}>
-                  Position Title *
-                </label>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                  <label style={{ fontSize: '0.88rem', fontWeight: '600', color: '#334155' }}>
+                    Position Title *
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleAIGenerateJob}
+                    disabled={isGeneratingAI}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      backgroundColor: '#EBF8F4',
+                      color: '#0C463B',
+                      border: '1px solid #A7F3D0',
+                      fontSize: '0.78rem',
+                      fontWeight: '700',
+                      cursor: isGeneratingAI ? 'not-allowed' : 'pointer',
+                      opacity: isGeneratingAI ? 0.7 : 1,
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    {isGeneratingAI ? (
+                      <>
+                        <Loader2 size={13} className="spin" /> Generating with AI...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles size={13} color="#0C463B" /> AI Auto-Draft Details
+                      </>
+                    )}
+                  </button>
+                </div>
                 <input
                   type="text"
                   placeholder="e.g. Senior Frontend Architect, Lead Product Designer"

@@ -41,10 +41,10 @@ const RoleRoute = ({ children, allowedRole }) => {
 };
 
 // General route protection for authenticated users of any role
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, message }) => {
   const { user } = useAuth();
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: window.location.pathname, message: message || 'Please log in to continue.' }} replace />;
   }
   return children;
 };
@@ -87,10 +87,10 @@ function App() {
               <Route path="/job/:id" element={<JobdetailsPage />} />
               <Route path="/job-details" element={<JobdetailsPage />} />
 
-              {/* AI Resume Generator & Builder */}
-              <Route path="/resume-builder" element={<ResumeBuilderPage />} />
-              <Route path="/resume-generation" element={<ResumeBuilderPage />} />
-              <Route path="/resume-generator" element={<ResumeBuilderPage />} />
+              {/* AI Resume Generator & Builder (Requires login) */}
+              <Route path="/resume-builder" element={<ProtectedRoute message="Please sign in or create an account to access the AI Resume Builder."><ResumeBuilderPage /></ProtectedRoute>} />
+              <Route path="/resume-generation" element={<ProtectedRoute message="Please sign in or create an account to access the AI Resume Builder."><ResumeBuilderPage /></ProtectedRoute>} />
+              <Route path="/resume-generator" element={<ProtectedRoute message="Please sign in or create an account to access the AI Resume Builder."><ResumeBuilderPage /></ProtectedRoute>} />
               <Route path="/resume" element={<Navigate to="/resume-builder" replace />} />
 
               {/* Authentication */}

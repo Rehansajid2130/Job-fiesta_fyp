@@ -178,13 +178,23 @@ Supported modern browsers:
 
 ---
 
-## 📜 Academic Deliverables
+## 📁 Repository Organization & Deliverables
 
-This repository serves as the official project repository for the **Final Year Project (FYP)**, containing:
-1. **Source Code**: Fully responsive React single-page application with modular component architecture.
-2. **Software Design Specification (SDS)**: Detailed architectural diagrams, database schema abstractions, and workflow state machines.
-3. **Project Presentations**: Milestone presentations summarizing research, design iteration, and engineering implementation.
-4. **User Manual**: Step-by-step instructions for candidate and recruiter workflows.
+All project deliverables, documentation, design assets, and academic reports are organized cleanly inside the `docs/` folder:
+
+```
+job-fiesta/
+├── backend/              # Node.js/Express REST API & Socket.io server
+├── frontend/             # React 18 + Vite frontend SaaS web application
+├── docs/                 # Official documentation & academic deliverables
+│   ├── reports/          # Software Design Specification, Phase 4 reports & User Manual (.docx)
+│   ├── presentations/    # Project presentations & milestone defense slide decks (.pptx)
+│   ├── design/           # Figma prototypes (.fig) and UI screenshot showcases
+│   └── roadmaps/         # System design audits, backend roadmap & development changelogs (.md)
+├── package.json          # Root scripts and workspace metadata
+├── README.md             # Project documentation and quickstart guide
+└── LICENSE               # MIT License
+```
 
 ---
 

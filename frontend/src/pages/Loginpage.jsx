@@ -229,6 +229,28 @@ const Loginpage = () => {
               </button>
             </div>
 
+            {/* Informational Redirect Message */}
+            {location.state?.message && !errorMsg && (
+              <div 
+                style={{
+                  backgroundColor: '#EBF8F4',
+                  border: '1px solid #A7F3D0',
+                  borderRadius: '8px',
+                  padding: '10px 14px',
+                  color: '#0C463B',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  marginBottom: '16px'
+                }}
+              >
+                <Info size={16} color="#0C463B" />
+                <span>{location.state.message}</span>
+              </div>
+            )}
+
             {/* Error Message if any */}
             {errorMsg && (
               <div 
