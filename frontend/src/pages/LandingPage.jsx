@@ -7,6 +7,7 @@ import Footer from '../components/common/Footer';
 import LandingHero from '../components/landing/LandingHero';
 import FeaturedJobsSection from '../components/landing/FeaturedJobsSection';
 import CategoriesSection from '../components/landing/CategoriesSection';
+import AiResumeBannerSection from '../components/landing/AiResumeBannerSection';
 import TestimonialsSection from '../components/landing/TestimonialsSection';
 import ContactSection from '../components/landing/ContactSection';
 import QuickApplyModal from '../components/landing/QuickApplyModal';
@@ -271,16 +272,19 @@ const LandingPage = () => {
         onCategoryClick={handleCategoryClick}
       />
 
-      {/* 5. TESTIMONIALS */}
+      {/* 5. AI RESUME BUILDER SHOWCASE */}
+      <AiResumeBannerSection />
+
+      {/* 6. TESTIMONIALS */}
       <TestimonialsSection
         testimonials={testimonials}
         onOpenMoreReviews={() => setMoreReviewsOpen(true)}
       />
 
-      {/* 6. CONTACT US */}
+      {/* 7. CONTACT US */}
       <ContactSection />
 
-      {/* 7. FOOTER */}
+      {/* 8. FOOTER */}
       <Footer />
 
       {/* QUICK APPLY MODAL */}
