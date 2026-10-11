@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import Badge from '../components/common/Badge';
+import Modal from '../components/common/Modal';
 import { useJobs } from '../context/JobContext';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -35,9 +36,11 @@ const JobSeekerDashBoardPage = () => {
     refreshUserData,
     interviews,
     cancelInterview,
-    activeResume
+    activeResume,
+    isSocketConnected
   } = useJobs();
   const [activeTab, setActiveTab] = useState('applications'); // applications, interviews, saved, recommended
+  const [selectedJourneyApp, setSelectedJourneyApp] = useState(null);
 
   React.useEffect(() => {
     if (!user) {
@@ -493,13 +496,74 @@ const JobSeekerDashBoardPage = () => {
 
         {/* Tab 1: Applications Table with Interactive Pipeline Stepper */}
         {activeTab === 'applications' && (
-          <div style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            border: '1px solid #E2E8F0',
-            overflow: 'hidden',
-            boxShadow: 'var(--shadow-sm)'
-          }}>
+          <div>
+            {/* Live Real-Time Application Tracking Banner */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '12px',
+              padding: '12px 20px',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '12px',
+              border: '1px solid #E2E8F0',
+              marginBottom: '16px',
+              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.02)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '3px 10px',
+                  borderRadius: '20px',
+                  backgroundColor: isSocketConnected ? '#ECFDF5' : '#FFFBEB',
+                  border: isSocketConnected ? '1px solid #A7F3D0' : '1px solid #FDE68A',
+                  fontSize: '0.78rem',
+                  fontWeight: '800',
+                  color: isSocketConnected ? '#065F46' : '#92400E'
+                }}>
+                  <span style={{
+                    width: '7px',
+                    height: '7px',
+                    borderRadius: '50%',
+                    backgroundColor: isSocketConnected ? '#10B981' : '#F59E0B',
+                    boxShadow: isSocketConnected ? '0 0 6px rgba(16, 185, 129, 0.8)' : 'none'
+                  }} />
+                  {isSocketConnected ? 'Live Real-Time Stream' : 'Connecting to Stream...'}
+                </span>
+                <span style={{ fontSize: '0.85rem', color: '#475569', fontWeight: '500' }}>
+                  Recruiter reviews, shortlist promotions & interview invites update live without refreshing.
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (refreshUserData) refreshUserData();
+                  if (showToast) showToast('Synchronized with latest database records', 'info');
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#0C463B',
+                  fontSize: '0.82rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  textDecoration: 'underline'
+                }}
+              >
+                Sync Now
+              </button>
+            </div>
+
+            <div style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '16px',
+              border: '1px solid #E2E8F0',
+              overflow: 'hidden',
+              boxShadow: 'var(--shadow-sm)'
+            }}>
             {applications.length > 0 ? (
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
@@ -529,7 +593,11 @@ const JobSeekerDashBoardPage = () => {
                             </div>
 
                             {/* Application Pipeline Stepper */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '8px' }}>
+                            <div 
+                              onClick={() => setSelectedJourneyApp(app)}
+                              style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '8px', cursor: 'pointer' }}
+                              title="Click to view real-time application timeline"
+                            >
                               {['Applied', 'Review', 'Interview', 'Decision'].map((stLabel, sIdx) => {
                                 const isCompleted = stageIdx > sIdx;
                                 const isCurrent = stageIdx === sIdx;
@@ -611,9 +679,34 @@ const JobSeekerDashBoardPage = () => {
                               )}
                               <button
                                 type="button"
+                                onClick={() => setSelectedJourneyApp(app)}
+                                style={{
+                                  fontSize: '0.82rem',
+                                  fontWeight: '600',
+                                  color: '#334155',
+                                  padding: '6px 12px',
+                                  borderRadius: '6px',
+                                  backgroundColor: '#FFFFFF',
+                                  border: '1px solid #CBD5E1',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.15s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.borderColor = '#0C463B';
+                                  e.currentTarget.style.color = '#0C463B';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.borderColor = '#CBD5E1';
+                                  e.currentTarget.style.color = '#334155';
+                                }}
+                              >
+                                Journey
+                              </button>
+                              <button
+                                type="button"
                                 onClick={() => handleMessageCompany(app)}
                                 style={{
-                                  fontSize: '0.85rem',
+                                  fontSize: '0.82rem',
                                   fontWeight: '600',
                                   color: '#0C463B',
                                   padding: '6px 12px',
@@ -736,6 +829,7 @@ const JobSeekerDashBoardPage = () => {
                 </div>
               </div>
             )}
+            </div>
           </div>
         )}
 
@@ -1060,6 +1154,251 @@ const JobSeekerDashBoardPage = () => {
           </div>
         )}
       </div>
+
+      {/* Real-Time Application Journey Timeline Modal */}
+      {selectedJourneyApp && (
+        <Modal
+          isOpen={!!selectedJourneyApp}
+          onClose={() => setSelectedJourneyApp(null)}
+          title={`Application Journey • ${selectedJourneyApp.jobTitle}`}
+          maxWidth="640px"
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {/* Header Spotlight Card */}
+            <div style={{
+              padding: '16px 20px',
+              backgroundColor: '#F8FAFC',
+              borderRadius: '12px',
+              border: '1px solid #E2E8F0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '12px'
+            }}>
+              <div>
+                <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#10B981', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  {selectedJourneyApp.company}
+                </span>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0F172A', margin: '4px 0 0 0' }}>
+                  {selectedJourneyApp.jobTitle}
+                </h3>
+                <span style={{ fontSize: '0.84rem', color: '#64748B' }}>
+                  Applied on {selectedJourneyApp.appliedDate || 'Recently'} • {selectedJourneyApp.matchScore || 85}% Match
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{
+                  padding: '6px 14px',
+                  borderRadius: '20px',
+                  backgroundColor: '#ECFDF5',
+                  color: '#065F46',
+                  fontWeight: '800',
+                  fontSize: '0.85rem',
+                  border: '1px solid #A7F3D0',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <span style={{
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    backgroundColor: '#10B981'
+                  }} />
+                  {selectedJourneyApp.status}
+                </span>
+              </div>
+            </div>
+
+            {/* Stepper Progress Visualizer */}
+            <div style={{
+              padding: '20px',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '12px',
+              border: '1px solid #E2E8F0'
+            }}>
+              <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#64748B', textTransform: 'uppercase' }}>
+                Hiring Funnel Status
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '16px', position: 'relative' }}>
+                {['Applied', 'Screening', 'Interviewing', 'Decision'].map((stLabel, idx) => {
+                  const currentIdx = getStageIndex(selectedJourneyApp.status);
+                  const isDone = currentIdx > idx;
+                  const isCurrent = currentIdx === idx;
+                  return (
+                    <div key={stLabel} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, position: 'relative', zIndex: 2 }}>
+                      <div style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        backgroundColor: isCurrent ? '#0C463B' : (isDone ? '#10B981' : '#F1F5F9'),
+                        color: isCurrent || isDone ? '#FFFFFF' : '#94A3B8',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: '800',
+                        fontSize: '0.82rem',
+                        border: isCurrent ? '3px solid #BBF7D0' : 'none',
+                        boxShadow: isCurrent ? '0 0 10px rgba(12, 70, 59, 0.35)' : 'none',
+                        transition: 'all 0.3s ease'
+                      }}>
+                        {isDone ? '✓' : (idx + 1)}
+                      </div>
+                      <span style={{
+                        fontSize: '0.78rem',
+                        fontWeight: isCurrent ? '800' : '600',
+                        color: isCurrent ? '#0C463B' : (isDone ? '#0F172A' : '#94A3B8'),
+                        marginTop: '8px'
+                      }}>
+                        {stLabel}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* If interview details exist */}
+            {selectedJourneyApp.interview && (
+              <div style={{
+                padding: '16px 20px',
+                borderRadius: '12px',
+                backgroundColor: '#F0FDF4',
+                border: '1px solid #BBF7D0',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Calendar size={16} color="#0C463B" />
+                    <strong style={{ fontSize: '0.92rem', color: '#0F172A' }}>
+                      {selectedJourneyApp.interview.roundType || 'Interview Round'}
+                    </strong>
+                  </div>
+                  <span style={{ fontSize: '0.75rem', fontWeight: '800', backgroundColor: '#DCFCE7', color: '#166534', padding: '2px 8px', borderRadius: '6px' }}>
+                    Confirmed
+                  </span>
+                </div>
+                <div style={{ fontSize: '0.85rem', color: '#334155' }}>
+                  <strong>{selectedJourneyApp.interview.date}</strong> at <strong>{selectedJourneyApp.interview.time}</strong> • {selectedJourneyApp.interview.location || 'Online'}
+                </div>
+                {selectedJourneyApp.interview.notes && (
+                  <p style={{ fontSize: '0.8rem', color: '#64748B', margin: 0, fontStyle: 'italic' }}>
+                    "{selectedJourneyApp.interview.notes}"
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Timeline Events Feed */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#64748B', textTransform: 'uppercase' }}>
+                Activity & Status History
+              </span>
+
+              {selectedJourneyApp.timeline && selectedJourneyApp.timeline.length > 0 ? (
+                selectedJourneyApp.timeline.map((evt, eIdx) => (
+                  <div key={eIdx} style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '12px',
+                    padding: '12px',
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '8px',
+                    border: '1px solid #E2E8F0'
+                  }}>
+                    <div style={{
+                      width: '24px',
+                      height: '24px',
+                      borderRadius: '50%',
+                      backgroundColor: '#EBF8F4',
+                      color: '#0C463B',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '11px',
+                      fontWeight: '800',
+                      flexShrink: 0
+                    }}>
+                      ✓
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.88rem', fontWeight: '700', color: '#0F172A' }}>
+                        {evt.stage ? evt.stage.toUpperCase() : 'STATUS UPDATE'}
+                      </div>
+                      <div style={{ fontSize: '0.82rem', color: '#64748B', marginTop: '2px' }}>
+                        {evt.note || 'Status updated by recruiting team.'}
+                      </div>
+                      <div style={{ fontSize: '0.74rem', color: '#94A3B8', marginTop: '4px' }}>
+                        {evt.timestamp ? new Date(evt.timestamp).toLocaleString() : 'Recently'}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div style={{
+                  padding: '16px',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '8px',
+                  border: '1px solid #E2E8F0',
+                  fontSize: '0.86rem',
+                  color: '#475569'
+                }}>
+                  <div style={{ fontWeight: '700', color: '#0F172A' }}>Application Submitted</div>
+                  <div style={{ color: '#64748B', marginTop: '4px' }}>
+                    Application is currently under review by {selectedJourneyApp.company} talent team.
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Bottom Actions */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '8px' }}>
+              <button
+                type="button"
+                onClick={() => setSelectedJourneyApp(null)}
+                style={{
+                  padding: '9px 16px',
+                  borderRadius: '8px',
+                  border: '1px solid #CBD5E1',
+                  backgroundColor: '#FFFFFF',
+                  color: '#475569',
+                  fontWeight: '600',
+                  fontSize: '0.86rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const appToMsg = selectedJourneyApp;
+                  setSelectedJourneyApp(null);
+                  handleMessageCompany(appToMsg);
+                }}
+                style={{
+                  padding: '9px 18px',
+                  borderRadius: '8px',
+                  backgroundColor: '#0C463B',
+                  color: '#FFFFFF',
+                  fontWeight: '700',
+                  fontSize: '0.86rem',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <MessageSquare size={14} /> Message Recruiter
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
 
       <Footer />
     </div>

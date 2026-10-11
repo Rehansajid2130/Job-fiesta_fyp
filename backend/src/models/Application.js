@@ -83,6 +83,23 @@ const applicationSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    interview: {
+      date: { type: String, default: '' },
+      time: { type: String, default: '' },
+      roundType: { type: String, default: '' },
+      location: { type: String, default: '' },
+      notes: { type: String, default: '' },
+      interviewer: { type: String, default: '' },
+      meetingLink: { type: String, default: '' },
+      status: { type: String, default: 'Scheduled' },
+    },
+    timeline: [
+      {
+        stage: { type: String, required: true },
+        note: { type: String, default: '' },
+        timestamp: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true,

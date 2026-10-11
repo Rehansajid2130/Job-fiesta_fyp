@@ -53,8 +53,8 @@ function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
-        <JobProvider>
-          <SocketProvider userId={localStorage.getItem('userId')}>
+        <SocketProvider>
+          <JobProvider>
             <ScrollToTop />
             <Toast />
             <Routes>
@@ -147,8 +147,8 @@ function App() {
                 </div>
               } />
             </Routes>
-          </SocketProvider>
-        </JobProvider>
+          </JobProvider>
+        </SocketProvider>
       </AuthProvider>
     </ErrorBoundary>
   );

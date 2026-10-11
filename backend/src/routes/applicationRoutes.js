@@ -6,6 +6,7 @@ const {
   getCandidatePipeline,
   getJobApplications,
   updateCandidateStage,
+  scheduleInterviewForApplication,
   getApplicationById,
 } = require('../controllers/applicationController');
 const { protect, authorize } = require('../middleware/auth');
@@ -25,6 +26,9 @@ router.get('/job/:jobId', protect, authorize('recruiter', 'employer', 'admin'), 
 // Update candidate ATS Kanban stage
 router.patch('/:id/stage', protect, authorize('recruiter', 'employer', 'admin'), updateCandidateStage);
 router.patch('/:id/status', protect, authorize('recruiter', 'employer', 'admin'), updateCandidateStage);
+
+// Schedule interview for candidate application
+router.post('/:id/schedule-interview', protect, authorize('recruiter', 'employer', 'admin'), scheduleInterviewForApplication);
 
 // Single application details
 router.get('/:id', protect, getApplicationById);

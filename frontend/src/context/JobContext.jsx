@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { useSocket } from './SocketContext';
 import { 
   initialJobs, 
   initialApplications, 
@@ -58,6 +59,8 @@ try {
 } catch (e) {}
 
 export const JobProvider = ({ children }) => {
+  const { socket, isConnected } = useSocket() || {};
+
   // Pure in-memory state: loaded from and synchronized with secure backend API
   const [jobs, setJobs] = useState(initialJobs);
   const [companies, setCompanies] = useState(initialCompanies);
@@ -273,8 +276,26 @@ export const JobProvider = ({ children }) => {
           console.warn('My applications fetch error:', err.message);
         }
       }
-      // Fetch live conversations for current authenticated user
+      // Fetch live conversations and notifications for current authenticated user
       fetchConversations();
+      fetchNotifications();
+    }
+  };
+
+  const fetchNotifications = async () => {
+    const token = localStorage.getItem('token');
+    if (!token || token.startsWith('demo-token')) return;
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      const res = await axios.get(`${apiUrl}/api/notifications`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const notifs = res.data?.data || [];
+      if (Array.isArray(notifs)) {
+        setNotifications(notifs);
+      }
+    } catch (err) {
+      console.warn('Backend notifications fetch error:', err.message);
     }
   };
 
@@ -318,7 +339,135 @@ export const JobProvider = ({ children }) => {
     fetchLiveJobs();
     refreshUserData();
     fetchConversations();
+    fetchNotifications();
   }, []);
+
+  // ---------------------------------------------------------------------------
+  // REAL-TIME WEBSOCKET EVENT LISTENERS
+  // Synchronizes Applications, Notifications, Interviews & ATS Pipeline Live
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (!socket) return;
+
+    // 1. In-app Push Notification
+    const handleNewNotification = (notif) => {
+      setNotifications(prev => [notif, ...prev.filter(n => n.id !== notif.id && n._id !== notif._id)]);
+      if (notif.title) {
+        showToast(notif.title, 'info');
+      }
+    };
+
+    // 2. Candidate Application Status Live Transition
+    const handleApplicationStatusUpdated = (data) => {
+      setApplications(prev => {
+        const updated = prev.map(app => {
+          const isMatch =
+            String(app.id) === String(data.applicationId) ||
+            String(app._id) === String(data.applicationId) ||
+            String(app.jobId) === String(data.jobId);
+          if (isMatch) {
+            return {
+              ...app,
+              status: data.status,
+              stage: data.stage,
+              notes: data.notes || app.notes,
+              interview: data.interview || app.interview,
+              timeline: data.timeline || app.timeline,
+              updatedAt: data.updatedAt
+            };
+          }
+          return app;
+        });
+        try {
+          localStorage.setItem('jobfiesta_user_applications', JSON.stringify(updated));
+        } catch (e) {}
+        return updated;
+      });
+
+      showToast(
+        `Application Update: ${data.company || 'Hiring Team'} moved your application to ${data.status}!`,
+        'success'
+      );
+    };
+
+    // 3. Recruiter Event: New Candidate Applied
+    const handleNewCandidateApplied = (cand) => {
+      setCandidates(prev => {
+        const exists = prev.some(c => String(c.applicationId || c.id) === String(cand.applicationId || cand.id));
+        if (exists) return prev;
+        return [cand, ...prev];
+      });
+      showToast(`New Applicant: ${cand.name} applied for ${cand.role} (${cand.matchScore}% Match)`, 'info');
+    };
+
+    // 4. Interview Scheduled Live
+    const handleInterviewScheduled = (data) => {
+      if (data.interview) {
+        setInterviews(prev => {
+          const updated = [data.interview, ...prev.filter(i => i.id !== data.interview.id)];
+          try {
+            localStorage.setItem('jobfiesta_user_interviews', JSON.stringify(updated));
+          } catch (e) {}
+          return updated;
+        });
+      }
+
+      setApplications(prev => {
+        const updated = prev.map(app => {
+          const isMatch =
+            String(app.id) === String(data.applicationId) ||
+            String(app.jobId) === String(data.interview?.jobId);
+          if (isMatch) {
+            return {
+              ...app,
+              status: 'Interview Scheduled',
+              interview: data.interview
+            };
+          }
+          return app;
+        });
+        try {
+          localStorage.setItem('jobfiesta_user_applications', JSON.stringify(updated));
+        } catch (e) {}
+        return updated;
+      });
+
+      showToast(`Interview Round Scheduled: ${data.interview?.roundType || 'Interview'}! 📅`, 'success');
+    };
+
+    // 5. Recruiter multi-tab sync
+    const handleCandidateStageUpdated = (data) => {
+      setCandidates(prev =>
+        prev.map(c =>
+          String(c.id || c.applicationId) === String(data.candidateId || data.applicationId)
+            ? { ...c, stage: data.stage, notes: data.notes || c.notes }
+            : c
+        )
+      );
+    };
+
+    // 6. Direct Message Notification
+    const handleNewMessageNotification = (msgNotif) => {
+      showToast(msgNotif.title || 'New Message Received 💬', 'info');
+      fetchConversations();
+    };
+
+    socket.on('new_notification', handleNewNotification);
+    socket.on('application_status_updated', handleApplicationStatusUpdated);
+    socket.on('new_candidate_applied', handleNewCandidateApplied);
+    socket.on('interview_scheduled', handleInterviewScheduled);
+    socket.on('candidate_stage_updated', handleCandidateStageUpdated);
+    socket.on('new_message_notification', handleNewMessageNotification);
+
+    return () => {
+      socket.off('new_notification', handleNewNotification);
+      socket.off('application_status_updated', handleApplicationStatusUpdated);
+      socket.off('new_candidate_applied', handleNewCandidateApplied);
+      socket.off('interview_scheduled', handleInterviewScheduled);
+      socket.off('candidate_stage_updated', handleCandidateStageUpdated);
+      socket.off('new_message_notification', handleNewMessageNotification);
+    };
+  }, [socket]);
 
   const toggleSaveJob = async (jobId) => {
     setSavedJobIds(prev => 
@@ -639,6 +788,26 @@ export const JobProvider = ({ children }) => {
       updateCandidateStage(interviewData.candidateId, 'interviewing');
     }
 
+    // Backend real-time persistence and candidate notification
+    const targetAppId = interviewData.applicationId || (typeof interviewData.candidateId === 'string' && interviewData.candidateId.length === 24 ? interviewData.candidateId : null);
+    const token = localStorage.getItem('token');
+    if (token && !token.startsWith('demo-token') && targetAppId) {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+        axios.post(`${apiUrl}/api/applications/${targetAppId}/schedule-interview`, {
+          date: newInterview.date,
+          time: newInterview.time,
+          duration: newInterview.duration,
+          roundType: newInterview.roundType,
+          location: newInterview.location,
+          notes: newInterview.notes,
+          interviewer: newInterview.interviewer
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        }).catch(err => console.warn('Backend schedule interview sync:', err.message));
+      } catch (e) {}
+    }
+
     // 3. Update candidate application status
     setApplications(prev => {
       const updated = prev.map(app => {
@@ -807,15 +976,37 @@ export const JobProvider = ({ children }) => {
   };
 
 
-  const markNotificationAsRead = (notifId) => {
+  const markNotificationAsRead = async (notifId) => {
     setNotifications(prev => prev.map(n => 
-      n.id === notifId ? { ...n, unread: false } : n
+      (n.id === notifId || n._id === notifId) ? { ...n, unread: false, read: true } : n
     ));
+    const token = localStorage.getItem('token');
+    if (token && !token.startsWith('demo-token') && typeof notifId === 'string' && notifId.length === 24) {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+        await axios.patch(`${apiUrl}/api/notifications/${notifId}/read`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (err) {
+        console.warn('Backend mark notification read error:', err.message);
+      }
+    }
   };
 
-  const markAllNotificationsAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
+  const markAllNotificationsAsRead = async () => {
+    setNotifications(prev => prev.map(n => ({ ...n, unread: false, read: true })));
     showToast('All notifications marked as read', 'info');
+    const token = localStorage.getItem('token');
+    if (token && !token.startsWith('demo-token')) {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+        await axios.patch(`${apiUrl}/api/notifications/read-all`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (err) {
+        console.warn('Backend mark all notifications read error:', err.message);
+      }
+    }
   };
 
   const addNotification = (notifData) => {
@@ -823,13 +1014,14 @@ export const JobProvider = ({ children }) => {
       id: `notif-${Date.now()}`,
       time: 'Just now',
       unread: true,
+      read: false,
       ...notifData
     };
     setNotifications(prev => [newNotif, ...prev]);
     showToast(newNotif.title, 'info');
   };
 
-  const unreadNotificationsCount = notifications.filter(n => n.unread).length;
+  const unreadNotificationsCount = notifications.filter(n => n.unread || !n.read).length;
   const unreadMessagesCount = conversations.reduce((sum, c) => sum + (c.unreadCount || (c.unread ? 1 : 0)), 0);
 
   return (
@@ -843,6 +1035,9 @@ export const JobProvider = ({ children }) => {
       markNotificationAsRead,
       markAllNotificationsAsRead,
       addNotification,
+      fetchNotifications,
+      isSocketConnected: isConnected,
+      socket,
       toast,
       showToast,
       applications,

@@ -41,7 +41,7 @@ const STAGES = [
 const CandidatesAtsPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { jobs, candidates, updateCandidateStage, showToast, startOrGetConversation, refreshUserData } = useJobs();
+  const { jobs, candidates, updateCandidateStage, showToast, startOrGetConversation, refreshUserData, isSocketConnected } = useJobs();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
@@ -135,6 +135,32 @@ const CandidatesAtsPage = () => {
               <p style={{ fontSize: '0.92rem', color: '#64748B' }}>
                 Track applicants across screening, technical interviews, and offer stages.
               </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '10px' }}>
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '3px 10px',
+                  borderRadius: '20px',
+                  backgroundColor: isSocketConnected ? '#ECFDF5' : '#FFFBEB',
+                  border: isSocketConnected ? '1px solid #A7F3D0' : '1px solid #FDE68A',
+                  fontSize: '0.78rem',
+                  fontWeight: '800',
+                  color: isSocketConnected ? '#065F46' : '#92400E'
+                }}>
+                  <span style={{
+                    width: '7px',
+                    height: '7px',
+                    borderRadius: '50%',
+                    backgroundColor: isSocketConnected ? '#10B981' : '#F59E0B',
+                    boxShadow: isSocketConnected ? '0 0 6px rgba(16, 185, 129, 0.8)' : 'none'
+                  }} />
+                  {isSocketConnected ? 'Real-Time Pipeline Active' : 'Connecting to Stream...'}
+                </span>
+                <span style={{ fontSize: '0.82rem', color: '#64748B' }}>
+                  • Stage transitions push instant alerts and schedule updates to candidates
+                </span>
+              </div>
             </div>
 
             {/* Quick stats ribbon */}

@@ -32,6 +32,9 @@ const io = new Server(server, {
   },
 });
 
+// Provide global socket.io access to controllers via req.app.get('io')
+app.set('io', io);
+
 // Socket.io Handshake Authentication Middleware
 // Verifies JWT on connection before any events can be transmitted
 io.use(async (socket, next) => {
@@ -75,7 +78,17 @@ io.use(async (socket, next) => {
 io.on('connection', (socket) => {
   console.log(`[Socket.io] Authenticated client connected: ${socket.id} (${socket.user?.fullName || 'User'})`);
 
-  // 1. User joins personal notification room (Strictly scoped to authenticated user ID)
+  // Automatically join personal user channel upon authentication
+  if (socket.user?._id) {
+    const userChannel = socket.user._id.toString();
+    socket.join(userChannel);
+    if (socket.user.role === 'recruiter' || socket.user.role === 'employer') {
+      socket.join(`recruiter_${userChannel}`);
+      socket.join('recruiter_pool');
+    }
+  }
+
+  // 1. User joins personal notification room (explicit re-join if needed)
   socket.on('join_user', () => {
     if (socket.user?._id) {
       const userChannel = socket.user._id.toString();

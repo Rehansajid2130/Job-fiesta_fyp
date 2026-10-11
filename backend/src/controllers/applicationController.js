@@ -94,14 +94,21 @@ exports.applyToJob = asyncHandler(async (req, res) => {
     missingSkills,
     screeningAnswers: Array.isArray(screeningAnswers) ? screeningAnswers : [],
     status: 'applied',
+    timeline: [
+      {
+        stage: 'applied',
+        note: 'Application submitted successfully',
+        timestamp: new Date(),
+      },
+    ],
   });
 
   // Increment applicantsCount on the job
   await Job.findByIdAndUpdate(jobId, { $inc: { applicantsCount: 1 } });
 
-  // Create notification for recruiter / job creator if available
+  // Create notification and emit real-time event for recruiter
   if (job.postedBy) {
-    await Notification.create({
+    const notif = await Notification.create({
       recipient: job.postedBy,
       sender: req.user.id,
       title: 'New Candidate Applied 📄',
@@ -109,6 +116,41 @@ exports.applyToJob = asyncHandler(async (req, res) => {
       type: 'application',
       link: '/candidates',
     });
+
+    const io = req.app.get('io');
+    if (io) {
+      const recruiterChannel = job.postedBy.toString();
+      const notifPayload = {
+        id: notif._id.toString(),
+        _id: notif._id,
+        title: notif.title,
+        message: notif.message,
+        type: notif.type,
+        link: notif.link,
+        read: false,
+        unread: true,
+        time: 'Just now',
+        createdAt: notif.createdAt,
+      };
+
+      io.to(recruiterChannel).emit('new_notification', notifPayload);
+      io.to(recruiterChannel).emit('new_candidate_applied', {
+        id: application._id.toString(),
+        applicationId: application._id.toString(),
+        name: req.user.fullName || 'Candidate Applicant',
+        email: req.user.email || '',
+        avatar: req.user.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces',
+        role: job.title,
+        company: job.company,
+        jobId: job._id.toString(),
+        stage: 'applied',
+        appliedDate: 'Just now',
+        matchScore,
+        matchedSkills,
+        missingSkills,
+        skills: candidateSkills,
+      });
+    }
   }
 
   return sendSuccess(res, application, 'Application submitted successfully', 201);
@@ -300,21 +342,32 @@ exports.updateCandidateStage = asyncHandler(async (req, res) => {
   }
 
   if (notes !== undefined) application.notes = notes;
+  if (req.body.interview) {
+    application.interview = req.body.interview;
+  }
 
-  await application.save();
-
-  // Create real-time notification for candidate
   const stageLabels = {
+    applied: 'Applied',
     screening: 'Screening Round',
     interviewing: 'Interview Stage',
     offered: 'Offer Extended! 🎉',
     rejected: 'Application Update',
     hired: 'Hired! Welcome to the Team 🎉',
   };
-
   const stageLabel = stageLabels[stage] || stage;
 
-  await Notification.create({
+  // Append to journey timeline
+  if (!application.timeline) application.timeline = [];
+  application.timeline.push({
+    stage,
+    note: notes || `Application moved to ${stageLabel}`,
+    timestamp: new Date(),
+  });
+
+  await application.save();
+
+  // Create real-time notification for candidate
+  const notif = await Notification.create({
     recipient: application.applicant,
     sender: req.user.id,
     title: `Application Update: ${stageLabel}`,
@@ -323,7 +376,157 @@ exports.updateCandidateStage = asyncHandler(async (req, res) => {
     link: '/jobseeker-dashboard',
   });
 
+  // Emit real-time WebSocket events
+  const io = req.app.get('io');
+  if (io) {
+    const applicantChannel = application.applicant.toString();
+    const notifPayload = {
+      id: notif._id.toString(),
+      _id: notif._id,
+      title: notif.title,
+      message: notif.message,
+      type: notif.type,
+      link: notif.link,
+      read: false,
+      unread: true,
+      time: 'Just now',
+      createdAt: notif.createdAt,
+    };
+
+    io.to(applicantChannel).emit('new_notification', notifPayload);
+    io.to(applicantChannel).emit('application_status_updated', {
+      applicationId: application._id.toString(),
+      jobId: application.job?._id?.toString() || application.job?.toString(),
+      jobTitle: application.job?.title || 'Position',
+      company: application.job?.company || 'Company',
+      stage,
+      status: stage === 'applied' ? 'Applied' : (stage === 'screening' ? 'Screening' : (stage === 'interviewing' ? 'Interview Scheduled' : (stage === 'offered' ? 'Offered' : (stage === 'hired' ? 'Hired' : 'Rejected')))),
+      notes: application.notes,
+      interview: application.interview,
+      timeline: application.timeline,
+      updatedAt: new Date().toISOString(),
+    });
+
+    // Notify recruiter channel as well
+    io.to(req.user.id.toString()).emit('candidate_stage_updated', {
+      candidateId: id,
+      applicationId: id,
+      stage,
+      notes: application.notes,
+    });
+  }
+
   return sendSuccess(res, application, `Candidate moved to ${stage.toUpperCase()}`);
+});
+
+/**
+ * @desc    Schedule interview for candidate application
+ * @route   POST /api/applications/:id/schedule-interview
+ * @access  Private (Employer/Recruiter/Admin)
+ */
+exports.scheduleInterviewForApplication = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { date, time, duration, roundType, location, notes, interviewer, meetingLink } = req.body;
+
+  if (!date || !time) {
+    return sendError(res, 'Interview date and time are required', 400);
+  }
+
+  const application = await Application.findById(id).populate('job', 'title company postedBy');
+  if (!application) {
+    return sendError(res, 'Application not found', 404);
+  }
+
+  const job = application.job;
+  const isOwner = job?.postedBy && job.postedBy.toString() === req.user.id.toString();
+  if (!isOwner && req.user.role !== 'admin') {
+    return sendError(res, 'Forbidden: You can only schedule interviews for your own job postings', 403);
+  }
+
+  application.status = 'interviewing';
+  application.interview = {
+    date,
+    time,
+    duration: duration || '45 mins',
+    roundType: roundType || 'Technical Interview',
+    location: location || 'Office HQ (On-site)',
+    notes: notes || '',
+    interviewer: interviewer || req.user.fullName || 'Hiring Lead',
+    meetingLink: meetingLink || 'https://meet.google.com/job-fiesta-interview',
+    status: 'Scheduled',
+  };
+
+  if (!application.timeline) application.timeline = [];
+  application.timeline.push({
+    stage: 'interviewing',
+    note: `Interview Scheduled: ${roundType || 'Interview'} on ${date} at ${time}`,
+    timestamp: new Date(),
+  });
+
+  await application.save();
+
+  // Create notification in DB
+  const notif = await Notification.create({
+    recipient: application.applicant,
+    sender: req.user.id,
+    title: 'Interview Scheduled! 📅',
+    message: `${job?.company || 'Recruiter'} scheduled ${roundType || 'an interview'} for ${job?.title || 'the position'} on ${date} at ${time}.`,
+    type: 'interview',
+    link: '/jobseeker-dashboard',
+  });
+
+  const io = req.app.get('io');
+  if (io) {
+    const applicantChannel = application.applicant.toString();
+    const notifPayload = {
+      id: notif._id.toString(),
+      _id: notif._id,
+      title: notif.title,
+      message: notif.message,
+      type: notif.type,
+      link: notif.link,
+      read: false,
+      unread: true,
+      time: 'Just now',
+      createdAt: notif.createdAt,
+    };
+
+    io.to(applicantChannel).emit('new_notification', notifPayload);
+    io.to(applicantChannel).emit('interview_scheduled', {
+      interview: {
+        id: `int-${application._id}`,
+        applicationId: application._id.toString(),
+        candidateId: application.applicant.toString(),
+        jobTitle: job?.title || 'Position',
+        company: job?.company || 'Company',
+        date,
+        time,
+        duration: duration || '45 mins',
+        roundType: roundType || 'Technical Interview',
+        location: location || 'Office HQ (On-site)',
+        notes: notes || '',
+        interviewer: interviewer || req.user.fullName || 'Hiring Lead',
+        meetingLink: meetingLink || 'https://meet.google.com/job-fiesta-interview',
+        status: 'Scheduled',
+      },
+      applicationId: application._id.toString(),
+      status: 'Interview Scheduled',
+      stage: 'interviewing',
+    });
+    io.to(applicantChannel).emit('application_status_updated', {
+      applicationId: application._id.toString(),
+      jobId: job?._id?.toString(),
+      jobTitle: job?.title,
+      company: job?.company,
+      stage: 'interviewing',
+      status: 'Interview Scheduled',
+      interview: application.interview,
+      timeline: application.timeline,
+      updatedAt: new Date().toISOString(),
+    });
+  }
+
+  return sendSuccess(res, application, 'Interview scheduled successfully and candidate notified in real time');
 });
 
 /**

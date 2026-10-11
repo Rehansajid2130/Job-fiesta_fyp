@@ -26,7 +26,8 @@ const Navbar = () => {
     unreadNotificationsCount, 
     unreadMessagesCount = 0,
     markNotificationAsRead, 
-    markAllNotificationsAsRead 
+    markAllNotificationsAsRead,
+    isSocketConnected
   } = useJobs();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -358,6 +359,38 @@ const Navbar = () => {
 
             {/* Right Navigation: Role Indicator, Browse Jobs, Notifications & Auth Buttons */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+
+              {/* Real-time Socket Live Sync Status Pill */}
+              {user && (
+                <div
+                  title={isSocketConnected ? "Real-time WebSocket connection active" : "Connecting to real-time sync service..."}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '5px 10px',
+                    borderRadius: '20px',
+                    backgroundColor: isSocketConnected ? '#ECFDF5' : '#FFFBEB',
+                    border: isSocketConnected ? '1px solid #A7F3D0' : '1px solid #FDE68A',
+                    fontSize: '0.74rem',
+                    fontWeight: '700',
+                    color: isSocketConnected ? '#065F46' : '#92400E',
+                    cursor: 'default',
+                    transition: 'all 0.25s ease'
+                  }}
+                  className="desktop-nav"
+                >
+                  <span style={{
+                    width: '7px',
+                    height: '7px',
+                    borderRadius: '50%',
+                    backgroundColor: isSocketConnected ? '#10B981' : '#F59E0B',
+                    boxShadow: isSocketConnected ? '0 0 6px rgba(16, 185, 129, 0.7)' : 'none',
+                    display: 'inline-block'
+                  }} />
+                  <span>{isSocketConnected ? 'Live Sync' : 'Reconnecting'}</span>
+                </div>
+              )}
 
               {/* Messages Link */}
               {user && (
