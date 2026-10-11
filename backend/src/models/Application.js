@@ -108,5 +108,8 @@ const applicationSchema = new mongoose.Schema(
 
 // Prevent duplicate applications from the same user to the same job
 applicationSchema.index({ job: 1, applicant: 1 }, { unique: true });
+applicationSchema.index({ applicant: 1, createdAt: -1 });
+applicationSchema.index({ job: 1, status: 1 });
+applicationSchema.index({ applicant: 1, status: 1 });
 
 module.exports = mongoose.model('Application', applicationSchema);

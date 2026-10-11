@@ -3,9 +3,12 @@ const router = express.Router();
 const {
   enhanceResumeContent,
   suggestSkills,
-  analyzeAtsScore
+  analyzeAtsScore,
+  uploadAndParseResume
 } = require('../controllers/resumeController');
+const { uploadResume } = require('../middleware/upload');
 
+router.post('/upload-and-parse', uploadResume.single('resume'), uploadAndParseResume);
 router.post('/enhance', enhanceResumeContent);
 router.post('/enhance-profile', (req, res) => {
   // Backwards compatibility endpoint for any legacy form calls

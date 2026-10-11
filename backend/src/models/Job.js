@@ -110,6 +110,9 @@ jobSchema.index({ title: 'text', company: 'text', description: 'text', skills: '
 
 // Compound indexes for faceted filtering, sorting, and recruiter lookups
 jobSchema.index({ status: 1, createdAt: -1 });
+jobSchema.index({ status: 1, category: 1, createdAt: -1 });
+jobSchema.index({ status: 1, workplaceType: 1, createdAt: -1 });
+jobSchema.index({ status: 1, salaryMin: 1, salaryMax: 1 });
 jobSchema.index({ jobType: 1, category: 1, location: 1 });
 jobSchema.index({ postedBy: 1, status: 1 });
 

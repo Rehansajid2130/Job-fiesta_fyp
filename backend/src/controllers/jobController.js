@@ -87,13 +87,26 @@ exports.getJobs = async (req, res, next) => {
       .limit(limitNum)
       .populate('postedBy', 'fullName email companyDetails avatar');
 
+    const totalPages = Math.ceil(total / limitNum) || 1;
+    const hasMore = pageNum < totalPages;
+
     res.status(200).json({
       success: true,
       total,
       page: pageNum,
-      pages: Math.ceil(total / limitNum) || 1,
+      pages: totalPages,
+      limit: limitNum,
       count: jobs.length,
+      hasMore,
       jobs,
+      data: jobs,
+      pagination: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages,
+        hasMore,
+      },
     });
   } catch (error) {
     next(error);

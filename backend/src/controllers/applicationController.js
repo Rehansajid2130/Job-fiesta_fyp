@@ -556,3 +556,166 @@ exports.getApplicationById = asyncHandler(async (req, res) => {
 
   return sendSuccess(res, application, 'Application details retrieved successfully');
 });
+
+/**
+ * @desc    Apply to a job with direct resume file upload (.pdf, .docx, .txt) & automated ATS parsing
+ * @route   POST /api/applications/:jobId/apply-with-resume
+ * @access  Private (Jobseeker, Admin)
+ */
+exports.applyWithResumeFile = asyncHandler(async (req, res) => {
+  const { jobId } = req.params;
+  const {
+    coverLetter,
+    expectedSalary,
+    portfolioUrl,
+    githubUrl,
+    experience,
+    screeningAnswers,
+  } = req.body;
+
+  if (!req.file && !req.body.resumeUrl) {
+    return sendError(res, 'Please upload a resume file (.pdf, .docx, or .txt) or provide a resumeUrl', 400);
+  }
+
+  const job = await Job.findById(jobId);
+  if (!job) {
+    return sendError(res, 'Job posting not found', 404);
+  }
+
+  if (job.status !== 'active') {
+    return sendError(res, 'This job posting is no longer active', 400);
+  }
+
+  // Check if already applied
+  const existing = await Application.findOne({
+    job: jobId,
+    applicant: req.user.id,
+  });
+  if (existing) {
+    return sendError(res, 'You have already applied for this position', 400);
+  }
+
+  let parsedSkills = [];
+  let parsedSummary = '';
+  let resumeFileUrl = req.body.resumeUrl || '';
+
+  if (req.file) {
+    resumeFileUrl = `/uploads/resumes/${req.file.filename}`;
+    try {
+      const { parseResumeFile } = require('../utils/resumeParser');
+      const parsed = await parseResumeFile(req.file.path, req.file.originalname);
+      parsedSkills = parsed.skills || [];
+      parsedSummary = parsed.summary || '';
+    } catch (parseErr) {
+      console.warn('[Resume Parse Warning]:', parseErr.message);
+    }
+  }
+
+  // Parse candidate skills from explicit body skills, parsed resume skills, or user profile
+  let explicitSkills = [];
+  if (req.body.skills) {
+    explicitSkills = Array.isArray(req.body.skills)
+      ? req.body.skills
+      : String(req.body.skills).split(',').map((s) => s.trim()).filter(Boolean);
+  }
+
+  const candidateSkills = [
+    ...new Set([
+      ...explicitSkills,
+      ...parsedSkills,
+      ...(req.user.skills || [])
+    ])
+  ];
+
+  const jobRequirements = [...new Set([...(job.skills || []), ...(job.tags || [])])];
+  const { matchScore, matchedSkills, missingSkills } = computeAtsMatch(candidateSkills, jobRequirements);
+
+  const application = await Application.create({
+    job: jobId,
+    applicant: req.user.id,
+    resumeUrl: resumeFileUrl || req.user.resumeUrl || '',
+    coverLetter: coverLetter || parsedSummary || '',
+    expectedSalary: expectedSalary || '',
+    portfolioUrl: portfolioUrl || '',
+    githubUrl: githubUrl || '',
+    experience: experience || '',
+    skills: candidateSkills,
+    matchScore,
+    matchedSkills,
+    missingSkills,
+    screeningAnswers: Array.isArray(screeningAnswers) ? screeningAnswers : [],
+    status: 'applied',
+    timeline: [
+      {
+        stage: 'applied',
+        note: req.file ? `Application submitted with uploaded resume file: ${req.file.originalname}` : 'Application submitted successfully',
+        timestamp: new Date(),
+      },
+    ],
+  });
+
+  // Increment applicantsCount on the job
+  await Job.findByIdAndUpdate(jobId, { $inc: { applicantsCount: 1 } });
+
+  // Create notification and emit real-time event for recruiter
+  if (job.postedBy) {
+    const notif = await Notification.create({
+      recipient: job.postedBy,
+      sender: req.user.id,
+      title: 'New Candidate Applied (Resume Attached) 📄',
+      message: `${req.user.fullName || 'A candidate'} applied for ${job.title} (${matchScore}% ATS Match).`,
+      type: 'application',
+      link: '/candidates',
+    });
+
+    const io = req.app.get('io');
+    if (io) {
+      const recruiterChannel = job.postedBy.toString();
+      io.to(recruiterChannel).emit('new_notification', {
+        id: notif._id.toString(),
+        _id: notif._id,
+        title: notif.title,
+        message: notif.message,
+        type: notif.type,
+        link: notif.link,
+        read: false,
+        unread: true,
+        time: 'Just now',
+        createdAt: notif.createdAt,
+      });
+
+      io.to(recruiterChannel).emit('new_candidate_applied', {
+        id: application._id.toString(),
+        applicationId: application._id.toString(),
+        name: req.user.fullName || 'Candidate Applicant',
+        email: req.user.email || '',
+        avatar: req.user.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces',
+        role: job.title,
+        company: job.company,
+        jobId: job._id.toString(),
+        stage: 'applied',
+        appliedDate: 'Just now',
+        matchScore,
+        matchedSkills,
+        missingSkills,
+        skills: candidateSkills,
+        resumeUrl: resumeFileUrl,
+      });
+    }
+  }
+
+  return sendSuccess(
+    res,
+    {
+      application,
+      parsedResume: {
+        fileName: req.file?.originalname,
+        fileUrl: resumeFileUrl,
+        extractedSkills: parsedSkills,
+        matchScore,
+      },
+    },
+    'Application submitted successfully with resume upload',
+    201
+  );
+});

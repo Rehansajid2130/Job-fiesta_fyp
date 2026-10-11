@@ -4,6 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const { Server } = require('socket.io');
 const connectDB = require('./config/db');
+const path = require('path');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 // Models for Socket.io persistence
@@ -264,6 +265,9 @@ app.use(
 );
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Serve uploaded static files (resumes, avatars, documents)
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Lightweight NoSQL Injection Protection Middleware
 app.use((req, res, next) => {

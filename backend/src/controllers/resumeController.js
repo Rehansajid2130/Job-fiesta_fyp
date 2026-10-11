@@ -203,3 +203,42 @@ exports.analyzeAtsScore = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Failed to analyze resume' });
   }
 };
+
+/**
+ * @desc    Upload resume file (.pdf, .docx, .txt) and parse into structured ATS fields
+ * @route   POST /api/resume/upload-and-parse
+ * @access  Public (or Authenticated)
+ */
+exports.uploadAndParseResume = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No resume file uploaded. Please attach a .pdf, .docx, or .txt file.',
+      });
+    }
+
+    const { parseResumeFile } = require('../utils/resumeParser');
+    const parsedData = await parseResumeFile(req.file.path, req.file.originalname);
+    const fileUrl = `/uploads/resumes/${req.file.filename}`;
+
+    return res.status(200).json({
+      success: true,
+      message: 'Resume file uploaded and parsed successfully',
+      data: {
+        fileUrl,
+        fileName: req.file.originalname,
+        storedFileName: req.file.filename,
+        fileSize: req.file.size,
+        mimeType: req.file.mimetype,
+        parsedData,
+      },
+    });
+  } catch (err) {
+    console.error('Error in uploadAndParseResume:', err);
+    return res.status(500).json({
+      success: false,
+      message: err.message || 'Failed to parse uploaded resume file',
+    });
+  }
+};
