@@ -7,8 +7,11 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "seed": "node src/seed.js",
-    "test": "node test-api.js",
-    "test:realtime": "node test-realtime.js"
+    "test": "node test-api.js && node test-backend-features.js",
+    "test:core": "node test-api.js",
+    "test:features": "node test-backend-features.js",
+    "test:realtime": "node test-realtime.js",
+    "test:all": "node test-api.js && node test-backend-features.js && node test-realtime.js"
   },
   "keywords": [
     "jobfiesta",
