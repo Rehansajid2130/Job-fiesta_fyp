@@ -569,6 +569,7 @@ const Navbar = () => {
                         Mark all read
                       </button>
                     )}
+                    </div>
                   </div>
 
                   <div style={{ maxHeight: '340px', overflowY: 'auto' }}>
