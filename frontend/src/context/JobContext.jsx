@@ -41,6 +41,48 @@ export const computeAtsMatch = (candidateSkills = [], jobRequirements = []) => {
   return { matchScore, matchedSkills: matched, missingSkills: missing };
 };
 
+// Web Audio API Synthesizer Chime (Zero external audio file dependency, pure procedural tone synthesis)
+export const playNotificationChime = () => {
+  try {
+    const isMuted = localStorage.getItem('jobfiesta_sound_muted') === 'true';
+    if (isMuted) return;
+
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+
+    const now = ctx.currentTime;
+    // Pleasant dual-tone bell chime: D5 (587.3Hz) followed by A5 (880Hz)
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(587.33, now);
+    gain1.gain.setValueAtTime(0.08, now);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.3);
+
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(880, now + 0.08);
+    gain2.gain.setValueAtTime(0.08, now + 0.08);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.48);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(now + 0.08);
+    osc2.stop(now + 0.48);
+  } catch (err) {
+    // Gracefully handle browser autoplay policies
+  }
+};
+
 const JobContext = createContext();
 
 export const useJobs = () => useContext(JobContext);
@@ -60,6 +102,37 @@ try {
 
 export const JobProvider = ({ children }) => {
   const { socket, isConnected } = useSocket() || {};
+
+  const [soundMuted, setSoundMuted] = useState(() => {
+    try {
+      return localStorage.getItem('jobfiesta_sound_muted') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const [hasNewNotificationPing, setHasNewNotificationPing] = useState(false);
+
+  const toggleSoundMuted = () => {
+    setSoundMuted((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('jobfiesta_sound_muted', String(next));
+      } catch {}
+      if (!next) {
+        playNotificationChime();
+      }
+      return next;
+    });
+  };
+
+  const triggerPing = () => {
+    setHasNewNotificationPing(true);
+    playNotificationChime();
+    setTimeout(() => {
+      setHasNewNotificationPing(false);
+    }, 4500);
+  };
 
   // Pure in-memory state: loaded from and synchronized with secure backend API
   const [jobs, setJobs] = useState(initialJobs);
@@ -352,6 +425,7 @@ export const JobProvider = ({ children }) => {
     // 1. In-app Push Notification
     const handleNewNotification = (notif) => {
       setNotifications(prev => [notif, ...prev.filter(n => n.id !== notif.id && n._id !== notif._id)]);
+      triggerPing();
       if (notif.title) {
         showToast(notif.title, 'info');
       }
@@ -359,6 +433,7 @@ export const JobProvider = ({ children }) => {
 
     // 2. Candidate Application Status Live Transition
     const handleApplicationStatusUpdated = (data) => {
+      triggerPing();
       setApplications(prev => {
         const updated = prev.map(app => {
           const isMatch =
@@ -392,6 +467,7 @@ export const JobProvider = ({ children }) => {
 
     // 3. Recruiter Event: New Candidate Applied
     const handleNewCandidateApplied = (cand) => {
+      triggerPing();
       setCandidates(prev => {
         const exists = prev.some(c => String(c.applicationId || c.id) === String(cand.applicationId || cand.id));
         if (exists) return prev;
@@ -402,6 +478,7 @@ export const JobProvider = ({ children }) => {
 
     // 4. Interview Scheduled Live
     const handleInterviewScheduled = (data) => {
+      triggerPing();
       if (data.interview) {
         setInterviews(prev => {
           const updated = [data.interview, ...prev.filter(i => i.id !== data.interview.id)];
@@ -448,6 +525,7 @@ export const JobProvider = ({ children }) => {
 
     // 6. Direct Message Notification
     const handleNewMessageNotification = (msgNotif) => {
+      triggerPing();
       showToast(msgNotif.title || 'New Message Received 💬', 'info');
       fetchConversations();
     };
@@ -1064,7 +1142,11 @@ export const JobProvider = ({ children }) => {
       cancelInterview,
       rescheduleInterview,
       activeResume,
-      saveActiveResume
+      saveActiveResume,
+      soundMuted,
+      toggleSoundMuted,
+      playNotificationChime,
+      hasNewNotificationPing
     }}>
       {children}
     </JobContext.Provider>

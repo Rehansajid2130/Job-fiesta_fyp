@@ -15,7 +15,9 @@ import {
   TrendingUp,
   Users2,
   Briefcase,
-  CheckCheck
+  CheckCheck,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import IconSwap from './IconSwap';
 
@@ -27,7 +29,10 @@ const Navbar = () => {
     unreadMessagesCount = 0,
     markNotificationAsRead, 
     markAllNotificationsAsRead,
-    isSocketConnected
+    isSocketConnected,
+    soundMuted,
+    toggleSoundMuted,
+    hasNewNotificationPing
   } = useJobs();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -416,23 +421,26 @@ const Navbar = () => {
                 >
                   <MessageSquare size={18} />
                   {unreadMessagesCount > 0 && (
-                    <span style={{
-                      position: 'absolute',
-                      top: '-3px',
-                      right: '-3px',
-                      backgroundColor: '#10B981',
-                      color: '#FFFFFF',
-                      fontSize: '10px',
-                      fontWeight: '800',
-                      borderRadius: '9999px',
-                      minWidth: '16px',
-                      height: '16px',
-                      padding: '0 4px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      border: '2px solid #FFFFFF'
-                    }}>
+                    <span
+                      className="live-message-pulse"
+                      style={{
+                        position: 'absolute',
+                        top: '-3px',
+                        right: '-3px',
+                        backgroundColor: '#10B981',
+                        color: '#FFFFFF',
+                        fontSize: '10px',
+                        fontWeight: '800',
+                        borderRadius: '9999px',
+                        minWidth: '16px',
+                        height: '16px',
+                        padding: '0 4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '2px solid #FFFFFF'
+                      }}
+                    >
                       {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
                     </span>
                   )}
@@ -452,19 +460,22 @@ const Navbar = () => {
                     width: '38px',
                     height: '38px',
                     borderRadius: '10px',
-                    border: '1px solid #E2E8F0',
+                    border: hasNewNotificationPing ? '1px solid #10B981' : '1px solid #E2E8F0',
                     backgroundColor: notifDropdownOpen ? '#F1F5F9' : '#FFFFFF',
                     color: '#334155',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)'
+                    boxShadow: hasNewNotificationPing
+                      ? '0 0 10px rgba(16, 185, 129, 0.45)'
+                      : '0 1px 3px rgba(0, 0, 0, 0.04)',
+                    transition: 'all 0.25s ease'
                   }}
                 >
                   <Bell size={18} />
                   <span className="t-badge" data-open={unreadNotificationsCount > 0 ? "true" : "false"}>
-                    <span className="t-badge-dot">
+                    <span className={`t-badge-dot ${hasNewNotificationPing || unreadNotificationsCount > 0 ? 'live-badge-pulse' : ''}`}>
                       {unreadNotificationsCount}
                     </span>
                   </span>
@@ -513,11 +524,36 @@ const Navbar = () => {
                         </span>
                       )}
                     </div>
-                    {unreadNotificationsCount > 0 && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      {/* Audio Chime Mute/Unmute Toggle */}
                       <button
                         type="button"
-                        onClick={markAllNotificationsAsRead}
+                        onClick={toggleSoundMuted}
+                        title={soundMuted ? "Sound muted — Click to enable real-time chimes" : "Sound active — Click to mute chimes"}
                         style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          background: soundMuted ? '#F1F5F9' : '#ECFDF5',
+                          border: soundMuted ? '1px solid #E2E8F0' : '1px solid #A7F3D0',
+                          padding: '3px 8px',
+                          borderRadius: '6px',
+                          color: soundMuted ? '#64748B' : '#065F46',
+                          cursor: 'pointer',
+                          fontSize: '0.72rem',
+                          fontWeight: '600',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        {soundMuted ? <VolumeX size={13} /> : <Volume2 size={13} />}
+                        <span>{soundMuted ? 'Muted' : 'Sound'}</span>
+                      </button>
+
+                      {unreadNotificationsCount > 0 && (
+                        <button
+                          type="button"
+                          onClick={markAllNotificationsAsRead}
+                          style={{
                           background: 'none',
                           border: 'none',
                           color: '#0C463B',
